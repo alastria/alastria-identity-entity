@@ -1,0 +1,33 @@
+<h1>LOGIN</h1>
+<form [formGroup]="formLogin" (ngSubmit)="onSubmit($event)" novalidate>
+  <div class="row justify-content-center">
+    <div class="col-md-4">
+      <div class="form-group">
+        <label for="user">Username</label>
+        <input formControlName="name" type="text" class="form-control" id="username">
+      </div>
+      <div *ngIf="!formLogin?.controls.name.valid && formLogin?.controls.name.touched" class="alert alert-danger">
+        Por favor introduzca un nombre de usuario
+      </div>
+    </div>
+  </div>
+  <div class="row justify-content-center">
+    <div class="col-md-4">
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input formControlName="password" type="password" class="form-control" id="Password" autocomplete=Off>
+      </div>
+      <div *ngIf="!formLogin?.controls.password.valid && formLogin?.controls.password.touched" class="alert alert-danger">
+        Por favor introduzca una contraseña
+      </div>
+    </div>
+  </div>
+  <div class="form-group button-login">
+    <button class="btn btn-primary" type="submit" [disabled]="!formLogin?.controls.name.valid  || !formLogin?.controls.password.valid"> 
+      Login 
+    </button>
+  </div>
+  <div *ngIf="errorLogin" class="alert alert-danger">
+    {{ errorLogin }}
+  </div>
+</form>
