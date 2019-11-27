@@ -1,0 +1,13 @@
+version: "2.0"
+
+services:
+
+  spBackend:
+    restart: on-failure:5
+    build: spBackend
+    image: serviceproviderback
+    ports:
+      - "10010:10010"
+    volumes:
+      - ./spBackend/api:/app/api
+    command: npm run start
