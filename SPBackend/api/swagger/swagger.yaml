@@ -1,0 +1,168 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: Service Provider backend
+# during dev, should point to your local machine
+host: localhost:10010
+# basePath prefixes all resource paths 
+basePath: /
+# 
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+paths:
+  /serviceProvider/alastriaId:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: serviceProvider.controller
+    post:
+      description: Create identity for a subject
+      # used as the method name of the controller
+      operationId: newAlastriaID
+      parameters:
+        - name: body
+          in: body
+          description: Necessary data to create a new Alastria ID
+          required: false
+          schema: 
+            $ref: "#/definitions/identityData"
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/alastriaIdentityResponse"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "503":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /serviceProvider/subjectCredential:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: serviceProvider.controller
+    post:
+      description: Create identity for a subject
+      # used as the method name of the controller
+      operationId: newSubjectCredential
+      parameters:
+        - name: body
+          in: body
+          description: Necessary data to add a new subject credential
+          required: false
+          schema: 
+            $ref: "#/definitions/subjectCredentialdata"
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/alastriaIdentityResponse"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "503":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /serviceProvider/{alastriaId}:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: serviceProvider.controller
+    get:
+      description: Get publick key of a Alastria Id
+      operationId: currentPublicKey
+      parameters:
+        - name: alastriaId
+          in: path
+          description: AlastriaId to find the publicKey
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/publickeyResponse"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "503":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /swagger:
+    x-swagger-pipe: swagger_raw
+# complex objects have schema definitions
+definitions:
+  alastriaIdentityResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  publickeyResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: object
+  ErrorResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  identityData:
+    type: "object"
+    required: [signedTX, address]
+    properties:
+      "signedTX":
+        type: string
+        example: "0x47f4c19df21b0f98718e1ed91c7d5c5f5511a64093b0a3dd943fb54a74eb16d2....0xe90eeaa7931c54966c2badf7bed04b5bb46c6dc4970bd32c05cc614c27f93d0e"
+      "address":
+        type: string
+        example: "0xAd50746a88e73ea0259392344b9e7D18EB2B9463"
+  subjectCredentialdata:
+    type: "object"
+    required: [signedTX]
+    properties:
+      "signedTX":
+        type: string
+        example: "0x47f4c19df21b0f98718e1ed91c7d5c5f5511a64093b0a3dd943fb54a74eb16d2....0xe90eeaa7931c54966c2badf7bed04b5bb46c6dc4970bd32c05cc614c27f93d0e"
