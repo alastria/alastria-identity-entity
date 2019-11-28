@@ -11,6 +11,7 @@ services:
     volumes:
       - ./spBackend/api:/app/api
     command: npm run start
+
   spFrontend:
     restart: on-failure:5
     build: spFrontend
