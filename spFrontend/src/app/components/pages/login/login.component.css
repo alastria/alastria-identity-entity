@@ -1,0 +1,43 @@
+h3 {
+    color: #325B8E;
+    margin-bottom: 50px;
+    font-family: -apple-system,Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    margin-top: 50px;
+    margin-bottom: 70px;
+}
+
+.left {
+    position: relative;
+    float: left;
+}
+
+.btn-primary {
+    background-color: #248BEA;
+}
+
+.right {
+    position: relative;
+    float: right;
+}
+
+.input {
+    margin-bottom: 20px;
+}
+
+.col-1 > span {
+    position: relative;
+    top: 3px;
+}
+
+.form-check-label, a.right {
+    color: #AFAFAF;
+}
+
+a.left {
+    color: #248BEA;
+}
+
+#separation {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
