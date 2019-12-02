@@ -11,8 +11,9 @@ h3 {
     float: left;
 }
 
-.btn-primary {
-    background-color: #248BEA;
+#normal-login > .btn-primary {
+    /* background-color: #248BEA; */
+    background-color: #325B8E;
 }
 
 .right {

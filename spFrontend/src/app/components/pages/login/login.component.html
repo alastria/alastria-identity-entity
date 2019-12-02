@@ -45,7 +45,7 @@
           </div>
         </div>
         <div class="col-4 col-sm-4 col-md-4 col-lg-4">
-          <div class="form-group right">
+          <div id="normal-login" class="form-group right">
             <button class="btn btn-primary" type="submit" [disabled]="!formLogin?.controls.name.valid  || !formLogin?.controls.password.valid"> 
               Login 
             </button>
@@ -75,7 +75,23 @@
         <hr>
       </div>
     </div>
-  <!-- </div> -->
-  <!-- </div> -->
+    <div id="social-login">
+      <app-button-login 
+        iconClass="fa fa-facebook-f" 
+        title="Log in with Facebook" 
+        [style]="styleButtonFacebook"
+        ></app-button-login>
+      <app-button-login 
+        iconClass="fa fa-google" 
+        title="Log in with Google" 
+        [style]="styleButtonGoogle"
+        imgUrl="../../../assets/images/google-icon.svg"
+        ></app-button-login>
+      <app-button-login 
+        iconClass="fa fa-google" 
+        title="Log in with AlastriaId" 
+        [style]="styleButtonAlastriaId"
+        imgUrl="../../../assets/images/alastria-icon.svg"></app-button-login>
+    </div>
 </div>
 

@@ -15,6 +15,22 @@ export class LoginComponent implements OnInit {
 
   formLogin: FormGroup;
   errorLogin: string;
+  styleButtonFacebook = {
+    color: '#5C7DC2',
+    backgroundIcon: '#45619D',
+    colorIcon: 'white'
+  };
+  styleButtonGoogle = {
+    color: '#4081ED',
+    backgroundIcon: 'white',
+    colorIcon: 'black'
+  };
+  styleButtonAlastriaId = {
+    color: '#00CAD6',
+    backgroundIcon: 'white',
+    colorIcon: 'black'
+  };
+
 
   constructor(private router: Router,
               private fb: FormBuilder,

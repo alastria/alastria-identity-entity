@@ -7,8 +7,13 @@ import { HttpClientModule } from '@angular/common/http';
 // SERVICES
 import { UserService } from 'src/app/services/user/user.service';
 
+// COMPONENTS
+import { ButtonLoginComponent } from 'src/app/components/common/button-login/button-login.component';
+
 @NgModule({
-  declarations: [],
+  declarations: [
+    ButtonLoginComponent
+  ],
   imports: [
     CommonModule,
     FormsModule,
@@ -22,7 +27,8 @@ import { UserService } from 'src/app/services/user/user.service';
   exports: [
     AngularFontAwesomeModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    ButtonLoginComponent
   ],
   bootstrap: []
 })
