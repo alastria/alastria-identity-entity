@@ -3,7 +3,10 @@
     <img *ngIf="imgUrl" [src]="imgUrl" [alt]="iconClass"/>
     <i *ngIf="!imgUrl" [class]="iconClass"></i>
   </div> 
-  <button id="button" class="btn btn-primary" [ngStyle]="{'background-color': style.color, 'border-color': style.color}">
+  <button id="button" 
+    class="btn btn-primary" 
+    [ngStyle]="{'background-color': style.color, 'border-color': style.color}"
+    (click)="onLogin()">
     <span>
       {{ title }}
     </span>

@@ -70,6 +70,10 @@ export class LoginComponent implements OnInit {
 
   }
 
+  handleLoginSocial(socialName: string) {
+    console.log(socialName);
+  }
+
   goToHome() {
 
     this.router.navigate(['/', 'home']);

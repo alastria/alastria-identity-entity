@@ -78,20 +78,27 @@
     <div id="social-login">
       <app-button-login 
         iconClass="fa fa-facebook-f" 
-        title="Log in with Facebook" 
+        title="Log in with Facebook"
+        socialName="facebook"
         [style]="styleButtonFacebook"
+        (handleLoginSocial)="handleLoginSocial($event)"
         ></app-button-login>
       <app-button-login 
         iconClass="fa fa-google" 
-        title="Log in with Google" 
+        title="Log in with Google"
+        socialName="google"
         [style]="styleButtonGoogle"
         imgUrl="../../../assets/images/google-icon.svg"
+        (handleLoginSocial)="handleLoginSocial($event)"
         ></app-button-login>
       <app-button-login 
         iconClass="fa fa-google" 
-        title="Log in with AlastriaId" 
+        title="Log in with AlastriaId"
+        socialName="alastriaId"
         [style]="styleButtonAlastriaId"
-        imgUrl="../../../assets/images/alastria-icon.svg"></app-button-login>
+        imgUrl="../../../assets/images/alastria-icon.svg"
+        (handleLoginSocial)="handleLoginSocial($event)">
+      </app-button-login>
     </div>
 </div>
 

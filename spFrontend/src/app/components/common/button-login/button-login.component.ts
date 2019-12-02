@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-button-login',
@@ -8,12 +8,18 @@ import { Component, OnInit, Input } from '@angular/core';
 export class ButtonLoginComponent implements OnInit {
   @Input() iconClass: string;
   @Input() title: string;
+  @Input() socialName: string;
   @Input() style: object = {};
   @Input() imgUrl: object = null;
+  @Output() handleLoginSocial = new EventEmitter<string>();
 
   constructor() { }
 
   ngOnInit() {
+  }
+
+  onLogin() {
+    this.handleLoginSocial.emit(this.socialName);
   }
 
 }
