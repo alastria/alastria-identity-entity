@@ -3,23 +3,27 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AngularFontAwesomeModule } from 'angular-font-awesome';
 import { HttpClientModule } from '@angular/common/http';
+import { QRCodeModule } from 'angularx-qrcode';
 
 // SERVICES
 import { UserService } from 'src/app/services/user/user.service';
 
 // COMPONENTS
 import { ButtonLoginComponent } from 'src/app/components/common/button-login/button-login.component';
+import { SimpleModalComponent } from 'src/app/components/common/simple-modal/simple-modal.component';
 
 @NgModule({
   declarations: [
-    ButtonLoginComponent
+    ButtonLoginComponent,
+    SimpleModalComponent
   ],
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    AngularFontAwesomeModule
+    AngularFontAwesomeModule,
+    QRCodeModule
   ],
   providers: [
     UserService
@@ -28,7 +32,9 @@ import { ButtonLoginComponent } from 'src/app/components/common/button-login/but
     AngularFontAwesomeModule,
     FormsModule,
     ReactiveFormsModule,
-    ButtonLoginComponent
+    QRCodeModule,
+    ButtonLoginComponent,
+    SimpleModalComponent,
   ],
   bootstrap: []
 })

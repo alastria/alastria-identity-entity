@@ -6,6 +6,8 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { UserService } from 'src/app/services/user/user.service';
 import { UserLogin } from 'src/app/models/userLogin/userLogin.model';
 
+declare var $: any;
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -45,7 +47,7 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  async onSubmit() {
+  async onSubmit(): Promise<any> {
 
     try {
       this.errorLogin = '';
@@ -70,11 +72,40 @@ export class LoginComponent implements OnInit {
 
   }
 
-  handleLoginSocial(socialName: string) {
-    console.log(socialName);
+  handleLoginSocial(socialName: string): void {
+
+    if (socialName === 'alastriaId') {
+      $('#myModal').modal('show');
+    } else {
+      console.log(socialName);
+    }
+
   }
 
-  goToHome() {
+  async handleLoginOk() {
+
+    try {
+      const user: UserLogin = {
+        name: 'test',
+        password: 'test'
+      };
+      const isLogin = await this.userService.login(user);
+
+      if (isLogin) {
+        $('#myModal').modal('hide');
+        this.router.navigate(['/', 'home']);
+      }
+    } catch (error) {
+      console.log('Error ', error);
+      if (error && error.status === 403) {
+        this.errorLogin = 'Usuario o contraseña incorrectos';
+      } else {
+        this.errorLogin = (error && error.message) ? error.message : 'Internal server error';
+      }
+    }
+  }
+
+  goToHome(): void {
 
     this.router.navigate(['/', 'home']);
 
