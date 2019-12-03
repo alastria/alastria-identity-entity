@@ -1,0 +1,9 @@
+{
+  "Log": {
+    "level": "debug"
+  },
+  "nodeUrl": {
+    "local": "http://localhost:8545",
+    "alastria": ""
+  }
+}

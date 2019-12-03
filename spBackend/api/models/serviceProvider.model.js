@@ -6,7 +6,6 @@ const web3Helper = require('../helpers/web3.helper')
 
 const web3 = web3Helper.getWeb3()
 
-
 module.exports = {
   createAlastriaID,
   addSubjectCredential,
