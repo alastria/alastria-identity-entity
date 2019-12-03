@@ -14,12 +14,14 @@ import { HomeComponent } from './components/pages/home/home.component';
 
 // SERVICES
 import { AuthGuardService } from './services/auth/auth-guard.service';
+import { HeaderComponent } from './components/shared/header/header.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
-    HomeComponent
+    HomeComponent,
+    HeaderComponent
   ],
   imports: [
     BrowserModule,
