@@ -6,11 +6,10 @@ import { HttpClientModule } from '@angular/common/http';
 // MODULES
 import { AppRoutingModule } from './app-routing.module';
 import { LoginModule } from './modules/login/login.module';
+import { HomeModule } from './modules/home/home.module';
 
 // COMPONENTS
 import { AppComponent } from './app.component';
-import { LoginComponent } from './components/pages/login/login.component';
-import { HomeComponent } from './components/pages/home/home.component';
 
 // SERVICES
 import { AuthGuardService } from './services/auth/auth-guard.service';
@@ -19,16 +18,15 @@ import { HeaderComponent } from './components/shared/header/header.component';
 @NgModule({
   declarations: [
     AppComponent,
-    LoginComponent,
-    HomeComponent,
-    HeaderComponent
+    HeaderComponent,
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,
     HttpClientModule,
-    LoginModule
+    LoginModule,
+    HomeModule
   ],
   providers: [AuthGuardService],
   bootstrap: [AppComponent]
