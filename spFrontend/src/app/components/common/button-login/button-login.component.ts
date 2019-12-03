@@ -18,8 +18,11 @@ export class ButtonLoginComponent implements OnInit {
   ngOnInit() {
   }
 
+  /**
+   * Function for emit social name information when click in button
+   */
   onLogin() {
-    this.handleLoginSocial.emit(this.socialName);
-  }
+      this.handleLoginSocial.emit(this.socialName);
+    }
 
-}
+  }

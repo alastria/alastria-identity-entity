@@ -11,6 +11,10 @@ export class UserService {
 
   constructor(private http: HttpClient) { }
 
+  /**
+   * @param user - data of user for login in the aplication
+   * @returns message correct or incorrect login
+   */
   async login(user: UserLogin): Promise<any> {
     try {
       const authUrl = '../../../assets/auth.json';
@@ -38,19 +42,31 @@ export class UserService {
     }
   }
 
+  /**
+   * Check if user is authenticated
+   * @returns - true or false id the user is authenticated
+   */
   isAuthenticated(): boolean {
     const currentUser = this.getUserLoggedIn();
 
     return (currentUser && currentUser.isAuthenticated) ? currentUser.isAuthenticated : false;
   }
 
+  /**
+   * Get data of user
+   * @returns user
+   */
   getUserLoggedIn(): UserLogin {
     return JSON.parse(sessionStorage.getItem('currentUser'));
   }
 
+  /**
+   * set data of user in sessionStorage
+   * @param user - data of user
+   */
   setUserLoggedIn(user: UserLogin): void {
-    sessionStorage.setItem('currentUser', JSON.stringify(user));
+      sessionStorage.setItem('currentUser', JSON.stringify(user));
+    }
   }
-}
 
 

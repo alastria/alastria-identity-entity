@@ -47,6 +47,9 @@ export class LoginComponent implements OnInit {
     });
   }
 
+  /**
+   * Function for submit login
+   */
   async onSubmit(): Promise<any> {
 
     try {
@@ -72,6 +75,10 @@ export class LoginComponent implements OnInit {
 
   }
 
+  /**
+   * Function that handle if click in any social button
+   * @param socialName - type social (facebook, google or alastriaId)
+   */
   handleLoginSocial(socialName: string): void {
 
     if (socialName === 'alastriaId') {
@@ -82,7 +89,10 @@ export class LoginComponent implements OnInit {
 
   }
 
-  async handleLoginOk() {
+  /**
+   * Function handle when click ok in modal simple
+   */
+  async handleLoginOk(): Promise<any> {
 
     try {
       const user: UserLogin = {

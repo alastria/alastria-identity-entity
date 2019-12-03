@@ -13,7 +13,10 @@ export class SimpleModalComponent implements OnInit {
   ngOnInit() {
   }
 
-  loginOk() {
-    this.handleLoginOk.emit();
+  /**
+   * Function for emit information when click ok
+   */
+  loginOk(): void {
+      this.handleLoginOk.emit();
+    }
   }
-}
