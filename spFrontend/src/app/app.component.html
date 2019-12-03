@@ -1,9 +1,9 @@
-<div class="content">
-  <div  class="app">
+<div class="content" [ngClass]="{'alastria-background-general': router.url !== '/login'}">
+  <div  class="app"  [ngClass]="{'app-login': router.url === '/login', 'app-general': router.url !== '/login'}">
     <router-outlet>
     </router-outlet>
   </div>
-  <div id="alastria-background">
+  <div id="alastria-background-login" *ngIf="router.url === '/login'">
     <div>
       <img src="../assets/images/logobw.svg" alt="alastria-logo" />
     </div>

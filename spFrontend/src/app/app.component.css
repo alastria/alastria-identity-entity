@@ -3,7 +3,12 @@
     height: 100%;
 }
 
-#alastria-background {
+.alastria-background-general {
+    background-color: #325B8E;
+    background-image: linear-gradient(rgb(50, 91, 142, 0), rgb(0, 202, 214, 1));
+}
+
+#alastria-background-login {
     background-color: #325B8E;
     background-image: linear-gradient(rgb(50, 91, 142, 0), rgb(0, 202, 214, 1));
     width: 50%;
@@ -12,16 +17,26 @@
     float: right;
 }
 
-.app {
-    width: 50%;
-    position: relative;
-    float: left;
-    text-align:center
-}
-
-#alastria-background > div {
+#alastria-background-login > div {
     display: table-cell;
     vertical-align: middle;
+}
+
+.app {
+    position: relative;
+    float: left;
+    text-align:center;
+    height: 100%;
+}
+
+.app-login {
+    width: 50%;
+}
+
+.app-general {
+    width: 100%;
+    -webkit-transition: width 2s; /* Safari prior 6.1 */
+    transition: width 2s;
 }
 
 div > img{
