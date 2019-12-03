@@ -16,7 +16,8 @@
   },
   "devDependencies": {
     "should": "7.1.0",
-    "supertest": "1.0.0"
+    "supertest": "1.0.0",
+    "load-json-file": "^5.2.0"
   },
   "scripts": {
     "start": "node app.js",

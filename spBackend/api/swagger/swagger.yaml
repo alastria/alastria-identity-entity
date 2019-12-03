@@ -24,7 +24,7 @@ paths:
     post:
       description: Create identity for a subject
       # used as the method name of the controller
-      operationId: newAlastriaID
+      operationId: createAlastriaID
       parameters:
         - name: body
           in: body
@@ -61,7 +61,7 @@ paths:
     post:
       description: Create identity for a subject
       # used as the method name of the controller
-      operationId: newSubjectCredential
+      operationId: addSubjectCredential
       parameters:
         - name: body
           in: body
@@ -97,7 +97,7 @@ paths:
     x-swagger-router-controller: serviceProvider.controller
     get:
       description: Get publick key of a Alastria Id
-      operationId: currentPublicKey
+      operationId: getCurrentPublicKey
       parameters:
         - name: alastriaId
           in: path

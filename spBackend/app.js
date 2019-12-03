@@ -3,37 +3,50 @@
 var SwaggerExpress = require('swagger-express-mw');
 const Log = require('log')
 const web3Helper = require('./api/helpers/web3.helper')
+const configHelper = require('./api/helpers/config.helper')
+const loadJsonFile = require('load-json-file')
 const cors = require('cors')
-var app = require('express')();
+let app = require('express')();
+let myConfig = {}
 
-const nodeurl = 'http://localhost:8545'
 const log = new Log('debug')
+
+const pathFile = 'config.json'
 
 
 module.exports = app; // for testing
 
-var config = {
-  appRoot: __dirname // required config
-};
+loadJsonFile(pathFile) 
+.then(config => {
+  configHelper.setConfig(config)
+  myConfig = configHelper.getConfig()
+  const nodeurl = myConfig.nodeUrl.local
+  web3Helper.instanceWeb3(nodeurl)
+  .then(web3Instantiated => {
 
-web3Helper.instanceWeb3(nodeurl)
-.then(web3Instantiated => {
-
-  log.debug('[App] Web3 instantiated correctly')
-  web3Helper.setWeb3(web3Instantiated)
+    var config = {
+      appRoot: __dirname // required config
+    };
   
-  SwaggerExpress.create(config, function(err, swaggerExpress) {
-    if (err) { throw err; }
+    log.debug('[App] -----> Web3 instantiated correctly')
+    web3Helper.setWeb3(web3Instantiated)
+    
+    SwaggerExpress.create(config, function(err, swaggerExpress) {
+      if (err) { throw err; }
+    
+      // install middleware
+      swaggerExpress.register(app);
+    
+      var port = process.env.PORT || 10010;
+      app.listen(port);
   
-    // install middleware
-    swaggerExpress.register(app);
+      // Enable CORS
+      app.use(cors());
   
-    var port = process.env.PORT || 10010;
-    app.listen(port);
-
-    // Enable CORS
-    app.use(cors());
-
-  });
+    });
+  })
+})
+.catch(error => {
+  log.error(`${error}`)
 })
 
