@@ -1,33 +1,103 @@
-<h1>LOGIN</h1>
-<form [formGroup]="formLogin" (ngSubmit)="onSubmit($event)" novalidate>
-  <div class="row justify-content-center">
-    <div class="col-md-4">
-      <div class="form-group">
-        <label for="user">Username</label>
-        <input formControlName="name" type="text" class="form-control" id="username">
-      </div>
-      <div *ngIf="!formLogin?.controls.name.valid && formLogin?.controls.name.touched" class="alert alert-danger">
-        Por favor introduzca un nombre de usuario
-      </div>
-    </div>
-  </div>
-  <div class="row justify-content-center">
-    <div class="col-md-4">
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input formControlName="password" type="password" class="form-control" id="Password" autocomplete=Off>
-      </div>
-      <div *ngIf="!formLogin?.controls.password.valid && formLogin?.controls.password.touched" class="alert alert-danger">
-        Por favor introduzca una contraseña
+<div class="container">
+  <h3>Alastria Service Provider</h3>
+  <form [formGroup]="formLogin" (ngSubmit)="onSubmit($event)" novalidate>
+    <div class="row input justify-content-center">
+      <div class="col-sm-12 col-md-10 col-lg-8">
+        <label class="sr-only" for="user">Username</label>
+        <div class="input-group mb-2">
+          <div class="input-group-prepend">
+            <div class="input-group-text">
+              <fa name="user"></fa> 
+            </div>
+          </div>
+          <input formControlName="name" id="username" type="text" class="form-control" placeholder="Username or email">
+        </div>
+        <div *ngIf="!formLogin?.controls.name.valid && formLogin?.controls.name.touched" class="alert alert-danger">
+          Por favor introduzca un nombre de usuario
+        </div>
       </div>
     </div>
+    <div class="row input justify-content-center">
+      <div class="col-sm-12 col-md-10 col-lg-8">
+        <label class="sr-only" for="user">Password</label>
+        <div class="input-group mb-2">
+          <div class="input-group-prepend">
+            <div class="input-group-text">
+                <fa name="key"></fa> 
+            </div>
+          </div>
+          <input formControlName="password" id="password" type="password" class="form-control" placeholder="Password" autocomplete=Off>
+        </div>
+        <div *ngIf="!formLogin?.controls.password.valid && formLogin?.controls.password.touched" class="alert alert-danger">
+          Por favor introduzca una contraseña
+        </div>
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-8 col-sm-8 col-md-6 col-lg-4">
+        <div class="form-check left">
+          <input class="form-check-input" type="checkbox" id="autoSizingCheck2">
+          <label class="form-check-label" for="autoSizingCheck2">
+            Remember me
+          </label>
+        </div>
+      </div>
+      <div class="col-4 col-sm-4 col-md-4 col-lg-4">
+        <div id="normal-login" class="form-group right">
+          <button class="btn btn-primary" type="submit" [disabled]="!formLogin?.controls.name.valid  || !formLogin?.controls.password.valid"> 
+            Login 
+          </button>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="errorLogin" class="alert alert-danger">
+      {{ errorLogin }}
+    </div>
+  </form>
+  <div class="row justify-content-center">
+      <div class="col-8 col-sm-8 col-md-6 col-lg-4">
+        <a class="left" href="#">Register now</a>
+      </div>
+      <div class="col-4 col-sm-4 col-md-4 col-lg-4">
+        <a class="right" href="#">Forgot password?</a>
+      </div>
   </div>
-  <div class="form-group button-login">
-    <button class="btn btn-primary" type="submit" [disabled]="!formLogin?.controls.name.valid  || !formLogin?.controls.password.valid"> 
-      Login 
-    </button>
+  <div id="separation" class="row justify-content-center">
+    <div class="col-5">
+      <hr>
+    </div>
+    <div class="col-1">
+      <span>or</span>
+    </div>
+    <div class="col-5">
+      <hr>
+    </div>
   </div>
-  <div *ngIf="errorLogin" class="alert alert-danger">
-    {{ errorLogin }}
+  <div id="social-login">
+    <app-button-login 
+      iconClass="fa fa-facebook-f" 
+      title="Log in with Facebook"
+      socialName="facebook"
+      [style]="styleButtonFacebook"
+      (handleLoginSocial)="handleLoginSocial($event)"
+      ></app-button-login>
+    <app-button-login 
+      iconClass="fa fa-google" 
+      title="Log in with Google"
+      socialName="google"
+      [style]="styleButtonGoogle"
+      imgUrl="../../../assets/images/google-icon.svg"
+      (handleLoginSocial)="handleLoginSocial($event)"
+      ></app-button-login>
+    <app-button-login 
+      iconClass="fa fa-google" 
+      title="Log in with AlastriaId"
+      socialName="alastriaId"
+      [style]="styleButtonAlastriaId"
+      imgUrl="../../../assets/images/alastria-icon.svg"
+      (handleLoginSocial)="handleLoginSocial($event)">
+    </app-button-login>
+    <app-simple-modal (handleLoginOk)="handleLoginOk()"></app-simple-modal>
   </div>
-</form>
+</div>
+

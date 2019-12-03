@@ -1,0 +1,42 @@
+.container-button {
+    display: block;
+    margin: auto;
+    margin-bottom: 10px;
+    width: 250px;
+    height: 38px;
+}
+
+button {
+    position: relative;
+    float: left;
+    margin-right: 10px;
+    height: 100%;
+    width: 200px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+div#icon {
+    position: relative;
+    float: left;
+    width: 40px;
+    height: 38px;
+    border-top-left-radius: 0.25rem;
+    border-bottom-left-radius: 0.25rem;
+    border: 1px solid;
+}
+
+i {
+    font-size: x-large;
+    vertical-align: -webkit-baseline-middle;
+}
+
+img {
+    vertical-align: -webkit-baseline-middle;
+    width: 24px;
+}
+
+span {
+    position: relative;
+    float: left;
+}

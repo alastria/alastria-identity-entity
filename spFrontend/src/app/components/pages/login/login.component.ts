@@ -6,6 +6,8 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { UserService } from 'src/app/services/user/user.service';
 import { UserLogin } from 'src/app/models/userLogin/userLogin.model';
 
+declare var $: any;
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -15,6 +17,22 @@ export class LoginComponent implements OnInit {
 
   formLogin: FormGroup;
   errorLogin: string;
+  styleButtonFacebook = {
+    color: '#5C7DC2',
+    backgroundIcon: '#45619D',
+    colorIcon: 'white'
+  };
+  styleButtonGoogle = {
+    color: '#4081ED',
+    backgroundIcon: 'white',
+    colorIcon: 'black'
+  };
+  styleButtonAlastriaId = {
+    color: '#00CAD6',
+    backgroundIcon: 'white',
+    colorIcon: 'black'
+  };
+
 
   constructor(private router: Router,
               private fb: FormBuilder,
@@ -29,7 +47,10 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  async onSubmit() {
+  /**
+   * Function for submit login
+   */
+  async onSubmit(): Promise<any> {
 
     try {
       this.errorLogin = '';
@@ -54,7 +75,47 @@ export class LoginComponent implements OnInit {
 
   }
 
-  goToHome() {
+  /**
+   * Function that handle if click in any social button
+   * @param socialName - type social (facebook, google or alastriaId)
+   */
+  handleLoginSocial(socialName: string): void {
+
+    if (socialName === 'alastriaId') {
+      $('#myModal').modal('show');
+    } else {
+      console.log(socialName);
+    }
+
+  }
+
+  /**
+   * Function handle when click ok in modal simple
+   */
+  async handleLoginOk(): Promise<any> {
+
+    try {
+      const user: UserLogin = {
+        name: 'test',
+        password: 'test'
+      };
+      const isLogin = await this.userService.login(user);
+
+      if (isLogin) {
+        $('#myModal').modal('hide');
+        this.router.navigate(['/', 'home']);
+      }
+    } catch (error) {
+      console.log('Error ', error);
+      if (error && error.status === 403) {
+        this.errorLogin = 'Usuario o contraseña incorrectos';
+      } else {
+        this.errorLogin = (error && error.message) ? error.message : 'Internal server error';
+      }
+    }
+  }
+
+  goToHome(): void {
 
     this.router.navigate(['/', 'home']);
 
