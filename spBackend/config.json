@@ -4,6 +4,6 @@
   },
   "nodeUrl": {
     "local": "http://localhost:8545",
-    "alastria": ""
+    "alastria": "http://63.33.206.111/rpc"
   }
 }
