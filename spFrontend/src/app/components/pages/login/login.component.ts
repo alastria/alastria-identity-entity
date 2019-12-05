@@ -62,7 +62,7 @@ export class LoginComponent implements OnInit {
       const isLogin = await this.userService.login(user);
 
       if (isLogin) {
-        this.router.navigate(['/', 'home']);
+        this.router.navigate(['/', 'profile']);
       }
     } catch (error) {
       console.log('Error ', error);
@@ -103,7 +103,7 @@ export class LoginComponent implements OnInit {
 
       if (isLogin) {
         $('#myModal').modal('hide');
-        this.router.navigate(['/', 'home']);
+        this.router.navigate(['/', 'profile']);
       }
     } catch (error) {
       console.log('Error ', error);
