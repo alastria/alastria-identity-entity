@@ -7,11 +7,13 @@ import { AuthGuardService } from './services/auth/auth-guard.service';
 // COMPONENTS
 import { LoginComponent } from './components/pages/login/login.component';
 import { HomeComponent } from './components/pages/home/home.component';
+import { ProfileComponent } from './components/pages/profile/profile.component';
 
 const APP_ROUTES: Routes = [
   { path: 'login', component: LoginComponent,  pathMatch: 'full'},
   { path: 'home', component: HomeComponent,  pathMatch: 'full', canActivate: [ AuthGuardService ]},
-  { path: '**', pathMatch: 'full', redirectTo: '/login'}
+  { path: 'profile', component: ProfileComponent,  pathMatch: 'full', canActivate: [ AuthGuardService ]},
+  { path: '**', pathMatch: 'full', redirectTo: '/home'}
 ];
 @NgModule({
   imports: [RouterModule.forRoot(APP_ROUTES)],
