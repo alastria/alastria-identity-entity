@@ -13,6 +13,8 @@ import { UserLogin } from 'src/app/models/userLogin/userLogin.model';
 })
 export class HomeComponent implements OnInit {
   user: UserLogin;
+  qrAlastriaId: any;
+  qrCredentials: any;
 
   constructor(private userService: UserService) { }
 
@@ -20,4 +22,19 @@ export class HomeComponent implements OnInit {
     this.user = this.userService.getUserLoggedIn();
   }
 
+  generateQrAlastriaId() {
+    this.qrAlastriaId = 'test';
+  }
+
+  closeQrAlastriaId(): void {
+    this.qrAlastriaId = null;
+  }
+
+  generateQrCredentials() {
+    this.qrCredentials = 'test2';
+  }
+
+  closeQrCredentials(): void {
+    this.qrCredentials = null;
+  }
 }
