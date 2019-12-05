@@ -20,9 +20,9 @@ export class UserService {
       const authUrl = '../../../assets/auth.json';
       let isLogin = false;
 
-      const authCredentials = await this.http.get(authUrl).toPromise();
+      const authCredentials: any = await this.http.get(authUrl).toPromise();
 
-      if (JSON.stringify(user) === JSON.stringify(authCredentials)) {
+      if (user.name === authCredentials.name && user.password === authCredentials.password) {
         isLogin = true;
       } else {
         const error = {
@@ -32,6 +32,8 @@ export class UserService {
 
         throw error;
       }
+
+      user.email = authCredentials.email;
       user.isAuthenticated = true;
       this.setUserLoggedIn(user);
 

@@ -9,11 +9,13 @@ import { QRCodeModule } from 'angularx-qrcode';
 import { UserService } from 'src/app/services/user/user.service';
 
 // COMPONENTS
+import { LoginComponent } from 'src/app/components/pages/login/login.component';
 import { ButtonLoginComponent } from 'src/app/components/common/button-login/button-login.component';
 import { SimpleModalComponent } from 'src/app/components/common/simple-modal/simple-modal.component';
 
 @NgModule({
   declarations: [
+    LoginComponent,
     ButtonLoginComponent,
     SimpleModalComponent
   ],

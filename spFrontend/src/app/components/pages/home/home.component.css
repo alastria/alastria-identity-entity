@@ -3,3 +3,21 @@
     height: 100%;
     margin: auto;
 }
+
+#form {
+    margin-left: 50px;
+}
+
+h3, h4 {
+    position: relative;
+    float: left;
+}
+
+h3 {
+    color: #325B8E;
+    margin-top: 50px;
+}
+
+h4 {
+    margin-top: 20px;
+}
