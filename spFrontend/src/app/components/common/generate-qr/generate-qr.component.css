@@ -1,0 +1,11 @@
+fa {
+    position: relative;
+    float: right;
+    margin-left: 5px;
+    cursor: pointer;
+    font-size: x-large;
+}
+
+h3, fa {
+    color: #325B8E;
+}
