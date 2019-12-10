@@ -9,6 +9,8 @@ services:
     environment: 
       - NODE_ENDPOINT=localEndpoint
       # - NODE_ENDPOINT=alastria
+    links:
+      - ganache:ganache
     ports:
       - "10010:10010"
     volumes:
