@@ -21,7 +21,7 @@ loadJsonFile(pathFile)
   configHelper.setConfig(config)
   myConfig = configHelper.getConfig()
 
-  if(process.env.NODE_ENDPOINT == 'localEndpint') {
+  if(process.env.NODE_ENDPOINT == 'localEndpoint') {
     nodeurl = myConfig.nodeUrl.local
   } else if(process.env.NODE_ENDPOINT == 'alastria') {
     nodeurl = myConfig.nodeUrl.alastria
