@@ -7,8 +7,8 @@ services:
     build: spBackend
     image: serviceproviderback
     environment: 
-      - NODE_ENDPOINT=localEndpint
-      # - NODE_ENDPOINT=alastria
+      #- NODE_ENDPOINT=localEndpint
+      - NODE_ENDPOINT=alastria
     ports:
       - "10010:10010"
     volumes:
