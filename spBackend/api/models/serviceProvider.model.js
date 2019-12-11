@@ -26,19 +26,17 @@ function addSubjectCredential() {
   })
 }
 
-function getCurrentPublicKey() {
+function getCurrentPublicKey(subject) {
   return new Promise((resolve, reject) => {
-    let subject = 0x57d2fc4a9818c81c2b5dedf60c32aaadbbbdd109 // TODO borrar
     let currentPubKey = transactionFactory.publicKeyRegistry.getCurrentPublicKey(web3, subject)
     web3.eth.call(currentPubKey)
-      .then(result => {
-        let publicKey = web3.utils.hexToUtf8(result)
-        console.log('RESULT ----->', publicKey.substr(1))
-        resolve(publicKey.substr(1))
-      })
-      .catch(error => {
-        console.log('Error -------->', error)
-        reject(error)
-      })
+    .then(result => {
+      let publicKey = web3.utils.hexToUtf8(result)
+      resolve(publicKey.substr(1))
+    })
+    .catch(error => {
+      console.log('Error -------->', error)
+      reject(error)
+    })
   })
 }

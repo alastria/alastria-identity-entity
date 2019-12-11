@@ -14,9 +14,11 @@ schemes:
 # format of bodies a client can send (Content-Type)
 consumes:
   - application/json
+  - text/plain
 # format of the responses to the client (Accepts)
 produces:
   - application/json
+  - text/plain
 paths:
   /serviceProvider/alastriaId:
     # binds a127 app logic to a route
@@ -132,17 +134,13 @@ paths:
 # complex objects have schema definitions
 definitions:
   alastriaIdentityResponse:
-    required:
-      - message
     properties:
-      message:
+      alastriaID:
         type: string
   publickeyResponse:
-    required:
-      - message
     properties:
-      message:
-        type: object
+      publicKey:
+        type: string
   ErrorResponse:
     required:
       - message
