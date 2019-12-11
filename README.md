@@ -1,4 +1,7 @@
 # Alastria Identity Service Provider
+This is an example of _Service Provider_ in Alastria. You can try the demo online accessing http://52.16.248.226/.
+
+
 This repository contains two main dockers, **spBackend** and **spFrontend**.
 
 This is an example of a Service Provider with Alastria.
@@ -11,9 +14,9 @@ Frontend of the Service Provider.
 
 ## How to run the Service Provider
 ### Requirements
-You need to install [`npm`](https://www.npmjs.com/get-npm), [`docker-compose`](https://docs.docker.com/compose/install/) and [`ganache-cli`](https://github.com/trufflesuite/ganache-cli).
+You need to install [`npm`](https://www.npmjs.com/get-npm) and [`docker-compose`](https://docs.docker.com/compose/install/).
 ### Install spFrontend
-First of all, you need to install some packages for the Frontend to work. In order to do that, move to the frontend directory `cd spFrontend`, then:
+First of all, you need to install some packages for the Frontend to work. In order to do that, move to the frontend directory `cdspFrontend`, then:
 ```sh
 npm install
 ```
@@ -22,11 +25,14 @@ After that, build and compile the project:
 npm run build
 ```
 ## Run the Service Provider
-Before running the Service Provider, if you want to run it locally, you need to start the `ganache-cli`:
-```sh
-ganache-cli
+Before running the Service Provider, you can change the blockchain node IP in the file [docker-compose.yaml](https://github.com/alastria/alastria-identity-serviceProvider/blob/develop/docker-compose.yaml). At the moment, you can choose one of this (**only one**):
+```yaml
+- NODE_ENDPOINT=localEndpoint
+#- NODE_ENDPOINT=alastria
 ```
-Once `ganache` is up, just run the dockers:
+In the example above, a ganache will run locally, so you will need to deploy the _smart contracts_ manually.
+
+Finally, just **run the dockers**:
 ```sh
 docker-compose up
 ```
