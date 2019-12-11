@@ -1,39 +1,47 @@
 <div class="container">
-  <div id="form">
     <div class="row">
-      <div class="col-sm-12">
-        <h3>Welcome to your home</h3>
+      <div class="col-12">
+        <h3>
+          <fa name="user"></fa>
+          Your Profile
+        </h3>
       </div>
     </div>
     <div class="row">
-      <div class="col-sm-12">
-        <h4>Personal Data</h4>
-      </div>
-    </div>
-    <app-disabled-form [user]="user"></app-disabled-form>
-  </div>
-  <div id="generate-qr">
-    <div class="row justify-content-center">
-      <div class="col-sm-12 col-md-12 col-lg-4">
-        <app-generate-qr
-          title="Create AlastriaId"
-          textButton="Generate QR"
-          [qrData]="qrAlastriaId"
-          [size]="300"
-          (handleGenerateQr)="generateQrAlastriaId()"
-          (handleCloseQr)="closeQrAlastriaId()">
-        </app-generate-qr>
-      </div>
-      <div class="col-sm-12 col-md-12 col-lg-4">
-          <app-generate-qr
-            title="Obtain Credentials"
-            textButton="Generate QR"
-            [qrData]="qrCredentials"
-            [size]="300"
-            (handleGenerateQr)="generateQrCredentials()"
-            (handleCloseQr)="closeQrCredentials()">
-          </app-generate-qr>
+      <div id="personalData" class="col-sm-6">
+        <div class="row">
+          <div class="col-sm-12">
+            <h4>Personal Data</h4>
+          </div>
         </div>
+        <app-disabled-form [user]="user"></app-disabled-form>
+      </div>
+      <div class="col-sm-6">
+        <div id="generate-qr">
+          <h4>Actions</h4>
+          <!-- <div class="row justify-content-center">
+            <div class="col-sm-12 col-md-12 col-lg-4">
+              <app-generate-qr
+                title="Create AlastriaId"
+                textButton="Generate QR"
+                [qrData]="qrAlastriaId"
+                [size]="300"
+                (handleGenerateQr)="generateQrAlastriaId()"
+                (handleCloseQr)="closeQrAlastriaId()">
+              </app-generate-qr>
+            </div>
+            <div class="col-sm-12 col-md-12 col-lg-4">
+                <app-generate-qr
+                  title="Obtain Credentials"
+                  textButton="Generate QR"
+                  [qrData]="qrCredentials"
+                  [size]="300"
+                  (handleGenerateQr)="generateQrCredentials()"
+                  (handleCloseQr)="closeQrCredentials()">
+                </app-generate-qr>
+              </div>
+          </div> -->
+        </div>
+      </div>
     </div>
-  </div>
 </div>

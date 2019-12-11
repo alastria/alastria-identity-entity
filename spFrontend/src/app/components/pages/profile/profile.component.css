@@ -2,10 +2,11 @@
     background-color: white;
     height: 100%;
     margin: auto;
+    padding: 50px;
 }
 
-#form {
-    margin-left: 50px;
+#personalData {
+    border-right: solid 1px;
 }
 
 h3, h4 {
@@ -15,7 +16,10 @@ h3, h4 {
 
 h3 {
     color: #325B8E;
-    margin-top: 50px;
+}
+
+fa {
+    color: #00CAD6;
 }
 
 h4 {
