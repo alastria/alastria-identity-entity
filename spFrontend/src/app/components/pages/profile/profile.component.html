@@ -8,7 +8,7 @@
       </div>
     </div>
     <div class="row">
-      <div id="personalData" class="col-sm-6">
+      <div id="personalData" class="col-md-6">
         <div class="row">
           <div class="col-sm-12">
             <h4>Personal Data</h4>
@@ -16,10 +16,31 @@
         </div>
         <app-disabled-form [user]="user"></app-disabled-form>
       </div>
-      <div class="col-sm-6">
-        <div id="generate-qr">
-          <h4>Actions</h4>
-          <!-- <div class="row justify-content-center">
+      <div id="actions" class="col-md-6">
+        <div class="row">
+          <div class="col-12">
+            <h4>Actions</h4>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <app-menu [options]="optionsMenu"></app-menu>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <!-- <app-button-login 
+              iconClass="fa fa-google" 
+              title="Create AlastriaId"
+              socialName="alastriaId"
+              [style]="styleButtonAlastriaId"
+              imgUrl="../../../assets/images/alastria-icon.svg"
+              (handleLoginSocial)="createAlastriaId($event)">
+            </app-button-login> -->
+          </div>
+        </div>
+        <!--<div id="generate-qr">
+           <div class="row justify-content-center">
             <div class="col-sm-12 col-md-12 col-lg-4">
               <app-generate-qr
                 title="Create AlastriaId"
@@ -40,8 +61,8 @@
                   (handleCloseQr)="closeQrCredentials()">
                 </app-generate-qr>
               </div>
-          </div> -->
-        </div>
+          </div> 
+        </div>-->
       </div>
     </div>
 </div>

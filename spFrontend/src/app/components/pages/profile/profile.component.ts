@@ -9,12 +9,20 @@ import { User } from 'src/app/models/user/user.model';
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
+  styles: [
+    `
+    :host ::ng-deep app-disabled-form > form{
+      padding-left: 40px;
+    }
+    `
+  ],
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
   user: User;
   qrAlastriaId: any;
   qrCredentials: any;
+  optionsMenu = ['Edit profile', 'Reset password'];
 
   constructor(private userService: UserService) { }
 
