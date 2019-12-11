@@ -14,7 +14,7 @@ Frontend of the Service Provider.
 
 ## How to run the Service Provider
 ### Requirements
-You need to install [`npm`](https://www.npmjs.com/get-npm) and [`docker-compose`](https://docs.docker.com/compose/install/).
+You need to install [`npm`](https://www.npmjs.com/get-npm), [`docker`](https://docs.docker.com/v17.09/engine/installation/) and [`docker-compose`](https://docs.docker.com/compose/install/).
 ### Install spFrontend
 First of all, you need to install some packages for the Frontend to work. In order to do that, move to the frontend directory `cdspFrontend`, then:
 ```sh
@@ -34,5 +34,5 @@ In the example above, a ganache will run locally, so you will need to deploy the
 
 Finally, just **run the dockers**:
 ```sh
-docker-compose up
+docker-compose up -d
 ```
