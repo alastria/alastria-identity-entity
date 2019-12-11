@@ -6,12 +6,12 @@ import { HttpClientModule } from '@angular/common/http';
 // MODULES
 import { AppRoutingModule } from './app-routing.module';
 import { LoginModule } from './modules/login/login.module';
-import { HomeModule } from './modules/home/home.module';
+import { ProfileModule } from './modules/profile/profile.module';
 
 // COMPONENTS
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './components/shared/header/header.component';
-import { ProfileComponent } from './components/pages/profile/profile.component';
+import { HomeComponent } from './components/pages/home/home.component';
 
 // SERVICES
 import { AuthGuardService } from './services/auth/auth-guard.service';
@@ -20,7 +20,7 @@ import { AuthGuardService } from './services/auth/auth-guard.service';
   declarations: [
     AppComponent,
     HeaderComponent,
-    ProfileComponent,
+    HomeComponent
   ],
   imports: [
     BrowserModule,
@@ -28,7 +28,7 @@ import { AuthGuardService } from './services/auth/auth-guard.service';
     AppRoutingModule,
     HttpClientModule,
     LoginModule,
-    HomeModule
+    ProfileModule
   ],
   providers: [AuthGuardService],
   bootstrap: [AppComponent]
