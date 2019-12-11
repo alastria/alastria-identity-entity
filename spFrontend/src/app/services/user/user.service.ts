@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 // MODELS
-import { UserLogin } from 'src/app/models/userLogin/userLogin.model';
+import { User } from 'src/app/models/user/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -15,14 +15,14 @@ export class UserService {
    * @param user - data of user for login in the aplication
    * @returns message correct or incorrect login
    */
-  async login(user: UserLogin): Promise<any> {
+  async login(user: User): Promise<any> {
     try {
       const authUrl = '../../../assets/auth.json';
       let isLogin = false;
-
       const authCredentials: any = await this.http.get(authUrl).toPromise();
 
-      if (user.name === authCredentials.name && user.password === authCredentials.password) {
+      if ((user.name === authCredentials.name || user.name === authCredentials.email)
+          && user.password === authCredentials.password) {
         isLogin = true;
       } else {
         const error = {
@@ -33,11 +33,10 @@ export class UserService {
         throw error;
       }
 
-      user.email = authCredentials.email;
-      user.isAuthenticated = true;
-      this.setUserLoggedIn(user);
+      authCredentials.isAuthenticated = isLogin;
+      delete authCredentials.password;
 
-      return isLogin;
+      return authCredentials;
     } catch (error) {
 
       throw error;
@@ -58,7 +57,7 @@ export class UserService {
    * Get data of user
    * @returns user
    */
-  getUserLoggedIn(): UserLogin {
+  getUserLoggedIn(): User {
     return JSON.parse(sessionStorage.getItem('currentUser'));
   }
 
@@ -66,7 +65,7 @@ export class UserService {
    * set data of user in sessionStorage
    * @param user - data of user
    */
-  setUserLoggedIn(user: UserLogin): void {
+  setUserLoggedIn(user: User): void {
       sessionStorage.setItem('currentUser', JSON.stringify(user));
     }
   }

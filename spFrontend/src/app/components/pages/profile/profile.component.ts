@@ -4,7 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { UserService } from 'src/app/services/user/user.service';
 
 // MODELS
-import { UserLogin } from 'src/app/models/userLogin/userLogin.model';
+import { User } from 'src/app/models/user/user.model';
 
 @Component({
   selector: 'app-profile',
@@ -12,7 +12,7 @@ import { UserLogin } from 'src/app/models/userLogin/userLogin.model';
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
-  user: UserLogin;
+  user: User;
   qrAlastriaId: any;
   qrCredentials: any;
 
