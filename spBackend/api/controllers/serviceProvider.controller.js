@@ -72,7 +72,7 @@ function getCurrentPublicKey(req, res) {
     console.log(req.swagger.params.alastriaId.value)
     let alastriaId = req.swagger.params.alastriaId.value
     log.debug(`${controller_name}[${getCurrentPublicKey.name}] -----> Sending params: ${JSON.stringify(alastriaId)}`)
-    serviceProvidermodel.getgetCurrentPublicKey(alastriaId)
+    serviceProvidermodel.getCurrentPublicKey(alastriaId)
     .then(credential => {
       if (credential) {
         log.debug(`${controller_name}[${getCurrentPublicKey.name}] -----> Successfully obtained ublic Key`)
