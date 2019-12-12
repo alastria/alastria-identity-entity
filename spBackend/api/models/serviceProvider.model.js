@@ -1,28 +1,60 @@
 'use strict';
 
+/////////////////////////////////////////////////////////
+///////                 constants                 ///////
+/////////////////////////////////////////////////////////
+
 const Log = require('log')
+const keythereum = require('keythereum')
+const configHelper = require('../helpers/config.helper')
 const { transactionFactory, UserIdentity, config, tokensFactory } = require('alastria-identity-lib')
 const web3Helper = require('../helpers/web3.helper')
 const moduleName = '[serviceProvider Model]'
-let fs = require('fs')
-let keythereum = require('keythereum')
+const web3 = web3Helper.getWeb3()
+const log = new Log('debug')
 
-let keyData = fs.readFileSync('../../config.json')
-let keystoreData = JSON.parse(keyData)
+let myConfig = configHelper.getConfig()
+let identityKeystore = myConfig.identityKeystore
+let issuerIdentity, identityPrivateKey
 
+/////////////////////////////////////////////////////////
+///////             PRIVATE FUNCTIONS             ///////
+/////////////////////////////////////////////////////////
 
-let identityKeystore = keystoreData.identityKeystore
-
-let identityPrivateKey
-try{
-	identityPrivateKey = keythereum.recover(keystoreData.addressPassword, identityKeystore)
-}catch(error){
-	console.log("ERROR: ", error)
+function getIssuerIdentity() {
+  try{
+    log.debug(`${moduleName}[${getIssuerIdentity.name}] -----> IN ...`)
+    identityPrivateKey = keythereum.recover(myConfig.addressPassword, identityKeystore)
+    issuerIdentity = new UserIdentity(web3, `0x${identityKeystore.address}`, identityPrivateKey)
+    log.debug(`${moduleName}[${getIssuerIdentity.name}] -----> Success`)
+    return issuerIdentity
+  }catch(error){
+    log.error(`${moduleName}[${getIssuerIdentity.name}] -----> ${error}`)
+    return error
+  }
 }
 
-let issuerIdentity = new UserIdentity(web3, `0x${identityKeystore.address}`, identityPrivateKey)
+function sendSigned(subjectCredentialSigned) {
+  return new Promise((resolve, reject) => {
+    log.debug(`${moduleName}[${sendSigned.name}] -----> IN ...`)
+    web3.eth.sendSignedTransaction(subjectCredentialSigned)
+    .on('transactionHash', function (hash) {
+      log.debug(`${moduleName}[${sendSigned.name}] -----> HASH: ${hash} ...`)
+    })
+    .on('receipt', receipt => {
+      resolve(receipt)
+    })
+    .on('error', error => {
+      log.error(`${moduleName}[${sendSigned.name}] -----> ${error}`)
+      reject(error)
+    }); 
 
-const web3 = web3Helper.getWeb3()
+  })
+}
+
+/////////////////////////////////////////////////////////
+///////               MODULE EXPORTS              ///////
+/////////////////////////////////////////////////////////
 
 module.exports = {
   createAlastriaID,
@@ -30,7 +62,9 @@ module.exports = {
   getCurrentPublicKey
 }
 
-const log = new Log('debug')
+/////////////////////////////////////////////////////////
+///////              PUBLIC FUNCTIONS             ///////
+/////////////////////////////////////////////////////////
 
 function createAlastriaID() {
   return new Promise((resolve, reject) => {
@@ -38,30 +72,63 @@ function createAlastriaID() {
   })
 }
 
-function addSubjectCredential(json) {
-  return new Promise((resolve, reject) => {
-    console.log("JSON -------->",json)
-    let subjectCredential = transactionFactory.credentialRegistry.addSubjectCredential(web3, credentialHash, uri)
-    let subjectCredentialSigned =  issuerIdentity.getKnownTransaction(subjectCredential)
-    web3.eth.sendSignedTransaction(subjectCredentialSigned)
-    .then(receipt => {
-      let subjectCredentialTransaction = transactionFactory.credentialRegistry.getSubjectCredentialStatus(web3, subject, credentialHash)
-				web3.eth.call(subjectCredentialTransaction)
-				.then(SubjectCredentialStatus => {
-					let result = web3.eth.abi.decodeParameters(["bool","uint8"],SubjectCredentialStatus)
-					let credentialStatus = { 
-						"exists": result[0],
-						"status":result[1]
-          }
-          console.log("CREDENTIAL -------->",credentialStatus)
-          resolve(credentialStatus)
-        }).catch(error => {
-          console.log('Error -------->', error)
-          reject(error)
-        })
-      })
+async function addSubjectCredential(params) {
+  log.debug(`${moduleName}[${addSubjectCredential.name}] -----> IN ...`)
+  log.debug(`${moduleName}[${addSubjectCredential.name}] -----> Calling addSubjectCredential with params: ${JSON.stringify(params)}`)
+  let subjectCredential = await transactionFactory.credentialRegistry.addSubjectCredential(web3, params.credentialHash, params.uri)
+  let issuerID = getIssuerIdentity()
+  let subjectCredentialSigned =  await issuerID.getKnownTransaction(subjectCredential)
+  sendSigned(subjectCredentialSigned)
+  .then(receipt => {
+    let subjectCredentialTransaction = transactionFactory.credentialRegistry.getSubjectCredentialStatus(web3, params.subject, params.credentialHash)
+    web3.eth.call(subjectCredentialTransaction)
+    .then(SubjectCredentialStatus => {
+      let result = web3.eth.abi.decodeParameters(["bool","uint8"],SubjectCredentialStatus)
+      let credentialStatus = { 
+        "exists": result[0],
+        "status":result[1]
+      }
+      log.debug(`${moduleName}[${addSubjectCredential.name}] -----> Success`)
+      return credentialStatus
+    }).catch(error => {
+      log.error(`${moduleName}[${addSubjectCredential.name}] -----> ${error}`)
+      return error
+    })
+  })
+  .catch(error => {
+    log.error(`${moduleName}[${addSubjectCredential.name}] -----> ${error}`)
+    return error
   })
 }
+
+// function addSubjectCredential(params) {
+//   return new Promise((resolve, reject) => {
+//     log.debug(`${moduleName}[${addSubjectCredential.name}] -----> IN ...`)
+//     log.debug(`${moduleName}[${addSubjectCredential.name}] -----> Calling addSubject credential With params: ${JSON.stringify(params)}`)
+//     let subjectCredential = transactionFactory.credentialRegistry.addSubjectCredential(web3, params.credentialHash, params.uri)
+//     let issuerID = getIssuerIdentity()
+//     let subjectCredentialSigned =  issuerID.getKnownTransaction(subjectCredential)
+//     console.log(subjectCredentialSigned)
+//     web3.eth.sendSignedTransaction(subjectCredentialSigned)
+//     .then(receipt => {
+//       console.log(receipt)
+//       let subjectCredentialTransaction = transactionFactory.credentialRegistry.getSubjectCredentialStatus(web3, params.subject, credentialHash)
+// 				web3.eth.call(subjectCredentialTransaction)
+// 				.then(SubjectCredentialStatus => {
+// 					let result = web3.eth.abi.decodeParameters(["bool","uint8"],SubjectCredentialStatus)
+// 					let credentialStatus = { 
+// 						"exists": result[0],
+// 						"status":result[1]
+//           }
+//           console.log("CREDENTIAL -------->",credentialStatus)
+//           resolve(credentialStatus)
+//         }).catch(error => {
+//           console.log('Error -------->', error)
+//           reject(error)
+//         })
+//       })
+//   })
+// }
 
 function getCurrentPublicKey(subject) {
   return new Promise((resolve, reject) => {

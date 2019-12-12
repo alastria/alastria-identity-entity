@@ -31,11 +31,18 @@ function createAlastriaID(req, res) {
       }
     })
     .catch(error => {
-      res.status(503).send(error)
+      let msg = {
+        message: error
+      }
+      res.status(400).send(msg)
     })
   }
   catch(error) {
     log.debug(`${controller_name}[${createAlastriaID.name}] -----> ${error}`)
+    let msg = {
+      message: error
+    }
+    res.status(503).send(msg)
    }
 }
 
@@ -58,11 +65,19 @@ function addSubjectCredential(req, res) {
       }
     })
     .catch(error => {
-      res.status(503).send(error)
+      log.debug(`${controller_name}[${addSubjectCredential.name}] -----> ${error}`)
+      let msg = {
+        message: JSON.stringify(error)
+      }
+      res.status(400).send(msg)
     })
   }
   catch(error) {
     log.debug(`${controller_name}[${addSubjectCredential.name}] -----> ${error}`)
+    let msg = {
+      message: JSON.stringify(error)
+    }
+    res.status(503).send(msg)
    }
 }
 
