@@ -69,14 +69,16 @@ function addSubjectCredential(req, res) {
 function getCurrentPublicKey(req, res) {
   try {
     log.debug(`${controller_name}[${getCurrentPublicKey.name}] -----> IN ...`)
-    console.log(req.swagger.params.alastriaId.value)
     let alastriaId = req.swagger.params.alastriaId.value
     log.debug(`${controller_name}[${getCurrentPublicKey.name}] -----> Sending params: ${JSON.stringify(alastriaId)}`)
-    serviceProvidermodel.getgetCurrentPublicKey(alastriaId)
+    serviceProvidermodel.getCurrentPublicKey(alastriaId)
     .then(credential => {
       if (credential) {
-        log.debug(`${controller_name}[${getCurrentPublicKey.name}] -----> Successfully obtained ublic Key`)
-        res.status(200).send(credential)
+        log.debug(`${controller_name}[${getCurrentPublicKey.name}] -----> Successfully obtained Public Key: ${credential}`)
+        let result = {
+          publicKey: credential.substr(31)
+        }
+        res.status(200).send(result)
       }
       else {
         let msg = {
