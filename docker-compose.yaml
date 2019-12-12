@@ -7,7 +7,7 @@ services:
     build: spBackend
     image: serviceproviderback
     environment: 
-      #- NODE_ENDPOINT=localEndpint
+      #- NODE_ENDPOINT=localEndpoint
       - NODE_ENDPOINT=alastria
     links:
       - ganache:ganache
