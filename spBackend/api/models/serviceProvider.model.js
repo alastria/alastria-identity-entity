@@ -20,9 +20,28 @@ function createAlastriaID() {
   })
 }
 
-function addSubjectCredential() {
+function addSubjectCredential(json) {
   return new Promise((resolve, reject) => {
-    // put here your code
+    // console.log("JSON -------->",json)
+    // let subjectCredential = transactionFactory.credentialRegistry.addSubjectCredential(web3, credentialHash, uri)
+    // let subjectCredentialSigned =  issuerIdentity.getKnownTransaction(subjectCredential)
+    // web3.eth.sendSignedTransaction(subjectCredentialSigned)
+    // .then(receipt => {
+    //   let subjectCredentialTransaction = transactionFactory.credentialRegistry.getSubjectCredentialStatus(web3, subject, credentialHash)
+		// 		web3.eth.call(subjectCredentialTransaction)
+		// 		.then(SubjectCredentialStatus => {
+		// 			let result = web3.eth.abi.decodeParameters(["bool","uint8"],SubjectCredentialStatus)
+		// 			let credentialStatus = { 
+		// 				"exists": result[0],
+		// 				"status":result[1]
+    //       }
+    //       console.log("CREDENTIAL -------->",credentialStatus)
+    //       resolve(credentialStatus)
+    //     }).catch(error => {
+    //       console.log('Error -------->', error)
+    //       reject(error)
+    //     })
+    //   })
   })
 }
 
