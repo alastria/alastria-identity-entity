@@ -12,8 +12,7 @@ services:
     ports:
       - "10010:10010"
     volumes:
-      # - ./spBackend/api:/app/api
-      - ./spBackend:/app   # Only for develp. live-reload.
+      - ./spBackend/api:/app/api
     command: npm run start
 
   spFrontend:

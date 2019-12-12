@@ -76,7 +76,7 @@ function getCurrentPublicKey(req, res) {
       if (credential) {
         log.debug(`${controller_name}[${getCurrentPublicKey.name}] -----> Successfully obtained Public Key: ${credential}`)
         let result = {
-          publicKey: credential
+          publicKey: credential.substr(31)
         }
         res.status(200).send(result)
       }

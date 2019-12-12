@@ -5,5 +5,6 @@
   "nodeUrl": {
     "local": "http://localhost:8545",
     "alastria": "http://63.33.206.111/rpc"
-  }
+  },
+  "alastriaID": "0x8fabb292d8a214136651d2e822f65cfa6d23811c"
 }
