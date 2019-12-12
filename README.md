@@ -16,7 +16,7 @@ Frontend of the Service Provider.
 ### Requirements
 You need to install [`npm`](https://www.npmjs.com/get-npm), [`docker`](https://docs.docker.com/v17.09/engine/installation/) and [`docker-compose`](https://docs.docker.com/compose/install/).
 ### Install spFrontend
-First of all, you need to install some packages for the Frontend to work. In order to do that, move to the frontend directory `cdspFrontend`, then:
+First of all, you need to install some packages for the Frontend to work. In order to do that, move to the frontend directory `cd spFrontend`, then:
 ```sh
 npm install
 ```
