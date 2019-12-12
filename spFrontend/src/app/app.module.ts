@@ -11,7 +11,6 @@ import { ProfileModule } from './modules/profile/profile.module';
 // COMPONENTS
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './components/shared/header/header.component';
-import { HomeComponent } from './components/pages/home/home.component';
 
 // SERVICES
 import { AuthGuardService } from './services/auth/auth-guard.service';
@@ -19,8 +18,7 @@ import { AuthGuardService } from './services/auth/auth-guard.service';
 @NgModule({
   declarations: [
     AppComponent,
-    HeaderComponent,
-    HomeComponent
+    HeaderComponent
   ],
   imports: [
     BrowserModule,

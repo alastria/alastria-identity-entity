@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { QRCodeModule } from 'angularx-qrcode';
 import { AngularFontAwesomeModule } from 'angular-font-awesome';
+import { SharedModule } from '../shared/shared.module';
 
 // COMPONENTS
 import { ProfileComponent } from 'src/app/components/pages/profile/profile.component';
@@ -15,13 +16,14 @@ import { MenuComponent } from 'src/app/components/common/menu/menu.component';
     ProfileComponent,
     DisabledFormComponent,
     GenerateQrComponent,
-    MenuComponent,
+    MenuComponent
   ],
   imports: [
     CommonModule,
     FormsModule,
     QRCodeModule,
-    AngularFontAwesomeModule
+    AngularFontAwesomeModule,
+    SharedModule
   ]
 })
 export class ProfileModule { }
