@@ -5,7 +5,11 @@
     padding: 50px;
 }
 
-#personalData {
+.container-button {
+    width: inherit;
+}
+
+#personal-data {
     border-right: solid 1px;
 }
 

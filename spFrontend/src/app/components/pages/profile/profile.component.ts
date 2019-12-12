@@ -11,7 +11,7 @@ import { User } from 'src/app/models/user/user.model';
   templateUrl: './profile.component.html',
   styles: [
     `
-    :host ::ng-deep app-disabled-form > form{
+    :host ::ng-deep app-disabled-form > form,  #create-alastria-id{
       padding-left: 40px;
     }
     `

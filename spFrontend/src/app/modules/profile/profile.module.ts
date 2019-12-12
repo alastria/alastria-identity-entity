@@ -10,13 +10,15 @@ import { ProfileComponent } from 'src/app/components/pages/profile/profile.compo
 import { DisabledFormComponent } from 'src/app/components/common/disabled-form/disabled-form.component';
 import { GenerateQrComponent } from 'src/app/components/common/generate-qr/generate-qr.component';
 import { MenuComponent } from 'src/app/components/common/menu/menu.component';
+import { CreateAlastriaIdComponent } from 'src/app/components/common/create-alastria-id/create-alastria-id.component';
 
 @NgModule({
   declarations: [
     ProfileComponent,
     DisabledFormComponent,
     GenerateQrComponent,
-    MenuComponent
+    MenuComponent,
+    CreateAlastriaIdComponent
   ],
   imports: [
     CommonModule,

@@ -8,7 +8,7 @@
       </div>
     </div>
     <div class="row">
-      <div id="personalData" class="col-md-6">
+      <div id="personal-data" class="col-md-6">
         <div class="row">
           <div class="col-sm-12">
             <h4>Personal Data</h4>
@@ -27,16 +27,9 @@
             <app-menu [options]="optionsMenu"></app-menu>
           </div>
         </div>
-        <div class="row">
+        <div id="create-alastria-id" class="row">
           <div class="col-12">
-            <!-- <app-button-login 
-              iconClass="fa fa-google" 
-              title="Create AlastriaId"
-              socialName="alastriaId"
-              [style]="styleButtonAlastriaId"
-              imgUrl="../../../assets/images/alastria-icon.svg"
-              (handleLoginSocial)="createAlastriaId($event)">
-            </app-button-login> -->
+            <app-create-alastria-id></app-create-alastria-id>
           </div>
         </div>
         <!--<div id="generate-qr">
