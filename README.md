@@ -32,7 +32,7 @@ Before running the Service Provider, you can change the blockchain node IP in th
 ```
 In the example above, a ganache will run locally, so you will need to deploy the _smart contracts_ manually.
 
-Finally, just **run the dockers**:
+Finally, just **run the dockers**. For this step, you need to stay **in the root directory**:
 ```sh
 docker-compose up -d
 ```
