@@ -159,8 +159,11 @@ definitions:
         example: "0xAd50746a88e73ea0259392344b9e7D18EB2B9463"
   subjectCredentialdata:
     type: "object"
-    required: [signedTX]
+    required: [credentialHash, uri]
     properties:
-      "signedTX":
+      "credentialHash":
         type: string
         example: "0x47f4c19df21b0f98718e1ed91c7d5c5f5511a64093b0a3dd943fb54a74eb16d2....0xe90eeaa7931c54966c2badf7bed04b5bb46c6dc4970bd32c05cc614c27f93d0e"
+      "uri":
+        type: string
+        example: "www.google.com"
