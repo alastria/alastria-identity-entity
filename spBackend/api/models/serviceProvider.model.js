@@ -108,7 +108,7 @@ function addSubjectCredential(params) {
       })
       .catch(error => {
         log.error(`${moduleName}[${addSubjectCredential.name}] -----> ${error}`)
-        resolve(error)
+        reject(error)
       })
     })
   })

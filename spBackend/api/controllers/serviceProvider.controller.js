@@ -59,7 +59,7 @@ function addSubjectCredential(req, res) {
     .catch(error => {
       log.debug(`${controller_name}[${addSubjectCredential.name}] -----> ${error}`)
       let msg = {
-        message: JSON.stringify(error)
+        message: 'Error: Transaction has been reverted by the EVM'
       }
       res.status(400).send(msg)
     })
@@ -67,7 +67,7 @@ function addSubjectCredential(req, res) {
   catch(error) {
     log.debug(`${controller_name}[${addSubjectCredential.name}] -----> ${error}`)
     let msg = {
-      message: JSON.stringify(error)
+      message: 'Insternal Server Erorr'
     }
     res.status(503).send(msg)
    }
