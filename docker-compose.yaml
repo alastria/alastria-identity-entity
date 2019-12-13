@@ -6,6 +6,12 @@ services:
     restart: on-failure:5
     build: spBackend
     image: serviceproviderback
+    environment: 
+      #- NODE_ENDPOINT=localEndpint
+      - NODE_ENDPOINT=alastria
+    links:
+      - ganache:ganache
+
     ports:
       - "10010:10010"
     volumes:
@@ -26,3 +32,9 @@ services:
       options:
         max-size: "1m"
         max-file: "3"
+
+  ganache:
+    restart: on-failure:5
+    image: trufflesuite/ganache-cli
+    ports:
+      - "8545:8545"

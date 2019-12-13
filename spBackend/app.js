@@ -6,13 +6,13 @@ const web3Helper = require('./api/helpers/web3.helper')
 const configHelper = require('./api/helpers/config.helper')
 const loadJsonFile = require('load-json-file')
 const cors = require('cors')
-let app = require('express')();
-let myConfig = {}
-
+const pathFile = 'config.json'
 const log = new Log('debug')
 
-const pathFile = 'config.json'
 
+let app = require('express')();
+let myConfig = {}
+let nodeurl = ''
 
 module.exports = app; // for testing
 
@@ -20,7 +20,16 @@ loadJsonFile(pathFile)
 .then(config => {
   configHelper.setConfig(config)
   myConfig = configHelper.getConfig()
-  const nodeurl = myConfig.nodeUrl.local
+
+  if(!process.env.NODE_ENDPOINT) {
+    nodeurl = myConfig.nodeUrl.alastria // change to local or alastria when yo are developing (swagger project start)
+  } else if(process.env.NODE_ENDPOINT == 'localEndpoint') {
+    nodeurl = myConfig.nodeUrl.local
+  } else if(process.env.NODE_ENDPOINT == 'alastria') {
+    nodeurl = myConfig.nodeUrl.alastria
+  }
+  log.debug(`[App] -----> Connected via RPC to ${nodeurl}`)
+  
   web3Helper.instanceWeb3(nodeurl)
   .then(web3Instantiated => {
 
