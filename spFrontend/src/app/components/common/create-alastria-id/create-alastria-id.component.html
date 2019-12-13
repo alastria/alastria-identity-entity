@@ -1,15 +1,14 @@
-<div id="qr">
-
+<div *ngIf="!publicKey">
+  <p>Mensaje de texto poniendo en valor para el usuario lo guay que es crearse un AlastriaID</p>
+  <app-button-login 
+    iconClass="fa fa-google" 
+    title="Create AlastriaID"
+    socialName="alastriaId"
+    [style]="styleButtonAlastriaId"
+    imgUrl="../../../assets/images/alastria-icon.svg"
+    (handleLoginSocial)="createAlastriaId($event)">
+  </app-button-login>
 </div>
-<p>Mensaje de texto poniendo en valor para el usuario lo guay que es crearse un AlastriaID</p>
-<app-button-login 
-  iconClass="fa fa-google" 
-  title="Create AlastriaID"
-  socialName="alastriaId"
-  [style]="styleButtonAlastriaId"
-  imgUrl="../../../assets/images/alastria-icon.svg"
-  (handleLoginSocial)="createAlastriaId($event)">
-</app-button-login>
 
 <div id="text-info-downloads" class="row">
   <div class="col-12">
@@ -22,7 +21,7 @@
     <qrcode [qrdata]="urlPlayStore" [size]="128" [level]="'M'"></qrcode>
   </div>
   <div class="col-12 col-sm-12 col-lg-6">
-    <img (click)="goToStore(urlAppStore)" src="../../../../assets/images/app-store-logo.svg" alt="">
+    <img (click)="goToStore(urlAppStore)" src="../../../../assets/images/app-store-logo.svg" alt="app store logo">
     <qrcode [qrdata]="urlAppStore" [size]="128" [level]="'M'"></qrcode>
   </div>
 </div>

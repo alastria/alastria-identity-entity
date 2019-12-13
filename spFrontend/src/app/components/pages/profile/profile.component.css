@@ -13,6 +13,11 @@
     border-right: solid 1px;
 }
 
+#qr {
+    height: 200px;
+}
+
+
 h3, h4 {
     position: relative;
     float: left;

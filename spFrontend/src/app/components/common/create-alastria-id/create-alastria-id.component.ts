@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+
+// Services
+import { ServiceProviderService } from 'src/app/services/serviceProvider/service-provider.service';
 
 @Component({
   selector: 'app-create-alastria-id',
@@ -14,6 +16,7 @@ import { Router } from '@angular/router';
   ],
 })
 export class CreateAlastriaIdComponent implements OnInit {
+  @Output() handleGenerateQr = new EventEmitter<object>();
   styleButtonAlastriaId = {
     color: '#00CAD6',
     backgroundIcon: 'white',
@@ -28,14 +31,30 @@ export class CreateAlastriaIdComponent implements OnInit {
 
   urlPlayStore = 'http://play.google.com/store/apps/'; // 'http://play.google.com/store/apps/details?id=<package_name>'
   urlAppStore = 'https://apps.apple.com/es/'; // 'http://itunes.apple.com/<país>/app/<nombre-aplicación>/id<ID-aplicación>?mt=8'
+  publicKey: object;
 
-  constructor(private router: Router) { }
+  constructor(private serviceProvider: ServiceProviderService) { }
 
   ngOnInit() {
   }
 
   goToStore(url: string) {
     window.open(url, '_blank');
+  }
+
+  async createAlastriaId(event: any) {
+    console.log('Test');
+    const alastriaId = 'test';
+    try {
+      this.publicKey = await this.serviceProvider.getPublicKey(alastriaId);
+      this.handleGenerateQr.emit(this.publicKey);
+    } catch (error) {
+      console.error('Error ', error);
+      this.publicKey = {
+        alastriaId: 'test'
+      };
+      this.handleGenerateQr.emit(this.publicKey);
+    }
   }
 
 }

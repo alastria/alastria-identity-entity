@@ -1,14 +1,8 @@
-<div class="container">
-  <h3 [style.width.px]="size"> {{ title }} </h3>
-  <div [style.width.px]="size" *ngIf="!qrData" [@fadeInOut]>
-    <button class="btn btn-primary" (click)="generateQr()"> {{ textButton }} </button>
-  </div>
-  <div id="qrDiv row" *ngIf="qrData" [@fadeInOut]>
-    <qrcode id="qr" [qrdata]="qrData" [size]="size" [level]="level"></qrcode>
-    <div [style.width.px]="size">
-      <fa name="times" (click)="closeQr()"></fa>
-      <fa name="refresh" (click)="generateQr()"></fa>
-    </div>
+<div id="qrDiv row" [@fadeInOut]>
+  <qrcode *ngIf="qrData" id="qr" [qrdata]="qrData" [size]="size" [level]="level"></qrcode>
+  <div id="icons" [style.width.px]="size">
+    <fa name="times" (click)="closeQr()"></fa>
+    <fa name="refresh" (click)="generateQr()"></fa>
   </div>
 </div>
 

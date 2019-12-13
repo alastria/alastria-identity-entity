@@ -14,6 +14,9 @@ import { User } from 'src/app/models/user/user.model';
     :host ::ng-deep app-disabled-form > form,  #create-alastria-id{
       padding-left: 40px;
     }
+    :host ::ng-deep app-generate-qr qrcode > img{
+      margin: auto;
+    }
     `
   ],
   styleUrls: ['./profile.component.css']
@@ -30,19 +33,16 @@ export class ProfileComponent implements OnInit {
     this.user = this.userService.getUserLoggedIn();
   }
 
-  generateQrAlastriaId() {
-    this.qrAlastriaId = 'test';
-  }
-
   closeQrAlastriaId(): void {
     this.qrAlastriaId = null;
   }
 
-  generateQrCredentials() {
-    this.qrCredentials = 'test2';
-  }
-
   closeQrCredentials(): void {
     this.qrCredentials = null;
+  }
+
+  handleGenerateQr(event: object): void {
+    console.log(event);
+    this.qrAlastriaId = event;
   }
 }
