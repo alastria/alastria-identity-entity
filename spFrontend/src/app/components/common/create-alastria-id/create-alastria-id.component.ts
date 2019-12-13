@@ -57,4 +57,8 @@ export class CreateAlastriaIdComponent implements OnInit {
     }
   }
 
+  closeQrAlastriaId(): void {
+    this.publicKey = null;
+    this.handleGenerateQr.emit(this.publicKey);
+  }
 }

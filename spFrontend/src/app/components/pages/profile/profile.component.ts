@@ -33,16 +33,7 @@ export class ProfileComponent implements OnInit {
     this.user = this.userService.getUserLoggedIn();
   }
 
-  closeQrAlastriaId(): void {
-    this.qrAlastriaId = null;
-  }
-
-  closeQrCredentials(): void {
-    this.qrCredentials = null;
-  }
-
   handleGenerateQr(event: object): void {
-    console.log(event);
     this.qrAlastriaId = event;
   }
 }

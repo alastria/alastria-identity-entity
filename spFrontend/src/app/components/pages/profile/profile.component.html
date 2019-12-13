@@ -17,7 +17,7 @@
         <app-disabled-form [user]="user"></app-disabled-form>
       </div>
       <div class="col-md-6">
-        <div id="actions-menu">
+        <div id="actions-menu" *ngIf="!qrAlastriaId">
             <div class="row">
               <div class="col-12">
                 <h4>Actions</h4>
@@ -28,18 +28,6 @@
                 <app-menu [options]="optionsMenu"></app-menu>
               </div>
             </div>
-        </div>
-        <div id="qr" [ngStyle]="{'margin-bottom': (qrAlastriaId) ? '40px' : '0px'}">
-          <div class="row">
-            <div class="col-12">
-              <app-generate-qr *ngIf="qrAlastriaId"
-                [qrData]="qrAlastriaId"
-                [size]="220"
-                (handleGenerateQr)="generateQrAlastriaId()"
-                (handleCloseQr)="closeQrAlastriaId()">
-              </app-generate-qr>
-            </div>
-          </div>
         </div>
         <div id="create-alastria-id" class="row">
           <div class="col-12">
