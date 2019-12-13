@@ -52,17 +52,9 @@ function addSubjectCredential(req, res) {
     let params = req.swagger.params.body.value
     log.debug(`${controller_name}[${addSubjectCredential.name}] -----> Sending params: ${JSON.stringify(params)}`)
     serviceProvidermodel.addSubjectCredential(params)
-    .then(credential => {
-      if (credential) {
-        log.debug(`${controller_name}[${addSubjectCredential.name}] -----> Successfully created added credential: ${JSON.stringify(credential)}`)
-        res.status(200).send(credential)
-      }
-      else {
-        let msg = {
-          message: 'Error adding credential'
-        }
-        res.status(404).send(msg)
-      }
+    .then(addedCredential => {
+      log.debug(`${controller_name}[${addSubjectCredential.name}] -----> Successfully added credential: ${JSON.stringify(addedCredential)}`)
+      res.status(200).send(addedCredential)
     })
     .catch(error => {
       log.debug(`${controller_name}[${addSubjectCredential.name}] -----> ${error}`)
@@ -103,10 +95,13 @@ function getCurrentPublicKey(req, res) {
       }
     })
     .catch(error => {
-      res.status(503).send(error)
+      let msg = {
+        message: `Insternal Server Error: ${error}`
+      }
+      res.status(503).send(msg)
     })
   }
   catch(error) {
-    log.debug(`${controller_name}[${getCurrentPublicKey.name}] -----> ${error}`)
+    log.error(`${controller_name}[${getCurrentPublicKey.name}] -----> ${error}`)
    }
 }
