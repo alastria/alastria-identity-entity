@@ -54,7 +54,7 @@ function addSubjectCredential(req, res) {
     serviceProvidermodel.addSubjectCredential(params)
     .then(credential => {
       if (credential) {
-        log.debug(`${controller_name}[${addSubjectCredential.name}] -----> Successfully created added credential`)
+        log.debug(`${controller_name}[${addSubjectCredential.name}] -----> Successfully created added credential: ${JSON.stringify(credential)}`)
         res.status(200).send(credential)
       }
       else {

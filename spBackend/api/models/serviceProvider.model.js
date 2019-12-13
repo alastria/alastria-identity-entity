@@ -26,7 +26,7 @@ function getIssuerIdentity() {
     log.debug(`${moduleName}[${getIssuerIdentity.name}] -----> IN ...`)
     identityPrivateKey = keythereum.recover(myConfig.addressPassword, identityKeystore)
     issuerIdentity = new UserIdentity(web3, `0x${identityKeystore.address}`, identityPrivateKey)
-    log.debug(`${moduleName}[${getIssuerIdentity.name}] -----> Success`)
+    log.debug(`${moduleName}[${getIssuerIdentity.name}] -----> Issuer Getted`)
     return issuerIdentity
   }catch(error){
     log.error(`${moduleName}[${getIssuerIdentity.name}] -----> ${error}`)
@@ -75,7 +75,7 @@ function createAlastriaID() {
 async function addSubjectCredential(params) {
   log.debug(`${moduleName}[${addSubjectCredential.name}] -----> IN ...`)
   log.debug(`${moduleName}[${addSubjectCredential.name}] -----> Calling addSubjectCredential with params: ${JSON.stringify(params)}`)
-  let subjectCredential = await transactionFactory.credentialRegistry.addSubjectCredential(web3, params.credentialHash, params.uri)
+  let subjectCredential = transactionFactory.credentialRegistry.addSubjectCredential(web3, params.credentialHash, params.uri)
   let issuerID = getIssuerIdentity()
   let subjectCredentialSigned =  await issuerID.getKnownTransaction(subjectCredential)
   sendSigned(subjectCredentialSigned)
@@ -89,6 +89,7 @@ async function addSubjectCredential(params) {
         "status":result[1]
       }
       log.debug(`${moduleName}[${addSubjectCredential.name}] -----> Success`)
+      console.log(credentialStatus)
       return credentialStatus
     }).catch(error => {
       log.error(`${moduleName}[${addSubjectCredential.name}] -----> ${error}`)
