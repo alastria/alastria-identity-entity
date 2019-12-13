@@ -25,10 +25,10 @@ import { AuthGuardService } from './services/auth/auth-guard.service';
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-    AppRoutingModule,
     HttpClientModule,
     LoginModule,
-    ProfileModule
+    ProfileModule,
+    AppRoutingModule,
   ],
   providers: [AuthGuardService],
   bootstrap: [AppComponent]
