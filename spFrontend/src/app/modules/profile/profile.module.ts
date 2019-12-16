@@ -18,7 +18,7 @@ import { CreateAlastriaIdComponent } from 'src/app/components/common/create-alas
     DisabledFormComponent,
     GenerateQrComponent,
     MenuComponent,
-    CreateAlastriaIdComponent
+    CreateAlastriaIdComponent,
   ],
   imports: [
     CommonModule,

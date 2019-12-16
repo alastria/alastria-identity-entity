@@ -1,17 +1,22 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { QRCodeModule } from 'angularx-qrcode';
 
 import { ButtonLoginComponent } from 'src/app/components/common/button-login/button-login.component';
+import { SimpleModalComponent } from 'src/app/components/common/simple-modal/simple-modal.component';
 
 @NgModule({
   declarations: [
-    ButtonLoginComponent
+    ButtonLoginComponent,
+    SimpleModalComponent
   ],
   imports: [
-    CommonModule
+    CommonModule,
+    QRCodeModule,
   ],
   exports: [
-    ButtonLoginComponent
+    ButtonLoginComponent,
+    SimpleModalComponent
   ]
 })
 export class SharedModule { }

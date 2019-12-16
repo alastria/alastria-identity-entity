@@ -1,4 +1,5 @@
-import { Component, OnInit, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
+import { sanitizeHtml } from '@angular/core/src/sanitization/sanitization';
 
 @Component({
   selector: 'app-simple-modal',
@@ -7,10 +8,13 @@ import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 })
 export class SimpleModalComponent implements OnInit {
   @Output() handleLoginOk = new EventEmitter();
-
+  @Input() type = 'normal';
+  @Input() htmlContent: string;
+  @Input() size: string; // xl, lg or sm
   constructor() { }
 
   ngOnInit() {
+    console.log(this.htmlContent);
   }
 
   /**

@@ -15,8 +15,7 @@ import { SimpleModalComponent } from 'src/app/components/common/simple-modal/sim
 
 @NgModule({
   declarations: [
-    LoginComponent,
-    SimpleModalComponent
+    LoginComponent
   ],
   imports: [
     CommonModule,
@@ -24,7 +23,6 @@ import { SimpleModalComponent } from 'src/app/components/common/simple-modal/sim
     ReactiveFormsModule,
     HttpClientModule,
     AngularFontAwesomeModule,
-    QRCodeModule,
     SharedModule
   ],
   providers: [
@@ -35,7 +33,6 @@ import { SimpleModalComponent } from 'src/app/components/common/simple-modal/sim
     FormsModule,
     ReactiveFormsModule,
     QRCodeModule,
-    SimpleModalComponent,
   ],
   bootstrap: []
 })

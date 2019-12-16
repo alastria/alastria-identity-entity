@@ -10,6 +10,8 @@ import { ServiceProviderService } from 'src/app/services/serviceProvider/service
 import { User } from 'src/app/models/user/user.model';
 import { Event } from 'src/app/models/enums/enums.model';
 
+declare var $: any;
+
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
@@ -31,6 +33,11 @@ export class ProfileComponent implements OnInit {
   qrCredentials: any;
   optionsMenu = ['Edit profile', 'Reset password'];
   ioConnection: any; // websocket connection
+  htmlSuccessCreateAlastriaId = `
+    <img src="../../../../assets/images/success-icon.svg" alt="Success icon">
+    <h1> Success! </h1>
+    <p> Congratulations, your Alastria ID has been created and vinculated with your accouunt </p>
+  `;
 
   constructor(private userService: UserService,
               private socketService: SocketService,
@@ -58,6 +65,7 @@ export class ProfileComponent implements OnInit {
         this.serviceProvider.createIdentity(identity)
           .then((result: any) => {
             if (result && result.status === 200) {
+              $('#myModal').modal('show');
               console.log(result);
             }
           })
