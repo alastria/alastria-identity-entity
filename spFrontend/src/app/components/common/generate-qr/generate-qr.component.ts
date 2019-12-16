@@ -29,7 +29,6 @@ export class GenerateQrComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    console.log(this.qrData);
   }
 
   generateQr(): void {

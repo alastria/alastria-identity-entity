@@ -1,12 +1,12 @@
-<div id="qr" [ngStyle]="{'margin-bottom': (publicKey) ? '160px' : '0px'}">
-  <div class="row" *ngIf="publicKey">
+<div id="qr" [ngStyle]="{'margin-bottom': (qrAlastriaId) ? '160px' : '0px'}">
+  <div class="row" *ngIf="qrAlastriaId">
     <div class="col-12">
       <h3>
         Create Your AlastriaID
       </h3>
     </div>
   </div>
-  <div id="subtitle" class="row" *ngIf="publicKey">
+  <div id="subtitle" class="row" *ngIf="qrAlastriaId">
     <div class="col-12">
       <span>
         Scan with your AlastriaID this QR Code to get your AlastriaId
@@ -15,8 +15,8 @@
   </div>
   <div class="row">
     <div class="col-12">
-      <app-generate-qr *ngIf="publicKey"
-        [qrData]="publicKey"
+      <app-generate-qr *ngIf="qrAlastriaId"
+        [qrData]="qrAlastriaId"
         [size]="200"
         (handleGenerateQr)="generateQrAlastriaId()"
         (handleCloseQr)="closeQrAlastriaId()">
@@ -25,7 +25,7 @@
   </div>
 </div>
 
-<div *ngIf="!publicKey">
+<div *ngIf="!qrAlastriaId">
   <p>Mensaje de texto poniendo en valor para el usuario lo guay que es crearse un AlastriaID</p>
   <app-button-login 
     iconClass="fa fa-google" 

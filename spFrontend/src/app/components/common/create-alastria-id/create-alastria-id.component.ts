@@ -1,7 +1,5 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-
-// Services
-import { ServiceProviderService } from 'src/app/services/serviceProvider/service-provider.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-create-alastria-id',
@@ -16,7 +14,7 @@ import { ServiceProviderService } from 'src/app/services/serviceProvider/service
   ],
 })
 export class CreateAlastriaIdComponent implements OnInit {
-  @Output() handleGenerateQr = new EventEmitter<object>();
+  @Output() handleGenerateQr = new EventEmitter<string>();
   styleButtonAlastriaId = {
     color: '#00CAD6',
     backgroundIcon: 'white',
@@ -31,9 +29,9 @@ export class CreateAlastriaIdComponent implements OnInit {
 
   urlPlayStore = 'http://play.google.com/store/apps/'; // 'http://play.google.com/store/apps/details?id=<package_name>'
   urlAppStore = 'https://apps.apple.com/es/'; // 'http://itunes.apple.com/<país>/app/<nombre-aplicación>/id<ID-aplicación>?mt=8'
-  publicKey: object;
+  qrAlastriaId: string;
 
-  constructor(private serviceProvider: ServiceProviderService) { }
+  constructor(private http: HttpClient) { }
 
   ngOnInit() {
   }
@@ -43,22 +41,22 @@ export class CreateAlastriaIdComponent implements OnInit {
   }
 
   async createAlastriaId(event: any) {
-    console.log('Test');
-    const alastriaId = 'test';
     try {
-      this.publicKey = await this.serviceProvider.getPublicKey(alastriaId);
-      this.handleGenerateQr.emit(this.publicKey);
+      this.qrAlastriaId = await this.generateQr();
+      this.handleGenerateQr.emit(this.qrAlastriaId);
     } catch (error) {
       console.error('Error ', error);
-      this.publicKey = {
-        alastriaId: 'test'
-      };
-      this.handleGenerateQr.emit(this.publicKey);
     }
   }
 
   closeQrAlastriaId(): void {
-    this.publicKey = null;
-    this.handleGenerateQr.emit(this.publicKey);
+    this.qrAlastriaId = null;
+    this.handleGenerateQr.emit(this.qrAlastriaId);
+  }
+
+  private async  generateQr(): Promise<string> {
+    const configUrl = '../../../assets/configTest.json';
+    const config = await this.http.get(configUrl).toPromise();
+    return JSON.stringify(config);
   }
 }

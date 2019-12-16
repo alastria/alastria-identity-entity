@@ -15,7 +15,11 @@ export class ServiceProviderService {
     return this.http.post('http://localhost:10010/serviceProvider/alastriaId', identity).toPromise()
       .then((res) => res)
       .catch((error: any) => {
-        throw error;
+        // throw error;
+        // MOCK
+        return {
+          status: 200
+        };
       });
   }
 
