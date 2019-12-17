@@ -54,6 +54,23 @@ export class ProfileComponent implements OnInit {
     this.initIoConnection();
   }
 
+  handleSelectOption(option: string) {
+    console.log({option});
+    switch (option) {
+      case this.optionsMenu[0]:
+        this.editProfile();
+        break;
+      case this.optionsMenu[1]:
+        this.resetPassword();
+        break;
+      case this.optionsMenu[2]:
+        this.fillYourProfile();
+        break;
+      default:
+        break;
+    }
+  }
+
   handleGenerateQr(event: string): void {
     this.qrAlastriaId = event;
 
@@ -71,6 +88,18 @@ export class ProfileComponent implements OnInit {
     if (this.isAlastriaVerified) {
       this.optionsMenu.push('Fill your profile');
     }
+  }
+
+  private editProfile(): void {
+    console.log('EDIT PROFILE');
+  }
+
+  private resetPassword(): void {
+    console.log('RESET PASSWORD');
+  }
+
+  private fillYourProfile(): void {
+    console.log('FILL YOUR PROFILE');
   }
 
   private initIoConnection(): void {

@@ -36,7 +36,7 @@
           </div>
           <div class="row">
             <div class="col-12">
-              <app-menu [options]="optionsMenu"></app-menu>
+              <app-menu [options]="optionsMenu" (handleSelectOption)="handleSelectOption($event)"></app-menu>
             </div>
           </div>
       </div>
