@@ -81,7 +81,7 @@ export class LoginComponent implements OnInit {
   handleLoginSocial(socialName: string): void {
 
     if (socialName === 'alastriaId') {
-      $('#myModal').modal('show');
+      $('#simpleModal').modal('show');
     } else {
       console.log(socialName);
     }
@@ -101,7 +101,7 @@ export class LoginComponent implements OnInit {
       const userLogin = await this.userService.login(user);
 
       this.userService.setUserLoggedIn(userLogin);
-      $('#myModal').modal('hide');
+      $('#simpleModal').modal('hide');
       this.router.navigate(['/', 'profile']);
     } catch (error) {
       console.log('Error ', error);

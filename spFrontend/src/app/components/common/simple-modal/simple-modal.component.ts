@@ -1,5 +1,4 @@
 import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
-import { sanitizeHtml } from '@angular/core/src/sanitization/sanitization';
 
 @Component({
   selector: 'app-simple-modal',
@@ -14,7 +13,6 @@ export class SimpleModalComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    console.log(this.htmlContent);
   }
 
   /**
