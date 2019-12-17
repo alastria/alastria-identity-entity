@@ -8,7 +8,16 @@
         </button>
       </div>
       <div class="modal-body">
-        
+        <form [formGroup]="form" (ngSubmit)="submit()">
+          <div class="row" *ngFor="let option of form.controls.options.controls; let i = index">
+            <div class="col-12">
+                <label formArrayName="options">
+                  <input type="checkbox" [formControlName]="i">
+                  {{options[i].label}}
+                </label>
+            </div>
+          </div>
+        </form>
       </div>
       <div class="modal-footer justify-content-between">
         <button type="button" class="btn btn-primary" (click)=fillYourProfile()>Fill Your Profile!</button>
