@@ -52,6 +52,7 @@ export class ProfileComponent implements OnInit {
   ngOnInit() {
     this.user = this.userService.getUserLoggedIn();
     this.initIoConnection();
+    this.checkAlastriaIdIsVerified();
   }
 
   handleSelectOption(option: string) {
@@ -83,7 +84,16 @@ export class ProfileComponent implements OnInit {
   }
 
   handleOk(): void {
-    $('#myModal').modal('hide');
+    $('#simpleModal').modal('hide');
+    this.checkAlastriaIdIsVerified();
+  }
+
+  handleFillYourProfile(profileFields: any): void {
+    console.log(profileFields);
+    $('#modalFillProfile').modal('hide');
+  }
+
+ private checkAlastriaIdIsVerified() {
     this.isAlastriaVerified = this.userService.getIsAlastriaIdVerified();
     if (this.isAlastriaVerified) {
       this.optionsMenu.push('Fill your profile');
@@ -100,6 +110,7 @@ export class ProfileComponent implements OnInit {
 
   private fillYourProfile(): void {
     console.log('FILL YOUR PROFILE');
+    $('#modalFillProfile').modal('show');
   }
 
   private initIoConnection(): void {
@@ -115,7 +126,7 @@ export class ProfileComponent implements OnInit {
           .then((result: any) => {
             if (result && result.status === 200) {
               this.userService.setIsAlastriaIdVerified(true);
-              $('#myModal').modal('show');
+              $('#simpleModal').modal('show');
               console.log(result);
             } else {
               this.userService.setIsAlastriaIdVerified(true);
