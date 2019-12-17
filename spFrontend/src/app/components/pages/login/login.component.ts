@@ -91,7 +91,7 @@ export class LoginComponent implements OnInit {
   /**
    * Function handle when click ok in modal simple
    */
-  async handleLoginOk(): Promise<any> {
+  async handleOk(): Promise<any> {
 
     try {
       const user: User = {

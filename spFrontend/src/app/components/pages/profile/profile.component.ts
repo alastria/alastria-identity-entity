@@ -50,7 +50,13 @@ export class ProfileComponent implements OnInit {
 
   handleGenerateQr(event: string): void {
     this.qrAlastriaId = event;
-    this.socketService.send('Test'); // mock
+    if (this.qrAlastriaId) {
+      this.socketService.send('Test'); // mock
+    }
+  }
+
+  handleOk(): void {
+    $('#myModal').modal('hide');
   }
 
   private initIoConnection(): void {

@@ -7,7 +7,7 @@ import { sanitizeHtml } from '@angular/core/src/sanitization/sanitization';
   styleUrls: ['./simple-modal.component.css']
 })
 export class SimpleModalComponent implements OnInit {
-  @Output() handleLoginOk = new EventEmitter();
+  @Output() handleOk = new EventEmitter();
   @Input() type = 'normal';
   @Input() htmlContent: string;
   @Input() size: string; // xl, lg or sm
@@ -21,6 +21,6 @@ export class SimpleModalComponent implements OnInit {
    * Function for emit information when click ok
    */
   loginOk(): void {
-      this.handleLoginOk.emit();
+      this.handleOk.emit();
     }
   }

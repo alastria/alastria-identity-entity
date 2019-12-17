@@ -11,10 +11,13 @@
         <div *ngIf="type === 'qr'">
           <qrcode [qrdata]="'Your QR code data string'" [size]="'256'" [level]="'M'"></qrcode>
         </div>
-        <div *ngIf="type === 'info'" [innerHTML]="htmlContent">
+        <div *ngIf="type !== 'qr'" [innerHTML]="htmlContent">
         </div>
       </div>
-      <div class="modal-footer">
+      <div *ngIf="type === 'info'" class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)=loginOk()>Ok!</button>
+      </div>
+      <div *ngIf="type !== 'info'" class="modal-footer">
         <button type="button" class="btn btn-primary" (click)=loginOk()>Ok!</button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
       </div>
