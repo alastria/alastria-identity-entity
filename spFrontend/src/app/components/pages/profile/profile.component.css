@@ -17,6 +17,9 @@
     height: 200px;
 }
 
+#verified-button {
+    margin-top: 50px;
+}
 
 h3, h4 {
     position: relative;

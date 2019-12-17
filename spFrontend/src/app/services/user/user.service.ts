@@ -8,6 +8,7 @@ import { User } from 'src/app/models/user/user.model';
   providedIn: 'root'
 })
 export class UserService {
+  isAlastriaIdVerified: boolean;
 
   constructor(private http: HttpClient) { }
 
@@ -66,8 +67,24 @@ export class UserService {
    * @param user - data of user
    */
   setUserLoggedIn(user: User): void {
-      sessionStorage.setItem('currentUser', JSON.stringify(user));
-    }
+    sessionStorage.setItem('currentUser', JSON.stringify(user));
   }
+
+  /**
+   * Get isAlastriaIdVerified
+   * @returns boolean
+   */
+  getIsAlastriaIdVerified(): boolean {
+    return this.isAlastriaIdVerified;
+  }
+
+  /**
+   * set isAlastriaIdVerified
+   * @param isAlastriaIdVerified - true or false
+   */
+  setIsAlastriaIdVerified(isAlastriaIdVerified: boolean): void {
+    this.isAlastriaIdVerified = isAlastriaIdVerified;
+  }
+}
 
 

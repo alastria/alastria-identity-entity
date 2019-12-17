@@ -38,6 +38,12 @@ export class ProfileComponent implements OnInit {
     <h1> Success! </h1>
     <p> Congratulations, your Alastria ID has been created and vinculated with your accouunt </p>
   `;
+  styleButtonAlastriaId = {
+    color: '#00CAD6',
+    backgroundIcon: 'white',
+    colorIcon: 'black'
+  };
+  isAlastriaVerified: boolean;
 
   constructor(private userService: UserService,
               private socketService: SocketService,
@@ -50,13 +56,21 @@ export class ProfileComponent implements OnInit {
 
   handleGenerateQr(event: string): void {
     this.qrAlastriaId = event;
+
+    // MOCK - WEBSOCKET
     if (this.qrAlastriaId) {
-      this.socketService.send('Test'); // mock
+      setTimeout(() => {
+        this.socketService.send('Test');
+      }, 5000);
     }
   }
 
   handleOk(): void {
     $('#myModal').modal('hide');
+    this.isAlastriaVerified = this.userService.getIsAlastriaIdVerified();
+    if (this.isAlastriaVerified) {
+      this.optionsMenu.push('Fill your profile');
+    }
   }
 
   private initIoConnection(): void {
@@ -71,8 +85,11 @@ export class ProfileComponent implements OnInit {
         this.serviceProvider.createIdentity(identity)
           .then((result: any) => {
             if (result && result.status === 200) {
+              this.userService.setIsAlastriaIdVerified(true);
               $('#myModal').modal('show');
               console.log(result);
+            } else {
+              this.userService.setIsAlastriaIdVerified(true);
             }
           })
         .catch((error: any) => {

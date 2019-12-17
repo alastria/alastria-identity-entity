@@ -4,6 +4,7 @@
     <i *ngIf="!imgUrl" [class]="iconClass"></i>
   </div> 
   <button id="button" 
+    [disabled]="isDisabled"
     class="btn btn-primary" 
     [ngStyle]="{'background-color': style.color, 'border-color': style.color, 'width': style.width}"
     (click)="onLogin()">

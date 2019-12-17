@@ -15,9 +15,20 @@
         </div>
       </div>
       <app-disabled-form [user]="user"></app-disabled-form>
+      <div id="verified-button" class="row" *ngIf="isAlastriaVerified">
+        <div class="col-12">
+          <app-button-login 
+            title="Alastria Verified"
+            socialName="alastriaId"
+            [style]="styleButtonAlastriaId"
+            isDisabled=true
+            imgUrl="../../../assets/images/alastria-icon.svg">
+          </app-button-login>
+        </div>
+      </div>
     </div>
     <div class="col-md-6">
-      <div id="actions-menu" *ngIf="!qrAlastriaId">
+      <div *ngIf="!qrAlastriaId || isAlastriaVerified" id="actions-menu">
           <div class="row">
             <div class="col-12">
               <h4>Actions</h4>
@@ -29,7 +40,7 @@
             </div>
           </div>
       </div>
-      <div id="create-alastria-id" class="row">
+      <div *ngIf="!isAlastriaVerified" id="create-alastria-id" class="row" >
         <div class="col-12">
           <app-create-alastria-id (handleGenerateQr)="handleGenerateQr($event)"></app-create-alastria-id>
         </div>
