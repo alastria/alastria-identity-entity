@@ -18,6 +18,5 @@ function setConfig(config) {
 }
 
 function getConfig() {
-  log.debug(`${helper_name}[${getConfig.name}] -----> Getting config: ${JSON.stringify(myConfig)}`)
   return myConfig
 }

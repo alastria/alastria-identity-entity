@@ -20,6 +20,7 @@ loadJsonFile(pathFile)
 .then(config => {
   configHelper.setConfig(config)
   myConfig = configHelper.getConfig()
+  log.debug(`[App] -----> Congif getted ${JSON.stringify(myConfig)}`)
 
   if(!process.env.NODE_ENDPOINT) {
     nodeurl = myConfig.nodeUrl.alastria // change to local or alastria when yo are developing (swagger project start)

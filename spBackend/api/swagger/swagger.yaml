@@ -24,7 +24,7 @@ paths:
     # binds a127 app logic to a route
     x-swagger-router-controller: serviceProvider.controller
     post:
-      description: Create identity for a subject
+      description: Create identity for a issuer
       # used as the method name of the controller
       operationId: createAlastriaID
       parameters:
@@ -57,26 +57,26 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /serviceProvider/subjectCredential:
+  /serviceProvider/issuerCredential:
     # binds a127 app logic to a route
     x-swagger-router-controller: serviceProvider.controller
     post:
-      description: Create identity for a subject
+      description: Registry identity of a issuer
       # used as the method name of the controller
-      operationId: addSubjectCredential
+      operationId: addIssuerCredential
       parameters:
         - name: body
           in: body
-          description: Necessary data to add a new subject credential
+          description: Necessary data to add a new issuer credential
           required: false
           schema: 
-            $ref: "#/definitions/subjectCredentialdata"
+            $ref: "#/definitions/issuerCredentialdata"
       responses:
         "200":
           description: Success
           schema:
             # a pointer to a definition
-            $ref: "#/definitions/alastriaIdentityResponse"
+            $ref: "#/definitions/addCredentialResponse"
         # responses may fall through to errors
         "400":
           description: Bad Request
@@ -137,6 +137,10 @@ definitions:
     properties:
       alastriaID:
         type: string
+  addCredentialResponse:
+    properties:
+      status:
+        type: string
   publickeyResponse:
     properties:
       publicKey:
@@ -149,21 +153,18 @@ definitions:
         type: string
   identityData:
     type: "object"
-    required: [signedTX, address]
+    required: [signedTX]
     properties:
       "signedTX":
         type: string
         example: "0x47f4c19df21b0f98718e1ed91c7d5c5f5511a64093b0a3dd943fb54a74eb16d2....0xe90eeaa7931c54966c2badf7bed04b5bb46c6dc4970bd32c05cc614c27f93d0e"
-      "address":
-        type: string
-        example: "0xAd50746a88e73ea0259392344b9e7D18EB2B9463"
-  subjectCredentialdata:
+  issuerCredentialdata:
     type: "object"
-    required: [credentialHash, uri]
+    required: [issuerCredentialHash, issuer]
     properties:
-      "credentialHash":
+      "issuerCredentialHash":
         type: string
         example: "0x47f4c19df21b0f98718e1ed91c7d5c5f5511a64093b0a3dd943fb54a74eb16d2....0xe90eeaa7931c54966c2badf7bed04b5bb46c6dc4970bd32c05cc614c27f93d0e"
-      "uri":
+      "issuer":
         type: string
         example: "www.google.com"

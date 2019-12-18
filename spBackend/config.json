@@ -6,5 +6,48 @@
     "local": "http://localhost:8545",
     "alastria": "http://63.33.206.111/rpc"
   },
+  "identityKeystore": {
+    "address": "ad88f1a89cf02a32010b971d8c8af3a2c7b3bd94",
+    "crypto": {
+      "cipher": "aes-128-ctr",
+      "ciphertext": "bcef56807596862208759d1a0c4d46ab2be8aeff23b3f194f581e760e075a43b",
+      "cipherparams": {
+        "iv": "4451c563d1efc0ab04d23e09cf9de9f5"
+      },
+      "kdf": "scrypt",
+      "kdfparams": {
+        "dklen": 32,
+        "n": 262144,
+        "p": 1,
+        "r": 8,
+        "salt": "13a33892beb9dd9b7e6290c900696ff0b542eda8735b0342a1bb26f22d07f863"
+      },
+      "mac": "fd10bdfca443cf86e443eb5c2800f292851e1e32e9af843a20f6efc582380316"
+    },
+    "id": "e4daad64-e96d-4120-9268-1d45bca4ad85",
+    "version": 3
+  },
+  "subjectKeystore": {
+    "address": "a9728125c573924b2b1ad6a8a8cd9bf6858ced49",
+    "crypto": {
+      "cipher": "aes-128-ctr",
+      "ciphertext": "a38f4475ef7cdeb77f262cc03369061e28e37415269cc41977ddecd04d9d8429",
+      "cipherparams": {
+        "iv": "d9be09d3895821995ca234502950ad39"
+      },
+      "kdf": "scrypt",
+      "kdfparams": {
+        "dklen": 32,
+        "n": 262144,
+        "p": 1,
+        "r": 8,
+        "salt": "c2c813066974631abe6cd325f904ea28c3a01b3c39a006a75f0e3fa7e390484d"
+      },
+      "mac": "a90b79da477cbad7e3817bcdad7d921306174da490e1ae1732cc90f4805e2459"
+    },
+    "id": "8f0eda33-ace1-4aec-a26b-510d924f920c",
+    "version": 3
+  },
+  "addressPassword": "Passw0rd",
   "alastriaID": "0x8fabb292d8a214136651d2e822f65cfa6d23811c"
 }
