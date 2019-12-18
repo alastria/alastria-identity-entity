@@ -57,7 +57,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /serviceProvider/subjectCredential:
+  /serviceProvider/credential:
     # binds a127 app logic to a route
     x-swagger-router-controller: serviceProvider.controller
     post:

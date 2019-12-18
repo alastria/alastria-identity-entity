@@ -7,14 +7,15 @@
 const Log = require('log')
 const keythereum = require('keythereum')
 const configHelper = require('../helpers/config.helper')
+let myConfig = configHelper.getConfig()
 const { transactionFactory, UserIdentity, config, tokensFactory } = require('alastria-identity-lib')
 const web3Helper = require('../helpers/web3.helper')
 const moduleName = '[serviceProvider Model]'
 const web3 = web3Helper.getWeb3()
-const log = new Log('debug')
+const log = new Log(myConfig.Log.level)
 
-let myConfig = configHelper.getConfig()
-let identityKeystore = myConfig.identityKeystore
+let subjectKeystore = myConfig.identityKeystore
+let issuerKeystore = myConfig.adminKeystore
 let issuerIdentity, identityPrivateKey
 let subjectKeystore = myConfig.subjectKeystore
 let subjectIdentity, subjectPrivateKey
@@ -52,6 +53,7 @@ function getIssuerIdentity() {
 function sendSigned(subjectCredentialSigned) {
   return new Promise((resolve, reject) => {
     log.debug(`${moduleName}[${sendSigned.name}] -----> IN ...`)
+    console.log(subjectCredentialSigned)
     web3.eth.sendSignedTransaction(subjectCredentialSigned)
       .on('transactionHash', function (hash) {
         log.debug(`${moduleName}[${sendSigned.name}] -----> HASH: ${hash} ...`)
@@ -67,18 +69,26 @@ function sendSigned(subjectCredentialSigned) {
   })
 }
 
-function getKnownTransaction(subjectCredential) {
+function getKnownTransaction(entity, transaction) {
   return new Promise((resolve, reject) => {
-    let issuerID = getSubjectIdentity()
-    issuerID.getKnownTransaction(subjectCredential)
-      .then(cosa => {
-        resolve(cosa)
+    if(entity == 'issuer') {
+      let issuerID = getIssuerIdentity()
+      issuerID.getKnownTransaction(transaction)
+      .then(trxIssuer => {
+        resolve(trxIssuer)
       })
+    } else if(entity == 'subject') {
+      let subjectID = getSubjectIdentity()
+      subjectID.getKnownTransaction(transaction)
+      .then(trxIssuer => {
+        resolve(trxIssuer)
+      })
+    }
   })
 }
 
-function preparedAlastriaId() {
-  let preparedId = transactionFactory.identityManager.prepareAlastriaID(web3, subjectKeystore.address)
+async function preparedAlastriaId() {
+  let preparedId = await transactionFactory.identityManager.prepareAlastriaID(web3, subjectKeystore.address)
   return preparedId
 }
 
@@ -97,42 +107,46 @@ module.exports = {
 /////////////////////////////////////////////////////////
 
 function createAlastriaID(params) {
-  console.log(params)
   return new Promise((resolve, reject) => {
     log.debug(`${moduleName}[${createAlastriaID.name}] -----> IN ...`)
     log.debug(`${moduleName}[${createAlastriaID.name}] -----> Calling addSubject credential With params: ${JSON.stringify(params)}`)
 
-    preparedAlastriaId()
-    let txCreateAlastriaID = transactionFactory.identityManager.createAlastriaIdentity(web3, params.rawPublicKey)
-    let signedPreparedTransaction = issuerIdentity.getKnownTransaction(preparedId)
-    let signedCreateTransaction = subjectIdentity.getKnownTransaction(txCreateAlastriaID)
-    web3.eth.sendSignedTransaction(signedPreparedTransaction)
-        .on('transactionHash', function (hash) {
-          console.log("HASH: ", hash)
+    let preparedId = preparedAlastriaId()
+    let signedPreparedTransaction = getKnownTransaction('issuer', preparedId)
+    let signedCreateTransaction = params.signedTX
+    sendSigned(signedPreparedTransaction)
+    .then(prepareSendSigned => {
+      console.log(prepareSendSigned)
+      sendSigned(signedCreateTransaction)
+      .then(createSendSigned => {
+        console.log(createSendSigned)
+        web3.eth.call({
+          to: config.alastriaIdentityManager,
+          data: web3.eth.abi.encodeFunctionCall(config.contractsAbi['AlastriaIdentityManager']['identityKeys'], [subjectKeystore.address])
         })
-        .on('receipt', function (receipt) {
-          console.log("RECEIPT: ", receipt)
-          web3.eth.sendSignedTransaction(signedCreateTransaction)
-            .on('transactionHash', function (hash) {
-              console.log("HASH: ", hash)
-            })
-            .on('receipt', function (receipt) {
-              console.log("RECEIPT: ", receipt)
-              web3.eth.call({
-                to: config.alastriaIdentityManager,
-                data: web3.eth.abi.encodeFunctionCall(config.contractsAbi['AlastriaIdentityManager']['identityKeys'], [subjectKeystore.address])
-              })
-                .then(AlastriaIdentity => {
-                  console.log(`alastriaProxyAddress: 0x${AlastriaIdentity.slice(26)}`)
-                  configData.subject = `0x${AlastriaIdentity.slice(26)}`
-                  fs.writeFileSync('../configuration.json', JSON.stringify(configData))
-                  let alastriaDID = tokensFactory.tokens.createDID('quor', AlastriaIdentity.slice(26));
-                  console.log('the alastria DID is:', alastriaDID)
-                })
-            })
-            .on('error', console.error); // If a out of gas error, the second parameter is the receipt.
+        .then(AlastriaIdentity => {
+          configData.subject = `0x${AlastriaIdentity.slice(26)}`
+          let alastriaDID = tokensFactory.tokens.createDID('quor', AlastriaIdentity.slice(26));
+          let objectIdentity = {
+            proxyAddress: `0x${AlastriaIdentity.slice(26)}`,
+            did: alastriaDID
+          }
+          resolve(objectIdentity)
         })
-        .on('error', console.error); // If a out of gas error, the second parameter is the receipt.
+        .catch(error => {
+          log.error(`${moduleName}[${createAlastriaID.name}] -----> ${error}`)
+          reject(error)
+        })
+      })
+      .catch(error => {
+        log.error(`${moduleName}[${createAlastriaID.name}] -----> ${error}`)
+        reject(error)
+      })
+    })
+    .catch(error => {
+      log.error(`${moduleName}[${createAlastriaID.name}] -----> ${error}`)
+      reject(error)
+    })
   })
 }
 
@@ -141,7 +155,7 @@ function addSubjectCredential(params) {
         log.debug(`${moduleName}[${addSubjectCredential.name}] -----> IN ...`)
         log.debug(`${moduleName}[${addSubjectCredential.name}] -----> Calling addSubject credential With params: ${JSON.stringify(params)}`)
         let subjectCredential = transactionFactory.credentialRegistry.addSubjectCredential(web3, params.credentialHash, params.uri)
-        getKnownTransaction(subjectCredential)
+        getKnownTransaction('subject', subjectCredential)
           .then(subjectCredentialSigned => {
             sendSigned(subjectCredentialSigned)
               .then(receipt => {
