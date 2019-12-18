@@ -16,6 +16,9 @@ const log = new Log('debug')
 let myConfig = configHelper.getConfig()
 let identityKeystore = myConfig.identityKeystore
 let issuerIdentity, identityPrivateKey
+let subjectKeystore = myConfig.subjectKeystore
+let subjectIdentity, subjectPrivateKey
+
 
 /////////////////////////////////////////////////////////
 ///////             PRIVATE FUNCTIONS             ///////
@@ -47,10 +50,10 @@ function getIssuerIdentity() {
   }
 }
 
-function sendSigned(subjectCredentialSigned) {
+function sendSigned(issuerCredentialSigned) {
   return new Promise((resolve, reject) => {
     log.debug(`${moduleName}[${sendSigned.name}] -----> IN ...`)
-    web3.eth.sendSignedTransaction(subjectCredentialSigned)
+    web3.eth.sendSignedTransaction(issuerCredentialSigned)
       .on('transactionHash', function (hash) {
         log.debug(`${moduleName}[${sendSigned.name}] -----> HASH: ${hash} ...`)
       })
@@ -65,12 +68,12 @@ function sendSigned(subjectCredentialSigned) {
   })
 }
 
-function getKnownTransaction(subjectCredential) {
+function getKnownTransaction(issuerCredential) {
   return new Promise((resolve, reject) => {
     let issuerID = getSubjectIdentity()
-    issuerID.getKnownTransaction(subjectCredential)
-      .then(cosa => {
-        resolve(cosa)
+    issuerID.getKnownTransaction(issuerCredential)
+      .then(receipt => {
+        resolve(receipt)
       })
   })
 }
@@ -86,7 +89,7 @@ function preparedAlastriaId() {
 
 module.exports = {
   createAlastriaID,
-  addSubjectCredential,
+  addIssuerCredential,
   getCurrentPublicKey
 }
 
@@ -134,32 +137,32 @@ function createAlastriaID(params) {
   })
 }
 
-function addSubjectCredential(params) {
+function addIssuerCredential(params) {
       return new Promise((resolve, reject) => {
-        log.debug(`${moduleName}[${addSubjectCredential.name}] -----> IN ...`)
-        log.debug(`${moduleName}[${addSubjectCredential.name}] -----> Calling addSubject credential With params: ${JSON.stringify(params)}`)
-        let subjectCredential = transactionFactory.credentialRegistry.addSubjectCredential(web3, params.credentialHash, params.uri)
-        getKnownTransaction(subjectCredential)
-          .then(subjectCredentialSigned => {
-            sendSigned(subjectCredentialSigned)
+        log.debug(`${moduleName}[${addIssuerCredential.name}] -----> IN ...`)
+        log.debug(`${moduleName}[${addIssuerCredential.name}] -----> Calling addIssuer credential With params: ${JSON.stringify(params)}`)
+        let issuerCredential = transactionFactory.credentialRegistry.addIssuerCredential(web3, params.issuerCredentialHash)
+        getKnownTransaction(issuerCredential)
+          .then(issuerCredentialSigned => {
+            sendSigned(issuerCredentialSigned)
               .then(receipt => {
-                let subjectCredentialTransaction = transactionFactory.credentialRegistry.getSubjectCredentialStatus(web3, params.subject, params.credentialHash)
-                web3.eth.call(subjectCredentialTransaction)
-                  .then(SubjectCredentialStatus => {
-                    let result = web3.eth.abi.decodeParameters(["bool", "uint8"], SubjectCredentialStatus)
+                let issuerCredentialTransaction = transactionFactory.credentialRegistry.getIssuerCredentialStatus(web3, params.issuer, params.issuerCredentialHash)
+                web3.eth.call(issuerCredentialTransaction)
+                  .then(IssuerCredentialStatus => {
+                    let result = web3.eth.abi.decodeParameters(["bool", "uint8"], IssuerCredentialStatus)
                     let credentialStatus = {
                       "exists": result[0],
                       "status": result[1]
                     }
-                    log.debug(`${moduleName}[${addSubjectCredential.name}] -----> Success`)
+                    log.debug(`${moduleName}[${addIssuerCredential.name}] -----> Success`)
                     resolve(credentialStatus)
                   }).catch(error => {
-                    log.error(`${moduleName}[${addSubjectCredential.name}] -----> ${error}`)
+                    log.error(`${moduleName}[${addIssuerCredential.name}] -----> ${error}`)
                     reject(error)
                   })
               })
               .catch(error => {
-                log.error(`${moduleName}[${addSubjectCredential.name}] -----> ${error}`)
+                log.error(`${moduleName}[${addIssuerCredential.name}] -----> ${error}`)
                 reject(error)
               })
           })

@@ -8,7 +8,7 @@ const controller_name = '[serviceProvider Controller]'
 
 module.exports = {
   createAlastriaID,
-  addSubjectCredential,
+  addIssuerCredential,
   getCurrentPublicKey
 }
 
@@ -46,18 +46,18 @@ function createAlastriaID(req, res) {
    }
 }
 
-function addSubjectCredential(req, res) {
+function addIssuerCredential(req, res) {
   try {
-    log.debug(`${controller_name}[${addSubjectCredential.name}] -----> IN ...`)
+    log.debug(`${controller_name}[${addIssuerCredential.name}] -----> IN ...`)
     let params = req.swagger.params.body.value
-    log.debug(`${controller_name}[${addSubjectCredential.name}] -----> Sending params: ${JSON.stringify(params)}`)
-    serviceProvidermodel.addSubjectCredential(params)
+    log.debug(`${controller_name}[${addIssuerCredential.name}] -----> Sending params: ${JSON.stringify(params)}`)
+    serviceProvidermodel.addIssuerCredential(params)
     .then(addedCredential => {
-      log.debug(`${controller_name}[${addSubjectCredential.name}] -----> Successfully added credential: ${JSON.stringify(addedCredential)}`)
+      log.debug(`${controller_name}[${addIssuerCredential.name}] -----> Successfully added credential: ${JSON.stringify(addedCredential)}`)
       res.status(200).send(addedCredential)
     })
     .catch(error => {
-      log.debug(`${controller_name}[${addSubjectCredential.name}] -----> ${error}`)
+      log.debug(`${controller_name}[${addIssuerCredential.name}] -----> ${error}`)
       let msg = {
         message: 'Error: Transaction has been reverted by the EVM'
       }
@@ -65,7 +65,7 @@ function addSubjectCredential(req, res) {
     })
   }
   catch(error) {
-    log.debug(`${controller_name}[${addSubjectCredential.name}] -----> ${error}`)
+    log.debug(`${controller_name}[${addIssuerCredential.name}] -----> ${error}`)
     let msg = {
       message: 'Insternal Server Erorr'
     }
