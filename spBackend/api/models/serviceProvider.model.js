@@ -16,6 +16,8 @@ const log = new Log('debug')
 let myConfig = configHelper.getConfig()
 let identityKeystore = myConfig.identityKeystore
 let issuerIdentity, identityPrivateKey
+let subjectKeystore = myConfig.subjectKeystore
+let subjectIdentity, subjectPrivateKey
 
 /////////////////////////////////////////////////////////
 ///////             PRIVATE FUNCTIONS             ///////
