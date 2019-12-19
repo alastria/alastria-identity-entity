@@ -48,7 +48,7 @@
     "id": "9277b6ec-6c04-4356-9e1c-dee015f459c5",
     "version": 3
   },
-"subjectKeystore": {
+  "subjectKeystore": {
     "address": "a9728125c573924b2b1ad6a8a8cd9bf6858ced49",
     "crypto": {
       "cipher": "aes-128-ctr",

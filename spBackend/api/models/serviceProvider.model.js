@@ -19,7 +19,7 @@ let issuerKeystore = myConfig.adminKeystore
 let issuerIdentity, identityPrivateKey
 
 let identityKeystore = myConfig.identityKeystore
-let subjectIdentity, subjectPrivateKey
+
 
 let subjectKeystore = myConfig.subjectKeystore
 let subjectIdentity, subjectPrivateKey
@@ -33,8 +33,8 @@ let subjectIdentity, subjectPrivateKey
 function getSubjectIdentity() {
   try {
     log.info(`${moduleName}[${getSubjectIdentity.name}] -----> IN ...`)
-    subjectPrivateKey = keythereum.recover(myConfig.addressPassword, identityKeystore)
-    subjectIdentity = new UserIdentity(web3, `0x${identityKeystore.address}`, subjectPrivateKey)
+    subjectPrivateKey = keythereum.recover(myConfig.addressPassword, subjectKeystore)
+    subjectIdentity = new UserIdentity(web3, `0x${subjectKeystore.address}`, subjectPrivateKey)
     log.info(`${moduleName}[${getSubjectIdentity.name}] -----> Issuer Getted`)
     return subjectIdentity
   } catch (error) {
@@ -101,7 +101,7 @@ function getKnownTransaction(entity, transaction) {
 }
 
 function preparedAlastriaId() {
-  let preparedId = transactionFactory.identityManager.prepareAlastriaID(web3, identityKeystore.address)
+  let preparedId = transactionFactory.identityManager.prepareAlastriaID(web3, subjectKeystore.address)
   return preparedId
 }
 
@@ -197,8 +197,6 @@ function addIssuerCredential(params) {
         log.error(`${moduleName}[${addSubjectCredential.name}] -----> ${error}`)
         reject(error)
       })
-    })
-  })
 }
 
 function getCurrentPublicKey(subject) {
