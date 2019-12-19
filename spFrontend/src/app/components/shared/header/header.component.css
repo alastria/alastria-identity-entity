@@ -18,6 +18,12 @@ h2 {
     text-align: center;
 }
 
+li {
+    list-style: none;
+    margin: auto;
+    width: 140px;
+}
+
 .header {
     width: 100%;
     background-color: #343a40;

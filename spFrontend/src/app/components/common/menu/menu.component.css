@@ -2,3 +2,10 @@ ul {
     list-style:none;
     text-align: left;
 }
+
+a {
+    color: #007bff;
+    text-decoration: none;
+    background-color: transparent;
+    cursor: pointer;
+}

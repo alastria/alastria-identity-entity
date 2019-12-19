@@ -36,7 +36,7 @@
           </div>
           <div class="row">
             <div class="col-12">
-              <app-menu [options]="optionsMenu"></app-menu>
+              <app-menu [options]="optionsMenu" (handleSelectOption)="handleSelectOption($event)"></app-menu>
             </div>
           </div>
       </div>
@@ -47,10 +47,18 @@
       </div>
     </div>
   </div>
-  <app-simple-modal 
+  <app-simple-modal *ngIf="!isAlastriaVerified"
     size="lg"
     type="info"
     [htmlContent]="htmlSuccessCreateAlastriaId"
     (handleOk)="handleOk()">
+  </app-simple-modal>
+  <app-modal-fill-profile
+    (handleFillYourProfile)="handleFillYourProfile($event)">
+  </app-modal-fill-profile>
+  <app-simple-modal *ngIf="isAlastriaVerified"
+    (handleOk)="handleOkFillProfile()" 
+    type="qr"
+    [qrData]="qrDataFillProfile">
   </app-simple-modal>
 </div>

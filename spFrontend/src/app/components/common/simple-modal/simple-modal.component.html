@@ -1,4 +1,4 @@
-<div class="modal" tabindex="-1" role="dialog" id="myModal">
+<div class="modal" tabindex="-1" role="dialog" [id]="id">
   <div class="modal-dialog" [ngClass]="{'modal-xl': size === 'xl', 'modal-lg': size === 'lg', 'modal-sm': size === 'sm'}" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -9,7 +9,7 @@
       </div>
       <div class="modal-body">
         <div *ngIf="type === 'qr'">
-          <qrcode [qrdata]="'Your QR code data string'" [size]="'256'" [level]="'M'"></qrcode>
+          <qrcode [qrdata]="qrData" [size]="'256'" [level]="'M'"></qrcode>
         </div>
         <div *ngIf="type !== 'qr'" [innerHTML]="htmlContent">
         </div>

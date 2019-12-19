@@ -28,7 +28,7 @@ export class ServiceProviderService {
       signedTX
     };
 
-    return this.http.post('http://localhost:10010/serviceProvider/subjectCredential', body).toPromise()
+    return this.http.post('http://localhost:10010/serviceProvider/issuerCredential', body).toPromise()
       .then((res) => res)
       .catch((error: any) => {
         throw error;

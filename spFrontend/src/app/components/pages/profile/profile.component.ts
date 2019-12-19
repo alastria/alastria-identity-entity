@@ -44,6 +44,7 @@ export class ProfileComponent implements OnInit {
     colorIcon: 'black'
   };
   isAlastriaVerified: boolean;
+  qrDataFillProfile: any = '[]';
 
   constructor(private userService: UserService,
               private socketService: SocketService,
@@ -52,6 +53,23 @@ export class ProfileComponent implements OnInit {
   ngOnInit() {
     this.user = this.userService.getUserLoggedIn();
     this.initIoConnection();
+    this.checkAlastriaIdIsVerified();
+  }
+
+  handleSelectOption(option: string) {
+    switch (option) {
+      case this.optionsMenu[0]:
+        this.editProfile();
+        break;
+      case this.optionsMenu[1]:
+        this.resetPassword();
+        break;
+      case this.optionsMenu[2]:
+        this.fillYourProfile();
+        break;
+      default:
+        break;
+    }
   }
 
   handleGenerateQr(event: string): void {
@@ -66,11 +84,41 @@ export class ProfileComponent implements OnInit {
   }
 
   handleOk(): void {
-    $('#myModal').modal('hide');
+    $('#simpleModal').modal('hide');
+    this.checkAlastriaIdIsVerified();
+  }
+
+  handleOkFillProfile(): void {
+    console.log('Fill profile');
+    $('#simpleModal').modal('hide');
+  }
+
+  async handleFillYourProfile(profileFields: Array<string>) {
+    await $('#modalFillProfile').modal('hide');
+    this.qrDataFillProfile = JSON.stringify(profileFields);
+    console.log(this.qrDataFillProfile);
+    $('#simpleModal').modal('show');
+  }
+
+ private checkAlastriaIdIsVerified() {
     this.isAlastriaVerified = this.userService.getIsAlastriaIdVerified();
-    if (this.isAlastriaVerified) {
-      this.optionsMenu.push('Fill your profile');
+    const titleOption = 'Fill your profile';
+    if (this.isAlastriaVerified && !this.optionsMenu.includes(titleOption)) {
+      this.optionsMenu.push(titleOption);
     }
+  }
+
+  private editProfile(): void {
+    console.log('EDIT PROFILE');
+  }
+
+  private resetPassword(): void {
+    console.log('RESET PASSWORD');
+  }
+
+  private fillYourProfile(): void {
+    console.log('FILL YOUR PROFILE');
+    $('#modalFillProfile').modal('show');
   }
 
   private initIoConnection(): void {
@@ -80,13 +128,14 @@ export class ProfileComponent implements OnInit {
       .subscribe((message: any) => {
         const identity: Identity = {
           signedTX: message,
+          address: ''
         };
 
         this.serviceProvider.createIdentity(identity)
           .then((result: any) => {
             if (result && result.status === 200) {
               this.userService.setIsAlastriaIdVerified(true);
-              $('#myModal').modal('show');
+              $('#simpleModal').modal('show');
               console.log(result);
             } else {
               this.userService.setIsAlastriaIdVerified(true);
