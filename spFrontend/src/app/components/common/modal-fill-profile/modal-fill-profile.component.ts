@@ -7,8 +7,7 @@ import { FormGroup, FormArray, FormBuilder, FormControl } from '@angular/forms';
   styleUrls: ['./modal-fill-profile.component.css']
 })
 export class ModalFillProfileComponent implements OnInit {
-  @Output() handleFillYourProfile = new EventEmitter<any>();
-  optionsChecked: Array<string> = [];
+  @Output() handleFillYourProfile = new EventEmitter<Array<string>>();
   form: FormGroup;
   options = [
     {
@@ -53,9 +52,8 @@ export class ModalFillProfileComponent implements OnInit {
    */
   fillYourProfile(): void {
     const selectedOptionsIds = this.form.value.options
-      .map((v, i) => v ? this.options[i].id : null)
+      .map((v, i) => v ? this.options[i].value : null)
       .filter(v => v !== null);
-    console.log(selectedOptionsIds);
-    // this.handleFillYourProfile.emit();
+    this.handleFillYourProfile.emit(selectedOptionsIds);
   }
 }

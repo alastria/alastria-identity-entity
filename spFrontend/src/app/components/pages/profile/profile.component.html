@@ -47,13 +47,17 @@
       </div>
     </div>
   </div>
-  <app-simple-modal 
+  <app-simple-modal *ngIf="!isAlastriaVerified"
     size="lg"
     type="info"
     [htmlContent]="htmlSuccessCreateAlastriaId"
     (handleOk)="handleOk()">
   </app-simple-modal>
   <app-modal-fill-profile
-    (handleFillYourProfile)="handleFillYourProfile()">
+    (handleFillYourProfile)="handleFillYourProfile($event)">
   </app-modal-fill-profile>
+  <app-simple-modal *ngIf="isAlastriaVerified"
+    (handleOk)="handleOk()" 
+    type="qr">
+  </app-simple-modal>
 </div>

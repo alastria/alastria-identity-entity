@@ -88,15 +88,17 @@ export class ProfileComponent implements OnInit {
     this.checkAlastriaIdIsVerified();
   }
 
-  handleFillYourProfile(profileFields: any): void {
+  async handleFillYourProfile(profileFields: Array<string>) {
     console.log(profileFields);
-    $('#modalFillProfile').modal('hide');
+    await $('#modalFillProfile').modal('hide');
+    $('#simpleModal').modal('show');
   }
 
  private checkAlastriaIdIsVerified() {
     this.isAlastriaVerified = this.userService.getIsAlastriaIdVerified();
-    if (this.isAlastriaVerified) {
-      this.optionsMenu.push('Fill your profile');
+    const titleOption = 'Fill your profile';
+    if (this.isAlastriaVerified && !this.optionsMenu.includes(titleOption)) {
+      this.optionsMenu.push(titleOption);
     }
   }
 
@@ -120,6 +122,7 @@ export class ProfileComponent implements OnInit {
       .subscribe((message: any) => {
         const identity: Identity = {
           signedTX: message,
+          address: ''
         };
 
         this.serviceProvider.createIdentity(identity)

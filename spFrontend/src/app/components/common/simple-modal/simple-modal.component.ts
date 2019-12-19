@@ -10,6 +10,7 @@ export class SimpleModalComponent implements OnInit {
   @Input() type = 'normal';
   @Input() htmlContent: string;
   @Input() size: string; // xl, lg or sm
+  @Input() id = 'simpleModal';
   constructor() { }
 
   ngOnInit() {
