@@ -1,0 +1,39 @@
+.container {
+    background-color: white;
+    height: 100%;
+    margin: auto;
+    padding: 50px;
+}
+
+.container-button {
+    width: inherit;
+}
+
+#personal-data {
+    border-right: solid 1px;
+}
+
+#qr {
+    height: 200px;
+}
+
+#verified-button {
+    margin-top: 50px;
+}
+
+h3, h4 {
+    position: relative;
+    float: left;
+}
+
+h3 {
+    color: #325B8E;
+}
+
+fa {
+    color: #00CAD6;
+}
+
+h4 {
+    margin-top: 20px;
+}

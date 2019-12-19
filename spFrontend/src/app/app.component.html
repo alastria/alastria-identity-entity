@@ -1,8 +1,10 @@
 <app-header *ngIf="router.url !== '/login'"></app-header>
 <div class="content" [ngClass]="{'alastria-background-general': router.url !== '/login'}">
   <div  class="app"  [ngClass]="{'app-login': router.url === '/login', 'app-general': router.url !== '/login'}">
-    <router-outlet>
-    </router-outlet>
+    <div class="outer-outlet">
+      <router-outlet>
+      </router-outlet>
+    </div>
   </div>
   <div id="alastria-background-login" *ngIf="router.url === '/login'">
     <div>

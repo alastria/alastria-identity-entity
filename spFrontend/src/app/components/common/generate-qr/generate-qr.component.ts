@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
-import {style, state, animate, transition, trigger} from '@angular/animations';
+import {style, animate, transition, trigger} from '@angular/animations';
+import { CreateAlastriaIdComponent } from '../create-alastria-id/create-alastria-id.component';
 
 @Component({
   selector: 'app-generate-qr',
@@ -18,8 +19,6 @@ import {style, state, animate, transition, trigger} from '@angular/animations';
   ]
 })
 export class GenerateQrComponent implements OnInit {
-    @Input() title: string;
-    @Input() textButton: string;
     @Input() qrData: any;
     @Input() size = 256;
     @Input() level = 'M';

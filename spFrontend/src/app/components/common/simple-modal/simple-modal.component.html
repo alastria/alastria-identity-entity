@@ -1,5 +1,5 @@
 <div class="modal" tabindex="-1" role="dialog" id="myModal">
-  <div class="modal-dialog" role="document">
+  <div class="modal-dialog" [ngClass]="{'modal-xl': size === 'xl', 'modal-lg': size === 'lg', 'modal-sm': size === 'sm'}" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Alastria Id</h5>
@@ -8,11 +8,16 @@
         </button>
       </div>
       <div class="modal-body">
-        <div>
-          <qrcode [qrdata]="'Your QR code data string'" [size]="256" [level]="'M'"></qrcode>
+        <div *ngIf="type === 'qr'">
+          <qrcode [qrdata]="'Your QR code data string'" [size]="'256'" [level]="'M'"></qrcode>
+        </div>
+        <div *ngIf="type !== 'qr'" [innerHTML]="htmlContent">
         </div>
       </div>
-      <div class="modal-footer">
+      <div *ngIf="type === 'info'" class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)=loginOk()>Ok!</button>
+      </div>
+      <div *ngIf="type !== 'info'" class="modal-footer">
         <button type="button" class="btn btn-primary" (click)=loginOk()>Ok!</button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
       </div>

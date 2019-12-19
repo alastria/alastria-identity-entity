@@ -1,0 +1,54 @@
+<div id="qr" [ngStyle]="{'margin-bottom': (qrAlastriaId) ? '160px' : '0px'}">
+  <div class="row" *ngIf="qrAlastriaId">
+    <div class="col-12">
+      <h3>
+        Create Your AlastriaID
+      </h3>
+    </div>
+  </div>
+  <div id="subtitle" class="row" *ngIf="qrAlastriaId">
+    <div class="col-12">
+      <span>
+        Scan with your AlastriaID this QR Code to get your AlastriaId
+      </span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <app-generate-qr *ngIf="qrAlastriaId"
+        [qrData]="qrAlastriaId"
+        [size]="200"
+        (handleGenerateQr)="createAlastriaId()"
+        (handleCloseQr)="closeQrAlastriaId()">
+      </app-generate-qr>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="!qrAlastriaId">
+  <p>Mensaje de texto poniendo en valor para el usuario lo guay que es crearse un AlastriaID</p>
+  <app-button-login 
+    iconClass="fa fa-google" 
+    title="Create AlastriaID"
+    socialName="alastriaId"
+    [style]="styleButtonAlastriaId"
+    imgUrl="../../../assets/images/alastria-icon.svg"
+    (handleLoginSocial)="createAlastriaId($event)">
+  </app-button-login>
+</div>
+
+<div id="text-info-downloads" class="row">
+  <div class="col-12">
+    <span>You don´t hace your AlastriaID aplication yet</span>
+  </div>
+</div>
+<div class="row">
+  <div class="col-12 col-sm-12 col-lg-6">
+    <img (click)="goToStore(urlPlayStore)" src="../../../../assets/images/google-play-badge.svg" alt="google play logo">
+    <qrcode [qrdata]="urlPlayStore" [size]="128" [level]="'M'"></qrcode>
+  </div>
+  <div class="col-12 col-sm-12 col-lg-6">
+    <img (click)="goToStore(urlAppStore)" src="../../../../assets/images/app-store-logo.svg" alt="app store logo">
+    <qrcode [qrdata]="urlAppStore" [size]="128" [level]="'M'"></qrcode>
+  </div>
+</div>

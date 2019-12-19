@@ -9,6 +9,7 @@ export class ButtonLoginComponent implements OnInit {
   @Input() iconClass: string;
   @Input() title: string;
   @Input() socialName: string;
+  @Input() isDisabled: boolean;
   @Input() style: object = {};
   @Input() imgUrl: object = null;
   @Output() handleLoginSocial = new EventEmitter<string>();

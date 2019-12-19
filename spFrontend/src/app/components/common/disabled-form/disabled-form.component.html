@@ -1,17 +1,25 @@
 <form>
   <div class="row">
-    <div class="col-12 col-sm-6 col-md-4">
+    <div class="col-12 col-sm-12 col-md-10">
       <div class="form-group">
-        <label for="username">Username</label>
-        <input type="username" class="form-control" id="username" name="username" [(ngModel)]="username" disabled>
+        <label for="username">Name and Surname</label>
+        <input type="username" class="form-control" id="fullname" name="fullname" [(ngModel)]="fullName" disabled>
       </div>
     </div>
   </div>
   <div class="row">
-    <div class="col-12 col-sm-6 col-md-4">
+    <div class="col-12 col-sm-12 col-md-10">
       <div class="form-group">
         <label for="email">Email</label>
-        <input type="email" class="form-control" id="email" name="email" [(ngModel)]="email" disabled>
+        <input type="email" class="form-control" id="email" name="email" [(ngModel)]="user.email" disabled>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12 col-sm-12 col-md-10">
+      <div class="form-group">
+        <label for="email">Address</label>
+        <input type="address" class="form-control" id="address" name="address" [(ngModel)]="user.address" disabled>
       </div>
     </div>
   </div>

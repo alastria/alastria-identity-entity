@@ -4,20 +4,18 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AngularFontAwesomeModule } from 'angular-font-awesome';
 import { HttpClientModule } from '@angular/common/http';
 import { QRCodeModule } from 'angularx-qrcode';
+import { SharedModule } from '../shared/shared.module';
 
 // SERVICES
 import { UserService } from 'src/app/services/user/user.service';
 
 // COMPONENTS
 import { LoginComponent } from 'src/app/components/pages/login/login.component';
-import { ButtonLoginComponent } from 'src/app/components/common/button-login/button-login.component';
 import { SimpleModalComponent } from 'src/app/components/common/simple-modal/simple-modal.component';
 
 @NgModule({
   declarations: [
-    LoginComponent,
-    ButtonLoginComponent,
-    SimpleModalComponent
+    LoginComponent
   ],
   imports: [
     CommonModule,
@@ -25,7 +23,7 @@ import { SimpleModalComponent } from 'src/app/components/common/simple-modal/sim
     ReactiveFormsModule,
     HttpClientModule,
     AngularFontAwesomeModule,
-    QRCodeModule
+    SharedModule
   ],
   providers: [
     UserService
@@ -35,8 +33,6 @@ import { SimpleModalComponent } from 'src/app/components/common/simple-modal/sim
     FormsModule,
     ReactiveFormsModule,
     QRCodeModule,
-    ButtonLoginComponent,
-    SimpleModalComponent,
   ],
   bootstrap: []
 })

@@ -1,0 +1,35 @@
+#text-info-downloads {
+    font-size: 10px;
+    text-align: center;
+    margin-top: 40px;
+    margin-bottom: 10px;
+}
+
+#qr {
+    height: 180px;
+}
+
+#qr h3, #qr span {
+    color: #325B8E;
+}
+
+#subtitle {
+    margin-bottom: 8px;
+}
+
+p {
+    text-align: justify;
+    width: 250px;
+    font-size: 10px;
+    font-weight: bold;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+img {
+    width: 200px;
+    cursor: pointer;
+    border: solid 1px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}

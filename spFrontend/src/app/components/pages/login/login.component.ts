@@ -4,7 +4,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 // SERVICES
 import { UserService } from 'src/app/services/user/user.service';
-import { UserLogin } from 'src/app/models/userLogin/userLogin.model';
+import { User } from 'src/app/models/user/user.model';
 
 declare var $: any;
 
@@ -54,16 +54,15 @@ export class LoginComponent implements OnInit {
 
     try {
       this.errorLogin = '';
-      const user: UserLogin = {
+      const user: User = {
         name: this.formLogin.get('name').value,
-        password: this.formLogin.get('name').value
+        password: this.formLogin.get('password').value
       };
 
-      const isLogin = await this.userService.login(user);
+      const userLogin = await this.userService.login(user);
 
-      if (isLogin) {
-        this.router.navigate(['/', 'home']);
-      }
+      this.userService.setUserLoggedIn(userLogin);
+      this.router.navigate(['/', 'profile']);
     } catch (error) {
       console.log('Error ', error);
       if (error && error.status === 403) {
@@ -92,19 +91,18 @@ export class LoginComponent implements OnInit {
   /**
    * Function handle when click ok in modal simple
    */
-  async handleLoginOk(): Promise<any> {
+  async handleOk(): Promise<any> {
 
     try {
-      const user: UserLogin = {
-        name: 'test',
+      const user: User = {
+        name: 'Samuel',
         password: 'test'
       };
-      const isLogin = await this.userService.login(user);
+      const userLogin = await this.userService.login(user);
 
-      if (isLogin) {
-        $('#myModal').modal('hide');
-        this.router.navigate(['/', 'home']);
-      }
+      this.userService.setUserLoggedIn(userLogin);
+      $('#myModal').modal('hide');
+      this.router.navigate(['/', 'profile']);
     } catch (error) {
       console.log('Error ', error);
       if (error && error.status === 403) {
