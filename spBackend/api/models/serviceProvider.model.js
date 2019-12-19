@@ -15,8 +15,10 @@ const web3 = web3Helper.getWeb3()
 const log = Log.getLogger()
 log.level = myConfig.Log.level
 
-let issuerKeystore = myConfig.adminKeystore
-let issuerIdentity, identityPrivateKey
+let adminKeystore = myConfig.adminKeystore
+let issuerKeystore = myConfig.issuerKeystore
+let issuerIdentity, issuerPrivateKey
+
 
 let identityKeystore = myConfig.identityKeystore
 
@@ -46,8 +48,8 @@ function getSubjectIdentity() {
 function getIssuerIdentity() {
   try {
     log.info(`${moduleName}[${getIssuerIdentity.name}] -----> IN ...`)
-    identityPrivateKey = keythereum.recover(myConfig.addressPassword, issuerKeystore)
-    issuerIdentity = new UserIdentity(web3, `0x${issuerKeystore.address}`, identityPrivateKey)
+    issuerPrivateKey = keythereum.recover(myConfig.addressPassword, issuerKeystore)
+    issuerIdentity = new UserIdentity(web3, `0x${issuerKeystore.address}`, issuerPrivateKey)
     log.info(`${moduleName}[${getIssuerIdentity.name}] -----> Issuer Getted`)
     return issuerIdentity
   } catch (error) {
@@ -163,40 +165,44 @@ function createAlastriaID(params) {
 }
 
 
-function addIssuerCredential(params) {
-      return new Promise((resolve, reject) => {
-        log.debug(`${moduleName}[${addIssuerCredential.name}] -----> IN ...`)
-        log.debug(`${moduleName}[${addIssuerCredential.name}] -----> Calling addIssuer credential With params: ${JSON.stringify(params)}`)
-        let issuerCredential = transactionFactory.credentialRegistry.addIssuerCredential(web3, params.issuerCredentialHash)
-        getKnownTransaction(issuerCredential)
-          .then(issuerCredentialSigned => {
-            sendSigned(issuerCredentialSigned)
-              .then(receipt => {
-                let issuerCredentialTransaction = transactionFactory.credentialRegistry.getIssuerCredentialStatus(web3, params.issuer, params.issuerCredentialHash)
-                web3.eth.call(issuerCredentialTransaction)
-                  .then(IssuerCredentialStatus => {
-                    let result = web3.eth.abi.decodeParameters(["bool", "uint8"], IssuerCredentialStatus)
-                    let credentialStatus = {
-                      "exists": result[0],
-                      "status": result[1]
-                    }
-                    log.debug(`${moduleName}[${addIssuerCredential.name}] -----> Success`)
-                    resolve(credentialStatus)
-                  }).catch(error => {
-                    log.error(`${moduleName}[${addIssuerCredential.name}] -----> ${error}`)
-                    reject(error)
-                  })
-              })
-              .catch(error => {
-                log.error(`${moduleName}[${addIssuerCredential.name}] -----> ${error}`)
-                reject(error)
-              })
-          })
-      })
-      .catch(error => {
-        log.error(`${moduleName}[${addSubjectCredential.name}] -----> ${error}`)
-        reject(error)
-      })
+async function addIssuerCredential(params) {
+      try {
+    return new Promise((resolve, reject) => {
+      log.debug(`${moduleName}[${addIssuerCredential.name}] -----> IN ...`);
+      log.debug(`${moduleName}[${addIssuerCredential.name}] -----> Calling addIssuer credential With params: ${JSON.stringify(params)}`);
+      let issuerCredential = transactionFactory.credentialRegistry.addIssuerCredential(web3, params.issuerCredentialHash);
+      getKnownTransaction('issuer', issuerCredential);
+      log.debug("3.1")
+        .then(issuerCredentialSigned => {
+          sendSigned(issuerCredentialSigned)
+            .then(receipt => {
+              let issuerCredentialTransaction = transactionFactory.credentialRegistry.getIssuerCredentialStatus(web3, params.issuer, params.issuerCredentialHash);
+              web3.eth.call(issuerCredentialTransaction)
+                .then(IssuerCredentialStatus => {
+                  log.debug("3.4");
+                  let result = web3.eth.abi.decodeParameters(["bool", "uint8"], IssuerCredentialStatus);
+                  let credentialStatus = {
+                    "exists": result[0],
+                    "status": result[1]
+                  };
+                  log.debug(`${moduleName}[${addIssuerCredential.name}] -----> Success`);
+                  resolve(credentialStatus);
+                }).catch(error => {
+                  log.error(`${moduleName}[${addIssuerCredential.name}] -----> ${error}`);
+                  reject(error);
+                });
+            })
+            .catch(error => {
+              log.error(`${moduleName}[${addIssuerCredential.name}] -----> ${error}`);
+              reject(error);
+            });
+        });
+    });
+  }
+  catch (error_1) {
+    log.error(`${moduleName}[${addIssuerCredential.name}] -----> ${error_1}`);
+    reject(error_1);
+  }
 }
 
 function getCurrentPublicKey(subject) {
