@@ -11,6 +11,8 @@ export class SimpleModalComponent implements OnInit {
   @Input() htmlContent: string;
   @Input() size: string; // xl, lg or sm
   @Input() id = 'simpleModal';
+  @Input() qrData: any;
+
   constructor() { }
 
   ngOnInit() {

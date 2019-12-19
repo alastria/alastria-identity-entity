@@ -57,7 +57,8 @@
     (handleFillYourProfile)="handleFillYourProfile($event)">
   </app-modal-fill-profile>
   <app-simple-modal *ngIf="isAlastriaVerified"
-    (handleOk)="handleOk()" 
-    type="qr">
+    (handleOk)="handleOkFillProfile()" 
+    type="qr"
+    [qrData]="qrDataFillProfile">
   </app-simple-modal>
 </div>

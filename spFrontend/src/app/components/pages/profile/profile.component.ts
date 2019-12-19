@@ -44,6 +44,7 @@ export class ProfileComponent implements OnInit {
     colorIcon: 'black'
   };
   isAlastriaVerified: boolean;
+  qrDataFillProfile: any = '[]';
 
   constructor(private userService: UserService,
               private socketService: SocketService,
@@ -56,7 +57,6 @@ export class ProfileComponent implements OnInit {
   }
 
   handleSelectOption(option: string) {
-    console.log({option});
     switch (option) {
       case this.optionsMenu[0]:
         this.editProfile();
@@ -88,9 +88,15 @@ export class ProfileComponent implements OnInit {
     this.checkAlastriaIdIsVerified();
   }
 
+  handleOkFillProfile(): void {
+    console.log('Fill profile');
+    $('#simpleModal').modal('hide');
+  }
+
   async handleFillYourProfile(profileFields: Array<string>) {
-    console.log(profileFields);
     await $('#modalFillProfile').modal('hide');
+    this.qrDataFillProfile = JSON.stringify(profileFields);
+    console.log(this.qrDataFillProfile);
     $('#simpleModal').modal('show');
   }
 
