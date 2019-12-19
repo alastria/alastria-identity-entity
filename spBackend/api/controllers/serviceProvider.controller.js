@@ -1,9 +1,12 @@
 'use strict';
 
-const Log = require('log')
+const Log = require('log4js')
 const serviceProvidermodel = require('../models/serviceProvider.model')
+const configHelper = require('../helpers/config.helper')
+const myConfig = configHelper.getConfig()
 
-const log = new Log('debug')
+const log = Log.getLogger()
+log.level = myConfig.Log.level
 const controller_name = '[serviceProvider Controller]'
 
 module.exports = {
@@ -14,13 +17,13 @@ module.exports = {
 
 function createAlastriaID(req, res) {
   try {
-    log.debug(`${controller_name}[${createAlastriaID.name}] -----> IN ...`)
+    log.info(`${controller_name}[${createAlastriaID.name}] -----> IN ...`)
     let params = req.swagger.params.body.value
-    log.debug(`${controller_name}[${createAlastriaID.name}] -----> Sending params: ${JSON.stringify(params)}`)
+    log.info(`${controller_name}[${createAlastriaID.name}] -----> Sending params: ${JSON.stringify(params)}`)
     serviceProvidermodel.createAlastriaID(params)
     .then(alastriaID => {
       if (alastriaID) {
-        log.debug(`${controller_name}[${createAlastriaID.name}] -----> Successfully created new AlastriaId`)
+        log.info(`${controller_name}[${createAlastriaID.name}] -----> Successfully created new AlastriaId`)
         res.status(200).send(alastriaID)
       }
       else {
@@ -32,15 +35,15 @@ function createAlastriaID(req, res) {
     })
     .catch(error => {
       let msg = {
-        message: error
+        message: `${error}`
       }
       res.status(400).send(msg)
     })
   }
   catch(error) {
-    log.debug(`${controller_name}[${createAlastriaID.name}] -----> ${error}`)
+    log.info(`${controller_name}[${createAlastriaID.name}] -----> ${error}`)
     let msg = {
-      message: error
+      message: `${error}`
     }
     res.status(503).send(msg)
    }
@@ -75,13 +78,13 @@ function addIssuerCredential(req, res) {
 
 function getCurrentPublicKey(req, res) {
   try {
-    log.debug(`${controller_name}[${getCurrentPublicKey.name}] -----> IN ...`)
+    log.info(`${controller_name}[${getCurrentPublicKey.name}] -----> IN ...`)
     let alastriaId = req.swagger.params.alastriaId.value
-    log.debug(`${controller_name}[${getCurrentPublicKey.name}] -----> Sending params: ${JSON.stringify(alastriaId)}`)
+    log.info(`${controller_name}[${getCurrentPublicKey.name}] -----> Sending params: ${JSON.stringify(alastriaId)}`)
     serviceProvidermodel.getCurrentPublicKey(alastriaId)
     .then(credential => {
       if (credential) {
-        log.debug(`${controller_name}[${getCurrentPublicKey.name}] -----> Successfully obtained Public Key: ${credential}`)
+        log.info(`${controller_name}[${getCurrentPublicKey.name}] -----> Successfully obtained Public Key: ${credential}`)
         let result = {
           publicKey: credential.substr(31)
         }

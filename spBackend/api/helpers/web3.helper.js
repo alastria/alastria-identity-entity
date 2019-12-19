@@ -1,10 +1,12 @@
 // web3.helper.js
 
-const Log = require('log')
+const Log = require('log4js')
 const Web3 = require('web3')
 const helper_name = '[Web3 Helper]'
 
-const log = new Log('debug')
+
+const log = Log.getLogger()
+
 
 module.exports = {
   instanceWeb3,

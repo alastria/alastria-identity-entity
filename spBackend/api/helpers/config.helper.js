@@ -1,9 +1,9 @@
 // config.helper.js
 
-const Log = require('log')
+const Log = require('log4js')
 const helper_name = '[Config Helper]'
 
-const log = new Log('debug')
+const log = Log.getLogger()
 
 module.exports = {
   setConfig,
