@@ -1,15 +1,16 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Observer } from 'rxjs';
+import * as socketIo from 'socket.io-client';
 
+// MODELS
 import { Event } from 'src/app/models/enums/enums.model';
 
-import * as socketIo from 'socket.io-client';
+import { environment } from './../../../environments/environment';
 
 
 const webSocket = WebSocket; // Here we stub out the window object
 
-const SERVER_URL = 'ws://localhost:8080';
+const SERVER_URL = environment.websocketUrl;
 
 @Injectable({
   providedIn: 'root'
