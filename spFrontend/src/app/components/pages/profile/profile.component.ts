@@ -97,7 +97,7 @@ export class ProfileComponent implements OnInit {
   handleEditProfile(user: User) {
     this.userService.setUserLoggedIn(user);
     this.user = this.userService.getUserLoggedIn();
-    this.isDisabledProfileForm = false;
+    this.editProfile();
   }
 
   async handleFillYourProfile(profileFields: Array<string>) {
