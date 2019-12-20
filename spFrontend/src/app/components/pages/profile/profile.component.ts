@@ -45,6 +45,7 @@ export class ProfileComponent implements OnInit {
   };
   isAlastriaVerified: boolean;
   qrDataFillProfile: any = '[]';
+  isDisabledProfileForm = true;
 
   constructor(private userService: UserService,
               private socketService: SocketService,
@@ -93,6 +94,12 @@ export class ProfileComponent implements OnInit {
     $('#simpleModal').modal('hide');
   }
 
+  handleEditProfile(user: User) {
+    this.userService.setUserLoggedIn(user);
+    this.user = this.userService.getUserLoggedIn();
+    this.isDisabledProfileForm = false;
+  }
+
   async handleFillYourProfile(profileFields: Array<string>) {
     await $('#modalFillProfile').modal('hide');
     this.qrDataFillProfile = JSON.stringify(profileFields);
@@ -110,6 +117,7 @@ export class ProfileComponent implements OnInit {
 
   private editProfile(): void {
     console.log('EDIT PROFILE');
+    this.isDisabledProfileForm = !this.isDisabledProfileForm;
   }
 
   private resetPassword(): void {
