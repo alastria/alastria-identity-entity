@@ -1,7 +1,7 @@
 swagger: "2.0"
 info:
   version: "0.0.1"
-  title: Service Provider backend
+  title: Issuer & Service Provider backend
 # during dev, should point to your local machine
 host: localhost:10010
 # basePath prefixes all resource paths 
@@ -24,7 +24,7 @@ paths:
     # binds a127 app logic to a route
     x-swagger-router-controller: serviceProvider.controller
     post:
-      description: Create identity for a issuer
+      description: Create a new Alastria identity, sent to an entity acting as an issuer (or identity helper)
       # used as the method name of the controller
       operationId: createAlastriaID
       parameters:
@@ -61,7 +61,7 @@ paths:
     # binds a127 app logic to a route
     x-swagger-router-controller: serviceProvider.controller
     get:
-      description: Get current public keys for service providers
+      description: Get current public keys for all service providers
       operationId: getServiceProviders
       responses:
         "200":
@@ -90,7 +90,7 @@ paths:
     # binds a127 app logic to a route
     x-swagger-router-controller: serviceProvider.controller
     get:
-      description: Get current public keys for issuers
+      description: Get current public keys for all issuers
       operationId: getIssuers
       responses:
         "200":
@@ -119,7 +119,7 @@ paths:
     # binds a127 app logic to a route
     x-swagger-router-controller: serviceProvider.controller
     get:
-      description: Get publick key of a Alastria Id
+      description: Get public key of a given Alastria DID
       operationId: getCurrentPublicKey
       parameters:
         - name: alastriaDID
@@ -154,7 +154,7 @@ paths:
     # binds a127 app logic to a route
     x-swagger-router-controller: serviceProvider.controller
     get:
-      description: Get publick key of a Alastria Id
+      description: Get past & current public keys of a given Alastria Id
       operationId: getCurrentPublicKeyList
       parameters:
         - name: alastriaDID
@@ -189,7 +189,7 @@ paths:
     # binds a127 app logic to a route
     x-swagger-router-controller: serviceProvider.controller
     get:
-      description: Get aailable credentials catalog
+      description: Get available credentials catalog from an issuer
       operationId: getCredentialCatalog
       responses:
         "200":
@@ -215,9 +215,11 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
     post:
-      description: Registry identity of a issuer
+      # The user type (subject or Issuer) could be determined from the entity session -> DID user type
+      # for the MVP we could assume the call is from an issuer the implementation for a subject will be required in the future
+      description: Registry Credential by the issuer
       # used as the method name of the controller
-      operationId: addSubjectCredential
+      operationId: addIssuerCredential
       parameters:
         - name: body
           in: body
@@ -251,8 +253,8 @@ paths:
   /credential/{identityDID}:
     get:
       x-swagger-router-controller: serviceProvider.controller
-      description: Get all the credentials available for the user with the status {available, valid, expired}
-      operationId: getSubjectCredentialListFromIssuer
+      description: Get all the credentials available for the Subject (IdentityDID) with the status {available, valid, expired}
+      operationId: getSubjectCredentialList
       parameters:
         - name: identityDID
           in: path
@@ -285,7 +287,7 @@ paths:
   /credential/status/{credentialHash}:
     get:
       x-swagger-router-controller: serviceProvider.controller
-      description: get current status for the given credential
+      description: get current Issuer or Subject status for the given credential
       operationId: getCredentialStatus
       parameters:
         - name: credentialHash
@@ -293,6 +295,7 @@ paths:
           type: string
           description: credential hash
           required: true
+        # only one of issuer & subject parameters should be used to obtain the Issuer status or the Subject status 
         - name: issuer
           in: query
           type: string
@@ -327,7 +330,8 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
     post:
-      description: Update a credential status if posible
+      # for the MVP we only need post from the issuer but a post for the subject to delete the credential will be required in the future 
+      description: Update an issuer credential status if posible
       # used as the method name of the controller
       operationId: updateCredentialStatus
       parameters:
@@ -369,7 +373,8 @@ paths:
     # binds a127 app logic to a route
     x-swagger-router-controller: serviceProvider.controller
     post:
-      description: Create presentation
+      # The presentation can only be created by an issuer and is not required for the MVP
+      description: Create presentation by the Subject
       # used as the method name of the controller
       operationId: addSubjectPresentation
       parameters:
@@ -440,7 +445,7 @@ paths:
   /presentation/status/{presentationHash}:
     get:
       x-swagger-router-controller: serviceProvider.controller
-      description: get current status for the given presentation
+      description: get current Subject or Service Provider (Receiver) status for the given presentation
       operationId: getpresentationStatus
       parameters:
         - name: presentationHash
@@ -448,10 +453,11 @@ paths:
           type: string
           description: presentation hash
           required: true
-        - name: issuer
+        # only one of serviceProvider & subject parameters should be used to obtain the Issuer status or the Subject status 
+        - name: serviceProvider
           in: query
           type: string
-          description: isssuer did
+          description: serviceProvider did
           required: false
         - name: subject
           in: query
@@ -482,10 +488,12 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
     post:
+      # The user type (subject or ServiceProvider) could be determined from the entity session -> DID user type
+      # for the MVP we could assume the call is from a ServiceProvider, the implementation for a subject will be required in the future    
       x-swagger-router-controller: serviceProvider.controller
-      description: Update a presentation status if posible
+      description: Update a serviceProvider presentation status if posible
       # used as the method name of the controller
-      operationId: updatepresentationStatus
+      operationId: updateReceiverPresentationStatus
       parameters:
         - name: presentationHash
           in: path
