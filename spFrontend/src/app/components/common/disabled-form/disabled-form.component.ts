@@ -21,15 +21,24 @@ export class DisabledFormComponent implements OnInit {
     this.generateFullName();
   }
 
+  /**
+   * Generate full name for show in html
+   */
   generateFullName(): void {
     this.fullName = (this.user) ? `${this.user.name} ${this.user.surname}` : '';
   }
 
+  /**
+   * Function for edit profile of user
+   */
   editProfile(): void {
     this.fullNameToNameOrSurname();
     this.handleEditProfile.emit(this.user);
   }
 
+  /**
+   * Function for get name and surname of the fullName
+   */
   private fullNameToNameOrSurname(): void {
     const fullNameSplit = this.fullName.split(' ');
     this.user.name = fullNameSplit[0];

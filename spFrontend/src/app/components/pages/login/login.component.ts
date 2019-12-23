@@ -51,7 +51,6 @@ export class LoginComponent implements OnInit {
    * Function for submit login
    */
   async onSubmit(): Promise<any> {
-
     try {
       this.errorLogin = '';
       const user: User = {
@@ -79,20 +78,17 @@ export class LoginComponent implements OnInit {
    * @param socialName - type social (facebook, google or alastriaId)
    */
   handleLoginSocial(socialName: string): void {
-
     if (socialName === 'alastriaId') {
       $('#simpleModal').modal('show');
     } else {
       console.log(socialName);
     }
-
   }
 
   /**
    * Function handle when click ok in modal simple
    */
   async handleOk(): Promise<any> {
-
     try {
       const user: User = {
         name: 'Samuel',
@@ -114,8 +110,6 @@ export class LoginComponent implements OnInit {
   }
 
   goToHome(): void {
-
     this.router.navigate(['/', 'home']);
-
   }
 }

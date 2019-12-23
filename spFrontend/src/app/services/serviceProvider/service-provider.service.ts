@@ -16,6 +16,11 @@ export class ServiceProviderService {
 
   constructor(private http: HttpClient) { }
 
+  /**
+   * Function for create identity calling at the server
+   * @param identity - data of identity for create a new identity
+   * @returns {*}
+   */
   createIdentity(identity: Identity): any {
     return this.http.post(`${this.apiUrl}/serviceProvider/alastriaId`, identity).toPromise()
       .then((res) => res)
@@ -28,6 +33,11 @@ export class ServiceProviderService {
       });
   }
 
+  /**
+   * Function for create subject credential calling at the server
+   * @param signedTX - hash of the signed transaction
+   * @returns {*}
+   */
   createSubjectCredential(signedTX: string): any {
     const body = {
       signedTX
@@ -39,7 +49,10 @@ export class ServiceProviderService {
         throw error;
       });
   }
-
+  /**
+   * @param alastriaId - identifier of alastria for get public key
+   * @returns {*}
+   */
   getPublicKey(alastriaId: string): any {
     return this.http.get(`${this.apiUrl}//serviceProvider/${alastriaId}`).toPromise()
       .then((res) => res)

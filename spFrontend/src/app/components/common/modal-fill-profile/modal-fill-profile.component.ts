@@ -37,8 +37,11 @@ export class ModalFillProfileComponent implements OnInit {
     }
   }
 
-  private addCheckboxes() {
-    this.options.forEach((o, i) => {
+  /**
+   * function for add checkboxes in the form
+   */
+  private addCheckboxes(): void {
+      this.options.forEach((o, i) => {
       const control = new FormControl(false); // if first item set to true, else false
       (this.form.controls.options as FormArray).push(control);
     });

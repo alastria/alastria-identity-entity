@@ -36,11 +36,18 @@ export class CreateAlastriaIdComponent implements OnInit {
   ngOnInit() {
   }
 
-  goToStore(url: string) {
+  /**
+   * Function for go to store of Play store or app store
+   * @param url - Play store or app store url
+   */
+  goToStore(url: string): void {
     window.open(url, '_blank');
   }
 
-  async createAlastriaId(event: any) {
+  /**
+   * When click in create alastria id button then active this function that generate qr and emit handleGenerateQr
+   */
+  async createAlastriaId(): Promise<any> {
     try {
       this.qrAlastriaId = await this.generateQr();
       this.handleGenerateQr.emit(this.qrAlastriaId);
@@ -49,12 +56,18 @@ export class CreateAlastriaIdComponent implements OnInit {
     }
   }
 
+  /**
+   * Function for emit the event close qr
+   */
   closeQrAlastriaId(): void {
     this.qrAlastriaId = null;
     this.handleGenerateQr.emit(this.qrAlastriaId);
   }
-
-  private async  generateQr(): Promise<string> {
+/**
+ * generate qr with config for create alastria id
+ * @returns - config
+ */
+private async  generateQr(): Promise<string> {
     const configUrl = '../../../assets/configTest.json';
     const config = await this.http.get(configUrl).toPromise();
     return JSON.stringify(config);
