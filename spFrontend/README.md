@@ -24,7 +24,7 @@ ng serve --configuration={configurationName}
 
 ### Installation and Deployment 🔧
 
-The first step open a terminal inside the proyect and go to chamaleon-front folder
+The first step open a terminal inside the proyect and go to spFrontend folder
 ```
 cd spFrontend
 ```
@@ -41,7 +41,7 @@ npm run start
 
 ### Installation and Deployment with Docker 🔧
 
-The first step open a terminal inside the proyect and go to chamaleon-front folder
+The first step open a terminal inside the proyect and go to spFrontend folder
 ```
 cd spFrontend
 ```

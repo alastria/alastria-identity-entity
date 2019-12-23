@@ -63,11 +63,12 @@ export class CreateAlastriaIdComponent implements OnInit {
     this.qrAlastriaId = null;
     this.handleGenerateQr.emit(this.qrAlastriaId);
   }
-/**
- * generate qr with config for create alastria id
- * @returns - config
- */
-private async  generateQr(): Promise<string> {
+
+  /**
+   * generate qr with config for create alastria id
+   * @returns - config
+   */
+  private async  generateQr(): Promise<string> {
     const configUrl = '../../../assets/configTest.json';
     const config = await this.http.get(configUrl).toPromise();
     return JSON.stringify(config);

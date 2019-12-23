@@ -49,6 +49,7 @@ export class ServiceProviderService {
         throw error;
       });
   }
+
   /**
    * @param alastriaId - identifier of alastria for get public key
    * @returns {*}
