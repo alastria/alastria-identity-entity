@@ -1,27 +1,67 @@
-# SPFront
+# SpFrontend
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.3.8.
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.7.2.
 
-## Development server
+## Starting 🚀
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+These instructions will allow you to get a copy of the project running on your local machine for development and testing purposes:
 
-## Code scaffolding
+Clone the proyect:
+```
+git clone https://github.com/alastria/alastria-identity-serviceProvider.git
+```
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+### ng build and ng serve with environments
 
-## Build
+For build or serve aplication with differents environments your insert this commands:
+```
+ng build --configuration={configurationName}
+```
+or
+```
+ng serve --configuration={configurationName}
+```
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+### Installation and Deployment 🔧
 
-## Running unit tests
+The first step open a terminal inside the proyect and go to chamaleon-front folder
+```
+cd spFrontend
+```
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Then you have to install all the dependencies
+```
+npm install
+```
 
-## Running end-to-end tests
+Finally you can init the application
+```
+npm run start
+```
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+### Installation and Deployment with Docker 🔧
 
-## Further help
+The first step open a terminal inside the proyect and go to chamaleon-front folder
+```
+cd spFrontend
+```
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+Then you have to build the project
+```
+npm run build
+```
+
+Create image of docker
+```
+docker build -t spFrontend .
+```
+
+After go to the previous folder
+```
+cd ..
+```
+
+Finally you can init the docker container
+```
+docker-compose up -d spFrontend
+```
