@@ -441,7 +441,6 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-
   /presentation/status/{presentationHash}:
     get:
       x-swagger-router-controller: serviceProvider.controller
@@ -548,7 +547,7 @@ definitions:
   credentialCatalogList:
     properties: 
       list:
-        type: array
+        type: string
         #schema:
           #$ref: "#/definitions/credentialCatalog"
   credentialCatalog:
@@ -574,7 +573,7 @@ definitions:
   publickeyListResponse:
     properties:
       publicKey:
-        type: array
+        type: string
   addPresentationResponse:
     properties:
       status:
@@ -582,7 +581,7 @@ definitions:
   updatePresentationData:
     properties:
       newStatus:
-        type: string
+        type: number
   presentationList:
     properties:
       list:
