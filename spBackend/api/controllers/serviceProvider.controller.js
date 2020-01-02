@@ -141,7 +141,7 @@ function getpresentationStatus(req, res){
 
 function updateReceiverPresentationStatus(req, res){
   try {
-    console.log(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> IN ...`);
+    log.debug(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> IN ...`);
     let presentationHash = req.swagger.params.presentationHash.value;
     log.debug(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> Sending params: ${JSON.stringify(presentationHash)}`)
     let newStatus = req.swagger.params.body.value;    
