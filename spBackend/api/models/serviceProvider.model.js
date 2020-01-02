@@ -110,42 +110,45 @@ module.exports = {
 /////////////////////////////////////////////////////////
 
 function createAlastriaID(params) {
-  console.log(params)
   return new Promise((resolve, reject) => {
-    log.debug(`${moduleName}[${createAlastriaID.name}] -----> IN ...`)
-    log.debug(`${moduleName}[${createAlastriaID.name}] -----> Calling addSubject credential With params: ${JSON.stringify(params)}`)
+    log.info(`${moduleName}[${createAlastriaID.name}] -----> IN ...`)
+    log.info(`${moduleName}[${createAlastriaID.name}] -----> Calling addSubject credential With params: ${JSON.stringify(params)}`)
 
-    preparedAlastriaId()
-    let txCreateAlastriaID = transactionFactory.identityManager.createAlastriaIdentity(web3, params.rawPublicKey)
-    let signedPreparedTransaction = issuerIdentity.subjectGetKnownTransaction(preparedId)
-    let signedCreateTransaction = subjectIdentity.subjectGetKnownTransaction(txCreateAlastriaID)
-    web3.eth.sendSignedTransaction(signedPreparedTransaction)
-        .on('transactionHash', function (hash) {
-          console.log("HASH: ", hash)
+    let signedCreateTransaction = params.signedTX
+    let preparedId = preparedAlastriaId()
+    issuerGetKnownTransaction(preparedId)
+    .then(signedPreparedTransaction => {
+      sendSigned(signedPreparedTransaction)
+      .then(prepareSendSigned => {
+        sendSigned(signedCreateTransaction)
+        .then(createSendSigned => {
+          web3.eth.call({
+            to: config.alastriaIdentityManager,
+            data: web3.eth.abi.encodeFunctionCall(config.contractsAbi['AlastriaIdentityManager']['identityKeys'], [issuerKeystore.address])
+          })
+          .then(AlastriaIdentity => {
+            let alastriaDID = tokensFactory.tokens.createDID('quor', AlastriaIdentity.slice(26));
+            let objectIdentity = {
+              proxyAddress: `0x${AlastriaIdentity.slice(26)}`,
+              did: alastriaDID
+            }
+            resolve(objectIdentity)
+          })
+          .catch(error => {
+            log.error(`${moduleName}[${createAlastriaID.name}] -----> ${error}`)
+            reject(error)
+          })
         })
-        .on('receipt', function (receipt) {
-          console.log("RECEIPT: ", receipt)
-          web3.eth.sendSignedTransaction(signedCreateTransaction)
-            .on('transactionHash', function (hash) {
-              console.log("HASH: ", hash)
-            })
-            .on('receipt', function (receipt) {
-              console.log("RECEIPT: ", receipt)
-              web3.eth.call({
-                to: config.alastriaIdentityManager,
-                data: web3.eth.abi.encodeFunctionCall(config.contractsAbi['AlastriaIdentityManager']['identityKeys'], [subjectKeystore.address])
-              })
-                .then(AlastriaIdentity => {
-                  console.log(`alastriaProxyAddress: 0x${AlastriaIdentity.slice(26)}`)
-                  configData.subject = `0x${AlastriaIdentity.slice(26)}`
-                  fs.writeFileSync('../configuration.json', JSON.stringify(configData))
-                  let alastriaDID = tokensFactory.tokens.createDID('quor', AlastriaIdentity.slice(26));
-                  console.log('the alastria DID is:', alastriaDID)
-                })
-            })
-            .on('error', console.error); // If a out of gas error, the second parameter is the receipt.
+        .catch(error => {
+          log.error(`${moduleName}[${createAlastriaID.name}] -----> ${error}`)
+          reject(error)
         })
-        .on('error', console.error); // If a out of gas error, the second parameter is the receipt.
+      })
+      .catch(error => {
+        log.error(`${moduleName}[${createAlastriaID.name}] -----> ${error}`)
+        reject(error)
+      })
+    })
   })
 }
 
@@ -185,7 +188,6 @@ function getCurrentPublicKey(subject) {
       return new Promise((resolve, reject) => {
         log.debug(`${moduleName}[${getCurrentPublicKey.name}] -----> IN ...`)
         let currentPubKey = transactionFactory.publicKeyRegistry.getCurrentPublicKey(web3, subject)
-        log.debug(`${moduleName}[${getCurrentPublicKey.name}] -----> calling web3 with params: ${subject}`)
         web3.eth.call(currentPubKey)
           .then(result => {
             log.debug(`${moduleName}[${getCurrentPublicKey.name}] -----> Success`)
