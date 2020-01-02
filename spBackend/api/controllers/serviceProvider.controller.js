@@ -12,7 +12,9 @@ const controller_name = '[serviceProvider Controller]'
 module.exports = {
   createAlastriaID,
   addIssuerCredential,
-  getCurrentPublicKey
+  getCurrentPublicKey,
+  getpresentationStatus,
+  updateReceiverPresentationStatus
 }
 
 function createAlastriaID(req, res) {
@@ -78,9 +80,9 @@ function addIssuerCredential(req, res) {
 
 function getCurrentPublicKey(req, res) {
   try {
-    log.info(`${controller_name}[${getCurrentPublicKey.name}] -----> IN ...`)
-    let alastriaId = req.swagger.params.alastriaId.value
-    log.info(`${controller_name}[${getCurrentPublicKey.name}] -----> Sending params: ${JSON.stringify(alastriaId)}`)
+    log.debug(`${controller_name}[${getCurrentPublicKey.name}] -----> IN ...`)
+    let alastriaId = req.swagger.params.alastriaDID.value
+    log.debug(`${controller_name}[${getCurrentPublicKey.name}] -----> Sending params: ${JSON.stringify(alastriaId)}`)
     serviceProvidermodel.getCurrentPublicKey(alastriaId)
     .then(credential => {
       if (credential) {
@@ -107,4 +109,57 @@ function getCurrentPublicKey(req, res) {
   catch(error) {
     log.error(`${controller_name}[${getCurrentPublicKey.name}] -----> ${error}`)
    }
+}
+
+function getpresentationStatus(req, res){
+  try {
+    log.debug(`${controller_name}[${getpresentationStatus.name}] -----> IN ...`);
+    let presentationHash = req.swagger.params.presentationHash.value;
+    log.debug(`${controller_name}[${getpresentationStatus.name}] -----> Sending params: ${JSON.stringify(presentationHash)}`)
+    let issuer = req.swagger.params.serviceProvider.value;
+    let subject = req.swagger.params.subject.value;
+    serviceProvidermodel.getpresentationStatus(presentationHash,issuer,subject)
+      .then(presentationStatus => { 
+        if (presentationStatus != null){
+          log.debug(`${controller_name}[${getpresentationStatus.name}] -----> Successfully obtained presentation status: ${presentationStatus}`);
+          res.status(200).send(presentationStatus);
+        }
+        else {
+          let msg = {
+            message: 'Error getting presentation status'
+          }
+          res.status(404).send(msg)
+        }        
+      })
+      .catch(error => {
+        let msg = {
+          message: `Insternal Server Error: ${error}`
+        }
+        res.status(503).send(msg)
+      })         
+  } catch (error) {
+    log.error(`${controller_name}[${getpresentationStatus.name}] -----> ${error}`)
+  }
+}
+
+function updateReceiverPresentationStatus(req, res){
+  try {
+    log.debug(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> IN ...`);
+    let presentationHash = req.swagger.params.presentationHash.value;
+    log.debug(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> Sending params: ${JSON.stringify(presentationHash)}`)
+    let newStatus = req.swagger.params.body.value;    
+    serviceProvidermodel.updateReceiverPresentationStatus(presentationHash,newStatus)
+      .then(() => { 
+          log.debug(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> Successfully updated status presentation`);
+          res.status(200).send();
+      })
+      .catch(error => {
+        let msg = {
+          message: `Insternal Server Error: ${error}`
+        }
+        res.status(503).send(msg)
+      })         
+  } catch (error) {
+    log.error(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> ${error}`)
+  }
 }

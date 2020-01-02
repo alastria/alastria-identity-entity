@@ -19,10 +19,9 @@ let adminKeystore = myConfig.adminKeystore
 let issuerKeystore = myConfig.issuerKeystore
 let issuerIdentity, issuerPrivateKey
 
-
-let identityKeystore = myConfig.identityKeystore
-
-
+let myConfig = configHelper.getConfig()
+let issuerKeystore = myConfig.issuerKeystore
+let issuerIdentity, issuerPrivateKey
 let subjectKeystore = myConfig.subjectKeystore
 let subjectIdentity, subjectPrivateKey
 
@@ -37,7 +36,7 @@ function getSubjectIdentity() {
     log.info(`${moduleName}[${getSubjectIdentity.name}] -----> IN ...`)
     subjectPrivateKey = keythereum.recover(myConfig.addressPassword, subjectKeystore)
     subjectIdentity = new UserIdentity(web3, `0x${subjectKeystore.address}`, subjectPrivateKey)
-    log.info(`${moduleName}[${getSubjectIdentity.name}] -----> Issuer Getted`)
+    log.debug(`${moduleName}[${getSubjectIdentity.name}] -----> Subject Getted`)
     return subjectIdentity
   } catch (error) {
     log.error(`${moduleName}[${getSubjectIdentity.name}] -----> ${error}`)
@@ -47,10 +46,10 @@ function getSubjectIdentity() {
 
 function getIssuerIdentity() {
   try {
-    log.info(`${moduleName}[${getIssuerIdentity.name}] -----> IN ...`)
+    log.debug(`${moduleName}[${getIssuerIdentity.name}] -----> IN ...`)
     issuerPrivateKey = keythereum.recover(myConfig.addressPassword, issuerKeystore)
     issuerIdentity = new UserIdentity(web3, `0x${issuerKeystore.address}`, issuerPrivateKey)
-    log.info(`${moduleName}[${getIssuerIdentity.name}] -----> Issuer Getted`)
+    log.debug(`${moduleName}[${getIssuerIdentity.name}] -----> Issuer Getted`)
     return issuerIdentity
   } catch (error) {
     log.error(`${moduleName}[${getIssuerIdentity.name}] -----> ${error}`)
@@ -77,17 +76,22 @@ function sendSigned(transactionSigned) {
   })
 }
 
-
-function getKnownTransaction(entity, transaction) {
+function subjectGetKnownTransaction(subjectCredential) {
   return new Promise((resolve, reject) => {
-    if(entity == 'issuer') {
-      let issuerID = getIssuerIdentity()
-      issuerID.getKnownTransaction(transaction)
-      .then(trxIssuer => {
-        resolve(trxIssuer)
+    let subjectID = getSubjectIdentity()
+    subjectID.getKnownTransaction(subjectCredential)
+      .then(receipt => {
+        resolve(receipt)
       })
-      .catch(error => {
-        reject(error)
+  })
+}
+
+function issuerGetKnownTransaction(issuerCredential) {
+  return new Promise((resolve, reject) => {
+    let issuerID = getIssuerIdentity()
+    issuerID.getKnownTransaction(issuerCredential)
+      .then(receipt => {
+        resolve(receipt)
       })
     } else if(entity == 'subject') {
       let subjectID = getSubjectIdentity()
@@ -114,7 +118,9 @@ function preparedAlastriaId() {
 module.exports = {
   createAlastriaID,
   addIssuerCredential,
-  getCurrentPublicKey
+  getCurrentPublicKey,
+  getpresentationStatus,
+  updateReceiverPresentationStatus
 }
 
 /////////////////////////////////////////////////////////
@@ -128,7 +134,7 @@ function createAlastriaID(params) {
 
     let signedCreateTransaction = params.signedTX
     let preparedId = preparedAlastriaId()
-    getKnownTransaction('issuer', preparedId)
+    issuerGetKnownTransaction(preparedId)
     .then(signedPreparedTransaction => {
       sendSigned(signedPreparedTransaction)
       .then(prepareSendSigned => {
@@ -136,7 +142,7 @@ function createAlastriaID(params) {
         .then(createSendSigned => {
           web3.eth.call({
             to: config.alastriaIdentityManager,
-            data: web3.eth.abi.encodeFunctionCall(config.contractsAbi['AlastriaIdentityManager']['identityKeys'], [identityKeystore.address])
+            data: web3.eth.abi.encodeFunctionCall(config.contractsAbi['AlastriaIdentityManager']['identityKeys'], [issuerKeystore.address])
           })
           .then(AlastriaIdentity => {
             let alastriaDID = tokensFactory.tokens.createDID('quor', AlastriaIdentity.slice(26));
@@ -163,62 +169,98 @@ function createAlastriaID(params) {
     })
   })
 }
-
-
-async function addIssuerCredential(params) {
-      try {
-    return new Promise((resolve, reject) => {
-      log.debug(`${moduleName}[${addIssuerCredential.name}] -----> IN ...`);
-      log.debug(`${moduleName}[${addIssuerCredential.name}] -----> Calling addIssuer credential With params: ${JSON.stringify(params)}`);
-      let issuerCredential = transactionFactory.credentialRegistry.addIssuerCredential(web3, params.issuerCredentialHash);
-      getKnownTransaction('issuer', issuerCredential);
-      log.debug("3.1")
-        .then(issuerCredentialSigned => {
-          sendSigned(issuerCredentialSigned)
-            .then(receipt => {
-              let issuerCredentialTransaction = transactionFactory.credentialRegistry.getIssuerCredentialStatus(web3, params.issuer, params.issuerCredentialHash);
-              web3.eth.call(issuerCredentialTransaction)
-                .then(IssuerCredentialStatus => {
-                  log.debug("3.4");
-                  let result = web3.eth.abi.decodeParameters(["bool", "uint8"], IssuerCredentialStatus);
-                  let credentialStatus = {
-                    "exists": result[0],
-                    "status": result[1]
-                  };
-                  log.debug(`${moduleName}[${addIssuerCredential.name}] -----> Success`);
-                  resolve(credentialStatus);
-                }).catch(error => {
-                  log.error(`${moduleName}[${addIssuerCredential.name}] -----> ${error}`);
-                  reject(error);
-                });
-            })
-            .catch(error => {
-              log.error(`${moduleName}[${addIssuerCredential.name}] -----> ${error}`);
-              reject(error);
-            });
-        });
-    });
-  }
-  catch (error_1) {
-    log.error(`${moduleName}[${addIssuerCredential.name}] -----> ${error_1}`);
-    reject(error_1);
-  }
-}
+function addIssuerCredential(params) {
+      return new Promise((resolve, reject) => {
+        log.debug(`${moduleName}[${addIssuerCredential.name}] -----> IN ...`)
+        log.debug(`${moduleName}[${addIssuerCredential.name}] -----> Calling addIssuer credential With params: ${JSON.stringify(params)}`)
+        let issuerCredential = transactionFactory.credentialRegistry.addIssuerCredential(web3, params.issuerCredentialHash)
+        subjectGetKnownTransaction(issuerCredential)
+          .then(issuerCredentialSigned => {
+            sendSigned(issuerCredentialSigned)
+              .then(receipt => {
+                let issuerCredentialTransaction = transactionFactory.credentialRegistry.getIssuerCredentialStatus(web3, params.issuer, params.issuerCredentialHash)
+                web3.eth.call(issuerCredentialTransaction)
+                  .then(IssuerCredentialStatus => {
+                    let result = web3.eth.abi.decodeParameters(["bool", "uint8"], IssuerCredentialStatus)
+                    let credentialStatus = {
+                      "exists": result[0],
+                      "status": result[1]
+                    }
+                    log.debug(`${moduleName}[${addIssuerCredential.name}] -----> Success`)
+                    resolve(credentialStatus)
+                  }).catch(error => {
+                    log.error(`${moduleName}[${addIssuerCredential.name}] -----> ${error}`)
+                    reject(error)
+                  })
+              })
+              .catch(error => {
+                log.error(`${moduleName}[${addIssuerCredential.name}] -----> ${error}`)
+                reject(error)
+              })
+          })
+      })
+    }
 
 function getCurrentPublicKey(subject) {
+      return new Promise((resolve, reject) => {
+        log.debug(`${moduleName}[${getCurrentPublicKey.name}] -----> IN ...`)
+        let currentPubKey = transactionFactory.publicKeyRegistry.getCurrentPublicKey(web3, subject)
+        web3.eth.call(currentPubKey)
+          .then(result => {
+            log.debug(`${moduleName}[${getCurrentPublicKey.name}] -----> Success`)
+            let publicKey = web3.utils.hexToUtf8(result)
+            resolve(publicKey.substr(1))
+          })
+          .catch(error => {
+            log.error(`${moduleName}[${getCurrentPublicKey.name}] -----> ${error}`)
+            reject(error)
+          })
+      })
+    }
+
+function getpresentationStatus(presentationHash,issuer,subject){
+    return new Promise((resolve, reject) => {
+      log.debug(`${moduleName}[${getpresentationStatus.name}] -----> IN ...`)
+      let presentationStatus = null;
+      if (issuer != null){
+        presentationStatus = transactionFactory.presentationRegistry.getReceiverPresentationStatus(web3, issuer, presentationHash);
+      }else if (subject != null){
+        presentationStatus = transactionFactory.presentationRegistry.getSubjectPresentationStatus(web3,subject,presentationHash);
+      }
+      if (presentationStatus != null){
+        web3.eth.call(presentationStatus)
+        .then(result => {
+          let resultStatus = web3.eth.abi.decodeParameters(["bool", "uint8"], result)
+          let resultStatusJson = {
+            exist: resultStatus[0],
+            status: resultStatus[1]
+          }
+          log.debug(`${moduleName}[${getpresentationStatus.name}] -----> Success`)
+          resolve(resultStatusJson);
+        })
+        .catch(error => {
+          log.error(`${moduleName}[${getpresentationStatus.name}] -----> ${error}`)
+          reject(error)
+        })        
+      }
+    });
+}    
+
+function updateReceiverPresentationStatus(presentationHash,newStatus){
   return new Promise((resolve, reject) => {
-    log.info(`${moduleName}[${getCurrentPublicKey.name}] -----> IN ...`)
-    let currentPubKey = transactionFactory.publicKeyRegistry.getCurrentPublicKey(web3, subject)
-    log.info(`${moduleName}[${getCurrentPublicKey.name}] -----> calling web3 with params: ${subject}`)
-    web3.eth.call(currentPubKey)
-      .then(result => {
-        log.info(`${moduleName}[${getCurrentPublicKey.name}] -----> Success`)
-        let publicKey = web3.utils.hexToUtf8(result)
-        resolve(publicKey.substr(1))
-      })
-      .catch(error => {
-        log.error(`${moduleName}[${getCurrentPublicKey.name}] -----> ${error}`)
-        reject(error)
-      })
-  })
-}
+    log.debug(`${moduleName}[${updateReceiverPresentationStatus.name}] -----> IN ...`)
+    let updatepresentationStatus = transactionFactory.presentationRegistry.updateReceiverPresentation(web3, presentationHash, newStatus.newStatus);
+    issuerGetKnownTransaction(updatepresentationStatus)
+    .then(updatepresentationStatusSigned => {    
+      sendSigned(updatepresentationStatusSigned)
+        .then(receipt => {
+          log.debug(`${moduleName}[${updateReceiverPresentationStatus.name}] -----> Success`)
+          resolve();
+        })
+        .catch(error => {
+          log.error(`${moduleName}[${updateReceiverPresentationStatus.name}] -----> ${error}`)
+          reject(error)
+        })
+    })
+  });
+}    

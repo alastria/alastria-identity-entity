@@ -1,11 +1,11 @@
 swagger: "2.0"
 info:
   version: "0.0.1"
-  title: Service Provider backend
+  title: Issuer & Service Provider backend
 # during dev, should point to your local machine
 host: localhost:10010
 # basePath prefixes all resource paths 
-basePath: /
+basePath: /alastria/entity
 # 
 schemes:
   # tip: remove http to make production-grade
@@ -20,11 +20,11 @@ produces:
   - application/json
   - text/plain
 paths:
-  /serviceProvider/alastriaId:
+  /identity:
     # binds a127 app logic to a route
     x-swagger-router-controller: serviceProvider.controller
     post:
-      description: Create identity for a issuer
+      description: Create a new Alastria identity, sent to an entity acting as an issuer (or identity helper)
       # used as the method name of the controller
       operationId: createAlastriaID
       parameters:
@@ -57,27 +57,18 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-
-  /serviceProvider/issuerCredential:
+  /identity/serviceProviders:
     # binds a127 app logic to a route
     x-swagger-router-controller: serviceProvider.controller
-    post:
-      description: Registry identity of a issuer
-      # used as the method name of the controller
-      operationId: addIssuerCredential
-      parameters:
-        - name: body
-          in: body
-          description: Necessary data to add a new issuer credential
-          required: false
-          schema: 
-            $ref: "#/definitions/issuerCredentialdata"
+    get:
+      description: Get current public keys for all service providers
+      operationId: getServiceProviders
       responses:
         "200":
           description: Success
           schema:
             # a pointer to a definition
-            $ref: "#/definitions/addCredentialResponse"
+            $ref: "#/definitions/publickeyListResponse"
         # responses may fall through to errors
         "400":
           description: Bad Request
@@ -95,14 +86,43 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /serviceProvider/{alastriaId}:
+  /identity/issuers:
     # binds a127 app logic to a route
     x-swagger-router-controller: serviceProvider.controller
     get:
-      description: Get publick key of a Alastria Id
+      description: Get current public keys for all issuers
+      operationId: getIssuers
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/publickeyListResponse"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "503":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /identity/{alastriaDID}:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: serviceProvider.controller
+    get:
+      description: Get public key of a given Alastria DID
       operationId: getCurrentPublicKey
       parameters:
-        - name: alastriaId
+        - name: alastriaDID
           in: path
           description: AlastriaId to find the publicKey
           required: true
@@ -130,22 +150,442 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /identity/{alastriaDID}/list:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: serviceProvider.controller
+    get:
+      description: Get past & current public keys of a given Alastria Id
+      operationId: getCurrentPublicKeyList
+      parameters:
+        - name: alastriaDID
+          in: path
+          description: AlastriaId to find the publicKey
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/publickeyListResponse"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "503":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /credential:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: serviceProvider.controller
+    get:
+      description: Get available credentials catalog from an issuer
+      operationId: getCredentialCatalog
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/credentialCatalogList"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "503":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    post:
+      # The user type (subject or Issuer) could be determined from the entity session -> DID user type
+      # for the MVP we could assume the call is from an issuer the implementation for a subject will be required in the future
+      description: Registry Credential by the issuer
+      # used as the method name of the controller
+      operationId: addIssuerCredential
+      parameters:
+        - name: body
+          in: body
+          description: Necessary data to add a new subject credential
+          required: false
+          schema: 
+            $ref: "#/definitions/issuerCredentialdata"
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/addCredentialResponse"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "503":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /credential/{identityDID}:
+    get:
+      x-swagger-router-controller: serviceProvider.controller
+      description: Get all the credentials available for the Subject (IdentityDID) with the status {available, valid, expired}
+      operationId: getSubjectCredentialList
+      parameters:
+        - name: identityDID
+          in: path
+          type: string
+          description: subject DID
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/credentialCatalogList"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "503":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /credential/status/{credentialHash}:
+    get:
+      x-swagger-router-controller: serviceProvider.controller
+      description: get current Issuer or Subject status for the given credential
+      operationId: getCredentialStatus
+      parameters:
+        - name: credentialHash
+          in: path
+          type: string
+          description: credential hash
+          required: true
+        # only one of issuer & subject parameters should be used to obtain the Issuer status or the Subject status 
+        - name: issuer
+          in: query
+          type: string
+          description: isssuer did
+          required: false
+        - name: subject
+          in: query
+          type: string
+          description: subject did
+          required: false
+      responses: 
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/addCredentialResponse"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "503":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    post:
+      # for the MVP we only need post from the issuer but a post for the subject to delete the credential will be required in the future 
+      description: Update an issuer credential status if posible
+      # used as the method name of the controller
+      operationId: updateCredentialStatus
+      parameters:
+        - name: credentialHash
+          in: path
+          type: string
+          description: credential hash
+          required: true
+        - name: body
+          in: body
+          description: Necessary data to add change credential status
+          required: true
+          schema: 
+            $ref: "#/definitions/updateCredentialData"
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/addCredentialResponse"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Credential not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "503":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /presentation:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: serviceProvider.controller
+    post:
+      # The presentation can only be created by an issuer and is not required for the MVP
+      description: Create presentation by the Subject
+      # used as the method name of the controller
+      operationId: addSubjectPresentation
+      parameters:
+        - name: body
+          in: body
+          description: Necessary data to add a new subject presentation
+          required: false
+          schema: 
+            $ref: "#/definitions/subjectPresentationData"
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/addPresentationResponse"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "503":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /presentation/{identityDID}:
+    get:
+      x-swagger-router-controller: serviceProvider.controller
+      description: Get all the presentations available for the user with the status {Valid, Received, AskDeletion, DeletionConfirmation}
+      operationId: getSubjectpresentationListFromIssuer
+      parameters:
+        - name: identityDID
+          in: path
+          type: string
+          description: subject DID
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/presentationList"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "503":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /presentation/status/{presentationHash}:
+    get:
+      x-swagger-router-controller: serviceProvider.controller
+      description: get current Subject or Service Provider (Receiver) status for the given presentation
+      operationId: getpresentationStatus
+      parameters:
+        - name: presentationHash
+          in: path
+          type: string
+          description: presentation hash
+          required: true
+        # only one of serviceProvider & subject parameters should be used to obtain the Issuer status or the Subject status 
+        - name: serviceProvider
+          in: query
+          type: string
+          description: serviceProvider did
+          required: false
+        - name: subject
+          in: query
+          type: string
+          description: subject did
+          required: false
+      responses: 
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/addPresentationResponse"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "503":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    post:
+      # The user type (subject or ServiceProvider) could be determined from the entity session -> DID user type
+      # for the MVP we could assume the call is from a ServiceProvider, the implementation for a subject will be required in the future    
+      x-swagger-router-controller: serviceProvider.controller
+      description: Update a serviceProvider presentation status if posible
+      # used as the method name of the controller
+      operationId: updateReceiverPresentationStatus
+      parameters:
+        - name: presentationHash
+          in: path
+          type: string
+          description: presentation hash
+          required: true
+        - name: body
+          in: body
+          description: Necessary data to add change presentation status
+          required: true
+          schema: 
+            $ref: "#/definitions/updatePresentationData"
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/addPresentationResponse"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: presentation not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "503":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /swagger:
     x-swagger-pipe: swagger_raw
 # complex objects have schema definitions
 definitions:
+  credential:
+    properties:
+      header:
+        type: "object"
+      payload:
+        type: "object"
+      signature:
+        type: "object"
   alastriaIdentityResponse:
     properties:
-      alastriaID:
+      alastriaDID:
+        type: string
+  credentialCatalogList:
+    properties: 
+      list:
+        type: string
+        #schema:
+          #$ref: "#/definitions/credentialCatalog"
+  credentialCatalog:
+    properties:
+      credentialName:
+        type: string
+      status:
+        type: string
+      credentialType:
         type: string
   addCredentialResponse:
     properties:
       status:
         type: string
+  updateCredentialData:
+    properties:
+      newStatus:
+        type: string
   publickeyResponse:
     properties:
       publicKey:
         type: string
+  publickeyListResponse:
+    properties:
+      publicKey:
+        type: string
+  addPresentationResponse:
+    properties:
+      status:
+        type: string
+  updatePresentationData:
+    properties:
+      newStatus:
+        type: number
+  presentationList:
+    properties:
+      list:
+        type: "object"
   ErrorResponse:
     required:
       - message
@@ -169,3 +609,14 @@ definitions:
       "issuer":
         type: string
         example: "www.google.com"
+  subjectPresentationData:
+    type: "object"
+    required: [subjectPresentationHash, subject]
+    properties:
+      "subjectPresentationHash":
+        type: string
+        example: "0x47f4c19df21b0f98718e1ed91c7d5c5f5511a64093b0a3dd943fb54a74eb16d2....0xe90eeaa7931c54966c2badf7bed04b5bb46c6dc4970bd32c05cc614c27f93d0e"
+      "subject":
+        type: string
+        example: "www.google.com"
+
