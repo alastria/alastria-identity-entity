@@ -52,13 +52,12 @@ function getIssuerIdentity() {
   }
 }
 
-
 function sendSigned(transactionSigned) {
   return new Promise((resolve, reject) => {
     log.debug(`${moduleName}[${sendSigned.name}] -----> IN ...`)
     web3.eth.sendSignedTransaction(transactionSigned)
       .on('transactionHash', function (hash) {
-        log.info(`${moduleName}[${sendSigned.name}] -----> HASH: ${hash} ...`)
+        log.debug(`${moduleName}[${sendSigned.name}] -----> HASH: ${hash} ...`)
       })
       .on('receipt', receipt => {
         resolve(receipt)
@@ -67,7 +66,6 @@ function sendSigned(transactionSigned) {
         log.error(`${moduleName}[${sendSigned.name}] -----> ${error}`)
         reject(error)
       });
-
   })
 }
 
@@ -247,5 +245,5 @@ function updateReceiverPresentationStatus(presentationHash,newStatus){
           reject(error)
         })
     })
-  });
+  })
 }    

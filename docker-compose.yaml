@@ -2,20 +2,19 @@ version: "2.0"
 
 services:
 
-  spBackend:
+  entityBackend:
     restart: on-failure:5
-    build: spBackend
-    image: serviceproviderback
+    build: entityBackend
+    image: entityback
     environment: 
       #- NODE_ENDPOINT=localEndpoint
       - NODE_ENDPOINT=alastria
-    links:
-      - ganache:ganache
-
+    # links:
+    #   - ganache:ganache  // if you are using local endpoint uncomment this two lines
     ports:
       - "10010:10010"
     volumes:
-      - ./spBackend/api:/app/api
+      - ./entityBackend/api:/app/api
     command: npm run start
 
   spFrontend:

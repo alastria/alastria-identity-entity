@@ -1,5 +1,9 @@
 'use strict';
 
+/////////////////////////////////////////////////////////
+///////                 CONSTANTS                 ///////
+/////////////////////////////////////////////////////////
+
 var SwaggerExpress = require('swagger-express-mw');
 const Log = require('log4js')
 const web3Helper = require('./api/helpers/web3.helper')
@@ -10,12 +14,16 @@ const pathFile = 'config.json'
 const log = Log.getLogger()
 log.level = 'debug'
 
+/////////////////////////////////////////////////////////
+///////              PUBLIC FUNCTIONS             ///////
+/////////////////////////////////////////////////////////
 
 let app = require('express')();
 let myConfig = {}
 let nodeurl = ''
 
-module.exports = app; // for testing
+// module.exports = app; // for testing
+
 
 loadJsonFile(pathFile) 
 .then(config => {

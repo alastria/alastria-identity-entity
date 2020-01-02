@@ -1,13 +1,20 @@
 'use strict';
 
+/////////////////////////////////////////////////////////
+///////                 constants                 ///////
+/////////////////////////////////////////////////////////
+
 const Log = require('log4js')
 const entityModel = require('../models/entity.model')
 const configHelper = require('../helpers/config.helper')
 const myConfig = configHelper.getConfig()
-
 const log = Log.getLogger()
 log.level = myConfig.Log.level
 const controller_name = '[Entity Controller]'
+
+/////////////////////////////////////////////////////////
+///////               MODULE EXPORTS              ///////
+/////////////////////////////////////////////////////////
 
 module.exports = {
   createAlastriaID,
@@ -16,6 +23,10 @@ module.exports = {
   getpresentationStatus,
   updateReceiverPresentationStatus
 }
+
+/////////////////////////////////////////////////////////
+///////              PUBLIC FUNCTIONS             ///////
+/////////////////////////////////////////////////////////
 
 function createAlastriaID(req, res) {
   try {
