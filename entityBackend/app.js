@@ -21,7 +21,7 @@ loadJsonFile(pathFile)
 .then(config => {
   configHelper.setConfig(config)
   myConfig = configHelper.getConfig()
-  log.info(`[App] -----> Congif getted ${JSON.stringify(myConfig)}`)
+  log.debug(`[App] -----> Congif getted ${JSON.stringify(myConfig)}`)
 
   if(!process.env.NODE_ENDPOINT) {
     nodeurl = myConfig.nodeUrl.alastria // change to local or alastria when yo are developing (swagger project start)
@@ -30,7 +30,7 @@ loadJsonFile(pathFile)
   } else if(process.env.NODE_ENDPOINT == 'alastria') {
     nodeurl = myConfig.nodeUrl.alastria
   }
-  log.info(`[App] -----> Connected via RPC to ${nodeurl}`)
+  log.debug(`[App] -----> Connected via RPC to ${nodeurl}`)
   
   web3Helper.instanceWeb3(nodeurl)
   .then(web3Instantiated => {
@@ -39,7 +39,7 @@ loadJsonFile(pathFile)
       appRoot: __dirname // required config
     };
   
-    log.info('[App] -----> Web3 instantiated correctly')
+    log.debug('[App] -----> Web3 instantiated correctly')
     web3Helper.setWeb3(web3Instantiated)
     
     SwaggerExpress.create(config, function(err, swaggerExpress) {
