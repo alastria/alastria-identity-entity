@@ -1,5 +1,4 @@
 import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
-import { sanitizeHtml } from '@angular/core/src/sanitization/sanitization';
 
 @Component({
   selector: 'app-simple-modal',
@@ -11,10 +10,12 @@ export class SimpleModalComponent implements OnInit {
   @Input() type = 'normal';
   @Input() htmlContent: string;
   @Input() size: string; // xl, lg or sm
+  @Input() id = 'simpleModal';
+  @Input() qrData: any;
+
   constructor() { }
 
   ngOnInit() {
-    console.log(this.htmlContent);
   }
 
   /**

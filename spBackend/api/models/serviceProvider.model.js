@@ -4,14 +4,20 @@
 ///////                 constants                 ///////
 /////////////////////////////////////////////////////////
 
-const Log = require('log')
+const Log = require('log4js')
 const keythereum = require('keythereum')
 const configHelper = require('../helpers/config.helper')
+const myConfig = configHelper.getConfig()
 const { transactionFactory, UserIdentity, config, tokensFactory } = require('alastria-identity-lib')
 const web3Helper = require('../helpers/web3.helper')
 const moduleName = '[serviceProvider Model]'
 const web3 = web3Helper.getWeb3()
-const log = new Log('debug')
+const log = Log.getLogger()
+log.level = myConfig.Log.level
+
+let adminKeystore = myConfig.adminKeystore
+let issuerKeystore = myConfig.issuerKeystore
+let issuerIdentity, issuerPrivateKey
 
 let myConfig = configHelper.getConfig()
 let issuerKeystore = myConfig.issuerKeystore
@@ -20,13 +26,14 @@ let subjectKeystore = myConfig.subjectKeystore
 let subjectIdentity, subjectPrivateKey
 
 
+
 /////////////////////////////////////////////////////////
 ///////             PRIVATE FUNCTIONS             ///////
 /////////////////////////////////////////////////////////
 
 function getSubjectIdentity() {
   try {
-    log.debug(`${moduleName}[${getSubjectIdentity.name}] -----> IN ...`)
+    log.info(`${moduleName}[${getSubjectIdentity.name}] -----> IN ...`)
     subjectPrivateKey = keythereum.recover(myConfig.addressPassword, subjectKeystore)
     subjectIdentity = new UserIdentity(web3, `0x${subjectKeystore.address}`, subjectPrivateKey)
     log.debug(`${moduleName}[${getSubjectIdentity.name}] -----> Subject Getted`)
@@ -50,12 +57,13 @@ function getIssuerIdentity() {
   }
 }
 
-function sendSigned(issuerCredentialSigned) {
+
+function sendSigned(transactionSigned) {
   return new Promise((resolve, reject) => {
-    log.debug(`${moduleName}[${sendSigned.name}] -----> IN ...`)
-    web3.eth.sendSignedTransaction(issuerCredentialSigned)
+    log.info(`${moduleName}[${sendSigned.name}] -----> IN ...`)
+    web3.eth.sendSignedTransaction(transactionSigned)
       .on('transactionHash', function (hash) {
-        log.debug(`${moduleName}[${sendSigned.name}] -----> HASH: ${hash} ...`)
+        log.info(`${moduleName}[${sendSigned.name}] -----> HASH: ${hash} ...`)
       })
       .on('receipt', receipt => {
         resolve(receipt)
@@ -85,6 +93,16 @@ function issuerGetKnownTransaction(issuerCredential) {
       .then(receipt => {
         resolve(receipt)
       })
+    } else if(entity == 'subject') {
+      let subjectID = getSubjectIdentity()
+      subjectID.getKnownTransaction(transaction)
+      .then(trxIssuer => {
+        resolve(trxIssuer)
+      })
+      .catch(error => {
+        reject(error)
+      })
+    }
   })
 }
 
@@ -151,7 +169,6 @@ function createAlastriaID(params) {
     })
   })
 }
-
 function addIssuerCredential(params) {
       return new Promise((resolve, reject) => {
         log.debug(`${moduleName}[${addIssuerCredential.name}] -----> IN ...`)

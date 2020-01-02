@@ -1,5 +1,5 @@
 <ul>
   <li *ngFor="let option of options">
-    <a href="#">{{ option }}</a>
+    <a (click)="selectOption(option)">{{ option }}</a>
   </li>
 </ul>

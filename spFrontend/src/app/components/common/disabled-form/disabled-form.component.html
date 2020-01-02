@@ -3,7 +3,7 @@
     <div class="col-12 col-sm-12 col-md-10">
       <div class="form-group">
         <label for="username">Name and Surname</label>
-        <input type="username" class="form-control" id="fullname" name="fullname" [(ngModel)]="fullName" disabled>
+        <input type="username" class="form-control" id="fullname" name="fullname" [(ngModel)]="fullName" [disabled]="isDisabled">
       </div>
     </div>
   </div>
@@ -11,7 +11,7 @@
     <div class="col-12 col-sm-12 col-md-10">
       <div class="form-group">
         <label for="email">Email</label>
-        <input type="email" class="form-control" id="email" name="email" [(ngModel)]="user.email" disabled>
+        <input type="email" class="form-control" id="email" name="email" [(ngModel)]="user.email" [disabled]="isDisabled">
       </div>
     </div>
   </div>
@@ -19,8 +19,13 @@
     <div class="col-12 col-sm-12 col-md-10">
       <div class="form-group">
         <label for="email">Address</label>
-        <input type="address" class="form-control" id="address" name="address" [(ngModel)]="user.address" disabled>
+        <input type="address" class="form-control" id="address" name="address" [(ngModel)]="user.address" [disabled]="isDisabled">
       </div>
+    </div>
+  </div>
+  <div class="row" *ngIf="!isDisabled">
+    <div class="col-12 col-sm-12 col-md-10">
+      <button type="button" class="btn btn-primary" (click)="editProfile()">Save</button>
     </div>
   </div>
 </form>

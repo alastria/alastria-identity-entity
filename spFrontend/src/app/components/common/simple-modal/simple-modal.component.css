@@ -2,3 +2,12 @@
     margin: auto !important;
     width: 50%;
 }
+
+h5 {
+    color: #325B8E;
+}
+
+button.btn-primary {
+    background-color: #325B8E;
+    margin: auto;
+}

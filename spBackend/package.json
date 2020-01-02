@@ -8,11 +8,11 @@
   "license": "",
   "main": "app.js",
   "dependencies": {
-    "express": "4.12.3",
-    "swagger-express-mw": "0.1.0",
-    "log": "1.4.0",
+    "alastria-identity-lib": "github:alastria/alastria-identity-lib#develop",
     "cors": "2.8.3",
-    "alastria-identity-lib": "github:alastria/alastria-identity-lib#develop"
+    "express": "4.12.3",
+    "log4js": "6.1.0",
+    "swagger-express-mw": "0.1.0"
   },
   "devDependencies": {
     "should": "7.1.0",
