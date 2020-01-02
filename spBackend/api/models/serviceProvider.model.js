@@ -29,7 +29,7 @@ function getSubjectIdentity() {
     log.debug(`${moduleName}[${getSubjectIdentity.name}] -----> IN ...`)
     subjectPrivateKey = keythereum.recover(myConfig.addressPassword, subjectKeystore)
     subjectIdentity = new UserIdentity(web3, `0x${subjectKeystore.address}`, subjectPrivateKey)
-    log.debug(`${moduleName}[${getSubjectIdentity.name}] -----> Issuer Getted`)
+    log.debug(`${moduleName}[${getSubjectIdentity.name}] -----> Subject Getted`)
     return subjectIdentity
   } catch (error) {
     log.error(`${moduleName}[${getSubjectIdentity.name}] -----> ${error}`)
