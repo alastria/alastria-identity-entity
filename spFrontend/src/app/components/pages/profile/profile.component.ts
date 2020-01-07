@@ -88,7 +88,7 @@ export class ProfileComponent implements OnInit {
     // MOCK - WEBSOCKET
     if (this.qrAlastriaId) {
       setTimeout(() => {
-        this.socketService.send('Test');
+        this.socketService.send('0xf9016781a980830927c094812c27bb1f50bcb4a2fea015bd89c3691cd759a580b901046d69d99a000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000a450382c1a00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000042303366646435376164656333643433386561323337666534366233336565316530313665646136623538356333653237656136363638366332656135333538343739000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001ca0cdf15464981e07eea36867ee40d24091a20a1c0750dc2db5b4a4136d1e4e4d80a03679a4efecffd8122ddba7391feaefb1a0a4623a224701bb8f97c6763e915f55');
       }, 5000);
     }
   }
@@ -167,10 +167,13 @@ export class ProfileComponent implements OnInit {
 
         this.serviceProvider.createIdentity(identity)
           .then((result: any) => {
-            if (result && result.status === 200) {
+            if (result && result.proxyAddress && result.did) {
               this.userService.setIsAlastriaIdVerified(true);
+              const userChange = this.userService.getUserLoggedIn();
+              userChange.proxyAddress = result.proxyAddress;
+              userChange.did = result.did;
+              this.userService.setUserLoggedIn(userChange);
               $('#simpleModal').modal('show');
-              console.log(result);
             } else {
               this.userService.setIsAlastriaIdVerified(true);
             }

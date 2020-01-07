@@ -35,8 +35,8 @@
 
 .app-general {
     width: 100%;
-    -webkit-transition: width 2s; /* Safari prior 6.1 */
-    transition: width 2s;
+    -webkit-transition: width 1s; /* Safari prior 6.1 */
+    transition: width 1s;
 }
 
 div > img{
