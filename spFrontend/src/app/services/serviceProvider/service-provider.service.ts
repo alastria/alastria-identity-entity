@@ -13,22 +13,24 @@ import { environment } from './../../../environments/environment';
 export class ServiceProviderService {
 
   apiUrl = environment.apiUrl;
+  path = 'alastria/entity';
 
   constructor(private http: HttpClient) { }
 
-  /**
+  /** 
    * Function for create identity calling at the server
    * @param identity - data of identity for create a new identity
    * @returns {*}
    */
   createIdentity(identity: Identity): any {
-    return this.http.post(`${this.apiUrl}/serviceProvider/alastriaId`, identity).toPromise()
+    return this.http.post(`${this.apiUrl}/${this.path}/identity`, identity).toPromise()
       .then((res) => res)
       .catch((error: any) => {
         // throw error;
         // MOCK
         return {
-          status: 200
+          proxyAddress: '0x374bfe163e60d348ddcdfe90e80c81393bc84df1',
+          did: 'did:ala:quor:redT:374bfe163e60d348ddcdfe90e80c81393bc84df1'
         };
       });
   }
@@ -43,7 +45,7 @@ export class ServiceProviderService {
       signedTX
     };
 
-    return this.http.post(`${this.apiUrl}//serviceProvider/issuerCredential`, body).toPromise()
+    return this.http.post(`${this.apiUrl}/${this.path}/credential`, body).toPromise()
       .then((res) => res)
       .catch((error: any) => {
         throw error;
