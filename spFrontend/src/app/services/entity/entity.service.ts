@@ -4,13 +4,13 @@ import { HttpClient } from '@angular/common/http';
 // Models
 import { Identity } from 'src/app/models/identity/identity.model';
 
-import { environment } from './../../../environments/environment';
+import { environment } from '../../../environments/environment';
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class ServiceProviderService {
+export class EntityService {
 
   apiUrl = environment.apiUrl;
   path = 'alastria/entity';
@@ -57,7 +57,7 @@ export class ServiceProviderService {
    * @returns {*}
    */
   getPublicKey(alastriaId: string): any {
-    return this.http.get(`${this.apiUrl}//serviceProvider/${alastriaId}`).toPromise()
+    return this.http.get(`${this.apiUrl}/${this.path}/${alastriaId}`).toPromise()
       .then((res) => res)
       .catch((error: any) => {
         throw error;

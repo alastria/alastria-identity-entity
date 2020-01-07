@@ -4,7 +4,7 @@ import { Component, OnInit } from '@angular/core';
 // SERVICES
 import { UserService } from 'src/app/services/user/user.service';
 import { SocketService } from 'src/app/services/socket/socket.service';
-import { ServiceProviderService } from 'src/app/services/serviceProvider/service-provider.service';
+import { EntityService } from 'src/app/services/entity/entity.service';
 
 // MODELS
 import { User } from 'src/app/models/user/user.model';
@@ -49,7 +49,7 @@ export class ProfileComponent implements OnInit {
 
   constructor(private userService: UserService,
               private socketService: SocketService,
-              private serviceProvider: ServiceProviderService) { }
+              private entityService: EntityService) { }
 
   ngOnInit() {
     this.user = this.userService.getUserLoggedIn();
@@ -165,7 +165,7 @@ export class ProfileComponent implements OnInit {
           address: ''
         };
 
-        this.serviceProvider.createIdentity(identity)
+        this.entityService.createIdentity(identity)
           .then((result: any) => {
             if (result && result.proxyAddress && result.did) {
               this.userService.setIsAlastriaIdVerified(true);
