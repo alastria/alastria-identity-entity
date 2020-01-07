@@ -15,11 +15,6 @@ const web3 = web3Helper.getWeb3()
 const log = Log.getLogger()
 log.level = myConfig.Log.level
 
-let adminKeystore = myConfig.adminKeystore
-let issuerKeystore = myConfig.issuerKeystore
-let issuerIdentity, issuerPrivateKey
-
-let myConfig = configHelper.getConfig()
 let issuerKeystore = myConfig.issuerKeystore
 let issuerIdentity, issuerPrivateKey
 let subjectKeystore = myConfig.subjectKeystore
@@ -90,19 +85,9 @@ function issuerGetKnownTransaction(issuerCredential) {
   return new Promise((resolve, reject) => {
     let issuerID = getIssuerIdentity()
     issuerID.getKnownTransaction(issuerCredential)
-      .then(receipt => {
-        resolve(receipt)
-      })
-    } else if(entity == 'subject') {
-      let subjectID = getSubjectIdentity()
-      subjectID.getKnownTransaction(transaction)
-      .then(trxIssuer => {
-        resolve(trxIssuer)
-      })
-      .catch(error => {
-        reject(error)
-      })
-    }
+    .then(receipt => {
+      resolve(receipt)
+    })
   })
 }
 
