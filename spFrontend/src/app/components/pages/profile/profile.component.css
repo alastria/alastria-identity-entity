@@ -3,6 +3,7 @@
     height: 100%;
     margin: auto;
     padding: 50px;
+    max-width: 1450px;
 }
 
 .container-button {
