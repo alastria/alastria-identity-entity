@@ -4,13 +4,13 @@
 ///////                 constants                 ///////
 /////////////////////////////////////////////////////////
 
+const { transactionFactory, UserIdentity, config, tokensFactory } = require('alastria-identity-lib')
 const Log = require('log4js')
 const keythereum = require('keythereum')
 const configHelper = require('../helpers/config.helper')
 const myConfig = configHelper.getConfig()
-const { transactionFactory, UserIdentity, config, tokensFactory } = require('alastria-identity-lib')
 const web3Helper = require('../helpers/web3.helper')
-const moduleName = '[serviceProvider Model]'
+const moduleName = '[Entity Model]'
 const web3 = web3Helper.getWeb3()
 const log = Log.getLogger()
 log.level = myConfig.Log.level
@@ -28,7 +28,7 @@ let subjectIdentity, subjectPrivateKey
 
 function getSubjectIdentity() {
   try {
-    log.info(`${moduleName}[${getSubjectIdentity.name}] -----> IN ...`)
+    log.debug(`${moduleName}[${getSubjectIdentity.name}] -----> IN ...`)
     subjectPrivateKey = keythereum.recover(myConfig.addressPassword, subjectKeystore)
     subjectIdentity = new UserIdentity(web3, `0x${subjectKeystore.address}`, subjectPrivateKey)
     log.debug(`${moduleName}[${getSubjectIdentity.name}] -----> Subject Getted`)
@@ -52,13 +52,12 @@ function getIssuerIdentity() {
   }
 }
 
-
 function sendSigned(transactionSigned) {
   return new Promise((resolve, reject) => {
-    log.info(`${moduleName}[${sendSigned.name}] -----> IN ...`)
+    log.debug(`${moduleName}[${sendSigned.name}] -----> IN ...`)
     web3.eth.sendSignedTransaction(transactionSigned)
       .on('transactionHash', function (hash) {
-        log.info(`${moduleName}[${sendSigned.name}] -----> HASH: ${hash} ...`)
+        log.debug(`${moduleName}[${sendSigned.name}] -----> HASH: ${hash} ...`)
       })
       .on('receipt', receipt => {
         resolve(receipt)
@@ -67,7 +66,6 @@ function sendSigned(transactionSigned) {
         log.error(`${moduleName}[${sendSigned.name}] -----> ${error}`)
         reject(error)
       });
-
   })
 }
 
@@ -75,9 +73,9 @@ function subjectGetKnownTransaction(subjectCredential) {
   return new Promise((resolve, reject) => {
     let subjectID = getSubjectIdentity()
     subjectID.getKnownTransaction(subjectCredential)
-      .then(receipt => {
-        resolve(receipt)
-      })
+    .then(receipt => {
+      resolve(receipt)
+    })
   })
 }
 
@@ -114,8 +112,8 @@ module.exports = {
 
 function createAlastriaID(params) {
   return new Promise((resolve, reject) => {
-    log.info(`${moduleName}[${createAlastriaID.name}] -----> IN ...`)
-    log.info(`${moduleName}[${createAlastriaID.name}] -----> Calling addSubject credential With params: ${JSON.stringify(params)}`)
+    log.debug(`${moduleName}[${createAlastriaID.name}] -----> IN ...`)
+    log.debug(`${moduleName}[${createAlastriaID.name}] -----> Calling addSubject credential With params: ${JSON.stringify(params)}`)
 
     let signedCreateTransaction = params.signedTX
     let preparedId = preparedAlastriaId()
@@ -247,5 +245,5 @@ function updateReceiverPresentationStatus(presentationHash,newStatus){
           reject(error)
         })
     })
-  });
+  })
 }    
