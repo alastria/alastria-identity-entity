@@ -21,7 +21,8 @@ module.exports = {
   addIssuerCredential,
   getCurrentPublicKey,
   getpresentationStatus,
-  updateReceiverPresentationStatus
+  updateReceiverPresentationStatus,
+  addSubjectPresentation
 }
 
 /////////////////////////////////////////////////////////
@@ -54,7 +55,7 @@ function createAlastriaID(req, res) {
     })
   }
   catch(error) {
-    log.info(`${controller_name}[${createAlastriaID.name}] -----> ${error}`)
+    log.error(`${controller_name}[${createAlastriaID.name}] -----> ${error}`)
     let msg = {
       message: `${error}`
     }
@@ -68,12 +69,12 @@ function addIssuerCredential(req, res) {
     let params = req.swagger.params.body.value
     log.debug(`${controller_name}[${addIssuerCredential.name}] -----> Sending params: ${JSON.stringify(params)}`)
     entityModel.addIssuerCredential(params)
-    .then(addedCredential => {
-      log.debug(`${controller_name}[${addIssuerCredential.name}] -----> Successfully added credential: ${JSON.stringify(addedCredential)}`)
-      res.status(200).send(addedCredential)
+    .then(addSubjectPres => {
+      log.debug(`${controller_name}[${addIssuerCredential.name}] -----> Successfully added credential: ${JSON.stringify(addSubjectPres)}`)
+      res.status(200).send(addSubjectPres)
     })
     .catch(error => {
-      log.debug(`${controller_name}[${addIssuerCredential.name}] -----> ${error}`)
+      log.error(`${controller_name}[${addIssuerCredential.name}] -----> ${error}`)
       let msg = {
         message: 'Error: Transaction has been reverted by the EVM'
       }
@@ -81,7 +82,34 @@ function addIssuerCredential(req, res) {
     })
   }
   catch(error) {
-    log.debug(`${controller_name}[${addIssuerCredential.name}] -----> ${error}`)
+    log.error(`${controller_name}[${addIssuerCredential.name}] -----> ${error}`)
+    let msg = {
+      message: 'Insternal Server Erorr'
+    }
+    res.status(503).send(msg)
+   }
+}
+
+function addSubjectPresentation(req, res) {
+  try {
+    log.debug(`${controller_name}[${addSubjectPresentation.name}] -----> IN ...`)
+    let params = req.swagger.params.body.value
+    log.debug(`${controller_name}[${addSubjectPresentation.name}] -----> Sending params: ${JSON.stringify(params)}`)
+    entityModel.addSubjectPresentation(params)
+    .then(addSubjectPres => {
+      log.debug(`${controller_name}[${addSubjectPresentation.name}] -----> Successfully added subject presentation: ${JSON.stringify(addSubjectPres)}`)
+      res.status(200).send(addSubjectPres)
+    })
+    .catch(error => {
+      log.error(`${controller_name}[${addSubjectPresentation.name}] -----> ${error}`)
+      let msg = {
+        message: 'Error: Transaction has been reverted by the EVM'
+      }
+      res.status(400).send(msg)
+    })
+  }
+  catch(error) {
+    log.error(`${controller_name}[${addSubjectPresentation.name}] -----> ${error}`)
     let msg = {
       message: 'Insternal Server Erorr'
     }
