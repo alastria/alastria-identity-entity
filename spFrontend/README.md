@@ -8,7 +8,7 @@ These instructions will allow you to get a copy of the project running on your l
 
 Clone the proyect:
 ```
-git clone https://github.com/alastria/alastria-identity-serviceProvider.git
+git clone https://github.com/alastria/alastria-identity-entity.git
 ```
 
 ### ng build and ng serve with environments
