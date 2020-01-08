@@ -55,7 +55,7 @@ function createAlastriaID(req, res) {
     })
   }
   catch(error) {
-    log.info(`${controller_name}[${createAlastriaID.name}] -----> ${error}`)
+    log.error(`${controller_name}[${createAlastriaID.name}] -----> ${error}`)
     let msg = {
       message: `${error}`
     }
@@ -74,7 +74,7 @@ function addIssuerCredential(req, res) {
       res.status(200).send(addSubjectPres)
     })
     .catch(error => {
-      log.debug(`${controller_name}[${addIssuerCredential.name}] -----> ${error}`)
+      log.error(`${controller_name}[${addIssuerCredential.name}] -----> ${error}`)
       let msg = {
         message: 'Error: Transaction has been reverted by the EVM'
       }
@@ -82,7 +82,7 @@ function addIssuerCredential(req, res) {
     })
   }
   catch(error) {
-    log.debug(`${controller_name}[${addIssuerCredential.name}] -----> ${error}`)
+    log.error(`${controller_name}[${addIssuerCredential.name}] -----> ${error}`)
     let msg = {
       message: 'Insternal Server Erorr'
     }
@@ -101,7 +101,7 @@ function addSubjectPresentation(req, res) {
       res.status(200).send(addSubjectPres)
     })
     .catch(error => {
-      log.debug(`${controller_name}[${addSubjectPresentation.name}] -----> ${error}`)
+      log.error(`${controller_name}[${addSubjectPresentation.name}] -----> ${error}`)
       let msg = {
         message: 'Error: Transaction has been reverted by the EVM'
       }
@@ -109,7 +109,7 @@ function addSubjectPresentation(req, res) {
     })
   }
   catch(error) {
-    log.debug(`${controller_name}[${addSubjectPresentation.name}] -----> ${error}`)
+    log.error(`${controller_name}[${addSubjectPresentation.name}] -----> ${error}`)
     let msg = {
       message: 'Insternal Server Erorr'
     }
