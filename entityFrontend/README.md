@@ -53,7 +53,7 @@ npm run build
 
 Create image of docker
 ```
-docker build -t entityFrontend .
+docker build -t entityfrontend .
 ```
 
 After go to the previous folder
