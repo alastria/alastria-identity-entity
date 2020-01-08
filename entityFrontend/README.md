@@ -8,7 +8,7 @@ These instructions will allow you to get a copy of the project running on your l
 
 Clone the proyect:
 ```
-git clone https://github.com/alastria/alastria-identity-serviceProvider.git
+git clone https://github.com/alastria/alastria-identity-entity.git
 ```
 
 ### ng build and ng serve with environments
@@ -24,9 +24,9 @@ ng serve --configuration={configurationName}
 
 ### Installation and Deployment 🔧
 
-The first step open a terminal inside the proyect and go to spFrontend folder
+The first step open a terminal inside the proyect and go to entity folder
 ```
-cd spFrontend
+cd entityFrontend
 ```
 
 Then you have to install all the dependencies
@@ -41,9 +41,9 @@ npm run start
 
 ### Installation and Deployment with Docker 🔧
 
-The first step open a terminal inside the proyect and go to spFrontend folder
+The first step open a terminal inside the proyect and go to entityFrontend folder
 ```
-cd spFrontend
+cd entityFrontend
 ```
 
 Then you have to build the project
@@ -53,7 +53,7 @@ npm run build
 
 Create image of docker
 ```
-docker build -t spFrontend .
+docker build -t entityfrontend .
 ```
 
 After go to the previous folder
@@ -63,5 +63,5 @@ cd ..
 
 Finally you can init the docker container
 ```
-docker-compose up -d spFrontend
+docker-compose up -d entityFrontend
 ```
