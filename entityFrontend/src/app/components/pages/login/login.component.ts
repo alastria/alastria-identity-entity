@@ -98,7 +98,7 @@ export class LoginComponent implements OnInit {
 
       this.userService.setUserLoggedIn(userLogin);
       $('#simpleModal').modal('hide');
-      this.router.navigate(['/', 'vinculate']);
+      this.router.navigate(['/', 'vinculate']); // TODO: Consultar al servidor si el usuario esta vinculado o no
     } catch (error) {
       console.log('Error ', error);
       if (error && error.status === 403) {
