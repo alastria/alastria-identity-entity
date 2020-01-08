@@ -1,10 +1,10 @@
 import { SharedModule } from '../shared/shared.module';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { QRCodeModule } from 'angularx-qrcode';
 
 // COMPONENTS
 import { LinkUserComponent } from 'src/app/components/pages/link-user/link-user.component';
-import { AngularFontAwesomeModule } from 'angular-font-awesome';
 
 @NgModule({
   declarations: [
@@ -13,6 +13,7 @@ import { AngularFontAwesomeModule } from 'angular-font-awesome';
   imports: [
     CommonModule,
     SharedModule,
+    QRCodeModule,
   ]
 })
 export class LinkUserModule { }
