@@ -1,3 +1,23 @@
-<p>
-  link-user works!
-</p>
+<div>
+  <div class="row">
+    <div id="personal-data" class="col-md-6">
+      <div class="row">
+        <div class="col-sm-12">
+          <h4>New user?</h4>
+        </div>
+      </div>
+      <app-user-form 
+        [user]="user" 
+        [isDisabled]="false"
+        [isNewUser]="true"
+        (handleEditProfile)="handleEditProfile($event)"></app-user-form>
+    </div>
+    <div class="col-md-6">
+      <div class="row">
+        <div class="col-12">
+          <h4>Already have an account?</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
