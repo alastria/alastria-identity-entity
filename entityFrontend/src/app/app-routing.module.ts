@@ -8,9 +8,11 @@ import { AuthGuardService } from './services/auth/auth-guard.service';
 import { LoginComponent } from './components/pages/login/login.component';
 import { HomeComponent } from './components/pages/home/home.component';
 import { ProfileComponent } from './components/pages/profile/profile.component';
+import { LinkUserComponent } from './components/pages/link-user/link-user.component';
 
 const APP_ROUTES: Routes = [
   { path: 'login', component: LoginComponent,  pathMatch: 'full'},
+  { path: 'vinculate', component: LinkUserComponent,  pathMatch: 'full', canActivate: [ AuthGuardService ]},
   { path: 'home', component: HomeComponent,  pathMatch: 'full', canActivate: [ AuthGuardService ]},
   { path: 'profile', component: ProfileComponent,  pathMatch: 'full', canActivate: [ AuthGuardService ]},
   { path: '**', pathMatch: 'full', redirectTo: '/home'}

@@ -61,7 +61,7 @@ export class LoginComponent implements OnInit {
       const userLogin = await this.userService.login(user);
 
       this.userService.setUserLoggedIn(userLogin);
-      this.router.navigate(['/', 'profile']);
+      this.router.navigate(['/', 'home']);
     } catch (error) {
       console.log('Error ', error);
       if (error && error.status === 403) {
@@ -98,7 +98,7 @@ export class LoginComponent implements OnInit {
 
       this.userService.setUserLoggedIn(userLogin);
       $('#simpleModal').modal('hide');
-      this.router.navigate(['/', 'profile']);
+      this.router.navigate(['/', 'vinculate']);
     } catch (error) {
       console.log('Error ', error);
       if (error && error.status === 403) {
@@ -107,9 +107,5 @@ export class LoginComponent implements OnInit {
         this.errorLogin = (error && error.message) ? error.message : 'Internal server error';
       }
     }
-  }
-
-  goToHome(): void {
-    this.router.navigate(['/', 'home']);
   }
 }

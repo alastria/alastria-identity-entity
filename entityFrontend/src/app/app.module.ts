@@ -7,11 +7,11 @@ import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { LoginModule } from './modules/login/login.module';
 import { ProfileModule } from './modules/profile/profile.module';
-
 // COMPONENTS
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './components/shared/header/header.component';
 import { HomeComponent } from './components/pages/home/home.component';
+import { LinkUserComponent } from './components/pages/link-user/link-user.component';
 
 // SERVICES
 import { AuthGuardService } from './services/auth/auth-guard.service';
@@ -20,15 +20,16 @@ import { AuthGuardService } from './services/auth/auth-guard.service';
   declarations: [
     AppComponent,
     HomeComponent,
-    HeaderComponent
+    HeaderComponent,
+    LinkUserComponent
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    AppRoutingModule,
     HttpClientModule,
     LoginModule,
     ProfileModule,
-    AppRoutingModule,
   ],
   providers: [AuthGuardService],
   bootstrap: [AppComponent]
