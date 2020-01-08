@@ -38,7 +38,7 @@ npm run build
 
 ## Run the Entity
 
-Before running the Entity, you can change the blockchain node IP in the file [docker-compose.yaml](https://github.com/alastria/alastria-identity-serviceProvider/blob/develop/docker-compose.yaml). At the moment, you can choose one of this (**only one**):
+Before running the Entity, you can change the blockchain node IP in the file [docker-compose.yaml](/docker-compose.yaml). At the moment, you can choose one of this (**only one**):
 
 ```yaml
 - NODE_ENDPOINT=localEndpoint
