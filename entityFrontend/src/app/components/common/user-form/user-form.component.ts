@@ -4,11 +4,11 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { User } from 'src/app/models/user/user.model';
 
 @Component({
-  selector: 'app-disabled-form',
-  templateUrl: './disabled-form.component.html',
-  styleUrls: ['./disabled-form.component.css']
+  selector: 'app-user-form',
+  templateUrl: './user-form.component.html',
+  styleUrls: ['./user-form.component.css']
 })
-export class DisabledFormComponent implements OnInit {
+export class UserFormComponent implements OnInit {
 
   @Input() user: User;
   @Input() isDisabled: boolean;

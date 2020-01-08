@@ -7,7 +7,7 @@ import { SharedModule } from '../shared/shared.module';
 
 // COMPONENTS
 import { ProfileComponent } from 'src/app/components/pages/profile/profile.component';
-import { DisabledFormComponent } from 'src/app/components/common/disabled-form/disabled-form.component';
+import { UserFormComponent } from 'src/app/components/common/user-form/user-form.component';
 import { GenerateQrComponent } from 'src/app/components/common/generate-qr/generate-qr.component';
 import { MenuComponent } from 'src/app/components/common/menu/menu.component';
 import { CreateAlastriaIdComponent } from 'src/app/components/common/create-alastria-id/create-alastria-id.component';
@@ -16,7 +16,7 @@ import { ModalFillProfileComponent } from 'src/app/components/common/modal-fill-
 @NgModule({
   declarations: [
     ProfileComponent,
-    DisabledFormComponent,
+    UserFormComponent,
     GenerateQrComponent,
     MenuComponent,
     CreateAlastriaIdComponent,

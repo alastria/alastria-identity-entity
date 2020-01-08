@@ -17,7 +17,7 @@ declare var $: any;
   templateUrl: './profile.component.html',
   styles: [
     `
-    :host ::ng-deep app-disabled-form > form,  #create-alastria-id{
+    :host ::ng-deep app-user-form > form,  #create-alastria-id{
       padding-left: 40px;
     }
     :host ::ng-deep app-generate-qr qrcode > img{
