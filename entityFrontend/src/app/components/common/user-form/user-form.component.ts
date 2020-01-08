@@ -12,6 +12,7 @@ export class UserFormComponent implements OnInit {
 
   @Input() user: User;
   @Input() isDisabled: boolean;
+  @Input() isNewUser: boolean;
   @Output() handleEditProfile = new EventEmitter<User>();
   fullName: string;
 
