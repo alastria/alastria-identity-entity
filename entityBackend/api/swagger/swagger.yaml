@@ -532,14 +532,6 @@ paths:
     x-swagger-pipe: swagger_raw
 # complex objects have schema definitions
 definitions:
-  credential:
-    properties:
-      header:
-        type: "object"
-      payload:
-        type: "object"
-      signature:
-        type: "object"
   alastriaIdentityResponse:
     properties:
       alastriaDID:
