@@ -283,19 +283,13 @@ function updateReceiverPresentationStatus(presentationHash, newStatus) {
 function getCredentialStatus(credentialHash, issuer, subject) {
   return new Promise((resolve, reject) => {
     log.debug(`${moduleName}[${getCredentialStatus.name}] -----> IN ...`)
-    console.log("----------------", credentialHash, issuer, subject)
-
-    console.log("ISSUER != null", issuer!=null)
     let credentialStatus = null;
     if (issuer != null) {
       credentialStatus = transactionFactory.credentialRegistry.getIssuerCredentialStatus(web3, issuer, credentialHash);
-      console.log("ES ISSUER")
     } else if (subject != null) {
       credentialStatus = transactionFactory.credentialRegistry.getSubjectCredentialStatus(web3, subject, credentialHash);
-      console.log("ES subject")
     }
     if (credentialStatus != null) {
-      console.log("Credential != null", credentialStatus)
       web3.eth.call(credentialStatus)
         .then(result => {
           let resultStatus = web3.eth.abi.decodeParameters(["bool", "uint8"], result)

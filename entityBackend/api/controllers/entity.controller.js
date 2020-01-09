@@ -208,12 +208,8 @@ function getCredentialStatus(req, res){
   try {
     log.debug(`${controller_name}[${getCredentialStatus.name}] -----> IN ...`);
     let credentialHash = req.swagger.params.credentialHash.value;
-    console.log("------ hash", credentialHash)
-    console.log("paramsss", req.swagger.params)
     let issuer = req.swagger.params.issuer.value;
-    console.log("------ issuer", issuer)
     let subject = req.swagger.params.subject.value;
-    console.log("------ subject", subject)
     log.debug(`${controller_name}[${getCredentialStatus.name}] -----> Sending params eeeee: ${JSON.stringify(credentialHash, issuer, subject)}`)
     entityModel.getCredentialStatus(credentialHash, issuer, subject)
       .then(credentialStatus => { 
