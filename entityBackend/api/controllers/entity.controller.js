@@ -22,7 +22,8 @@ module.exports = {
   getCurrentPublicKey,
   getpresentationStatus,
   updateReceiverPresentationStatus,
-  addSubjectPresentation
+  addSubjectPresentation,
+  getCredentialStatus
 }
 
 /////////////////////////////////////////////////////////
@@ -202,3 +203,39 @@ function updateReceiverPresentationStatus(req, res){
     log.error(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> ${error}`)
   }
 }
+
+function getCredentialStatus(req, res){
+  try {
+    log.debug(`${controller_name}[${getCredentialStatus.name}] -----> IN ...`);
+    let credentialHash = req.swagger.params.credentialHash.value;
+    console.log("------ hash", credentialHash)
+    console.log("paramsss", req.swagger.params)
+    let issuer = req.swagger.params.issuer.value;
+    console.log("------ issuer", issuer)
+    let subject = req.swagger.params.subject.value;
+    console.log("------ subject", subject)
+    log.debug(`${controller_name}[${getCredentialStatus.name}] -----> Sending params eeeee: ${JSON.stringify(credentialHash, issuer, subject)}`)
+    entityModel.getCredentialStatus(credentialHash, issuer, subject)
+      .then(credentialStatus => { 
+        if (credentialStatus != null){
+          log.debug(`${controller_name}[${getCredentialStatus.name}] -----> Successfully obtained presentation status: ${credentialStatus}`);
+          res.status(200).send(credentialStatus);
+        }
+        else {
+          let msg = {
+            message: 'Error getting presentation status'
+          }
+          res.status(404).send(msg)
+        }        
+      })
+      .catch(error => {
+        let msg = {
+          message: `Insternal Server Error: ${error}`
+        }
+        res.status(503).send(msg)
+      })         
+  } catch (error) {
+    log.error(`${controller_name}[${getCredentialStatus.name}] -----> ${error}`)
+  }
+}
+

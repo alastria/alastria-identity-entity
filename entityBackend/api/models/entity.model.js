@@ -104,7 +104,8 @@ module.exports = {
   getCurrentPublicKey,
   getpresentationStatus,
   updateReceiverPresentationStatus,
-  addSubjectPresentation
+  addSubjectPresentation,
+  getCredentialStatus
 }
 
 /////////////////////////////////////////////////////////
@@ -277,4 +278,38 @@ function updateReceiverPresentationStatus(presentationHash, newStatus) {
           })
       })
   })
-}    
+}
+
+function getCredentialStatus(credentialHash, issuer, subject) {
+  return new Promise((resolve, reject) => {
+    log.debug(`${moduleName}[${getCredentialStatus.name}] -----> IN ...`)
+    console.log("----------------", credentialHash, issuer, subject)
+
+    console.log("ISSUER != null", issuer!=null)
+    let credentialStatus = null;
+    if (issuer != null) {
+      credentialStatus = transactionFactory.credentialRegistry.getIssuerCredentialStatus(web3, issuer, credentialHash);
+      console.log("ES ISSUER")
+    } else if (subject != null) {
+      credentialStatus = transactionFactory.credentialRegistry.getSubjectCredentialStatus(web3, subject, credentialHash);
+      console.log("ES subject")
+    }
+    if (credentialStatus != null) {
+      console.log("Credential != null", credentialStatus)
+      web3.eth.call(credentialStatus)
+        .then(result => {
+          let resultStatus = web3.eth.abi.decodeParameters(["bool", "uint8"], result)
+          let resultStatusJson = {
+            exist: resultStatus[0],
+            status: resultStatus[1]
+          }
+          log.debug(`${moduleName}[${getCredentialStatus.name}] -----> Success`)
+          resolve(resultStatusJson);
+        })
+        .catch(error => {
+          log.error(`${moduleName}[${getCredentialStatus.name}] -----> ${error}`)
+          reject(error)
+        })
+    }
+  });
+}
