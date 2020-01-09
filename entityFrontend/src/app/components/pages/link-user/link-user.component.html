@@ -9,8 +9,7 @@
       <app-user-form
         [inputsForm]="inputsNewUserForm"
         [user]="user" 
-        isDisabled="false"
-        buttonName="Register"
+        buttonName="REGISTER"
         (handleEditProfile)="handleEditProfile($event)">
       </app-user-form>
       <div id="qr-register" class="row justify-content-center">
@@ -29,6 +28,12 @@
           <h4>Already have an account?</h4>
         </div>
       </div>
+      <app-user-form
+        [inputsForm]="inputsLoginForm"
+        [user]="user"
+        buttonName="LOGIN"
+        (handleEditProfile)="handleLogin($event)">
+      </app-user-form>
     </div>
   </div>
 </div>

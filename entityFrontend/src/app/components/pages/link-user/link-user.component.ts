@@ -51,8 +51,24 @@ export class LinkUserComponent implements OnInit {
       icon: 'key'
     },
   ];
+  inputsLoginForm: Array<any> = [
+    {
+      label: 'Email',
+      type: 'email',
+      name: 'emailLogin',
+      value: 'email',
+      icon: 'envelope'
+    },
+    {
+      label: 'Password',
+      type: 'password',
+      name: 'passwordLogin',
+      value: 'password',
+      icon: 'key'
+    },
+  ];
 
-  constructor(private userService: UserService) { }
+  constructor() { }
 
   ngOnInit() {
     this.user = {

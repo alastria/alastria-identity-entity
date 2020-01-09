@@ -1,5 +1,5 @@
 <form>
-  <div class="row" [ngClass]="{'justify-content-center': buttonName.toLowerCase() != 'save' && !isDisabled}" *ngFor="let input of inputsForm">
+  <div class="row" [ngClass]="{'justify-content-center': buttonName.toLowerCase() !== 'save' && !isDisabled}" *ngFor="let input of inputsForm">
     <div class="col-12 col-sm-12 col-md-8">
       <div class="form-group">
         <label [for]="input.name">{{ input.label }}</label>

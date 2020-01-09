@@ -21,7 +21,6 @@ export class UserFormComponent implements OnInit {
 
   ngOnInit() {
     this.generateFullName();
-    console.log(this.isDisabled);
   }
 
   /**
