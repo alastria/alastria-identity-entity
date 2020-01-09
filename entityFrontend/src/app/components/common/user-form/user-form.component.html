@@ -1,88 +1,23 @@
 <form>
-  <div class="row" [ngClass]="{'justify-content-center': isNewUser}">
+  <div class="row" [ngClass]="{'justify-content-center': buttonName.toLowerCase() != 'save' && !isDisabled}" *ngFor="let input of inputsForm">
     <div class="col-12 col-sm-12 col-md-8">
       <div class="form-group">
-        <label for="username">Name and Surname</label>
+        <label [for]="input.name">{{ input.label }}</label>
         <div class="input-group mb-2">
           <div class="input-group-prepend">
             <div class="input-group-text">
-              <fa name="user"></fa> 
+              <fa [name]="input.icon"></fa> 
             </div>
           </div>
-          <input type="username" class="form-control" id="fullname" name="fullname" [(ngModel)]="fullName" [disabled]="isDisabled">
+          <input *ngIf="input.value.toLowerCase() !== 'fullname'" [type]="input.type" class="form-control" [id]="input.name" [name]="input.name" [(ngModel)]="user[input.value]" [disabled]="isDisabled">
+          <input *ngIf="input.value.toLowerCase() === 'fullname'" [type]="input.type" class="form-control" [id]="input.name" [name]="input.name" [(ngModel)]="fullName" [disabled]="isDisabled">
         </div>
       </div>
     </div>
   </div>
-  <div class="row" [ngClass]="{'justify-content-center': isNewUser}">
+  <div class="row" [ngClass]="{'justify-content-center': buttonName.toLowerCase() != 'save' && !isDisabled}" *ngIf="buttonName && !isDisabled">
     <div class="col-12 col-sm-12 col-md-8">
-      <div class="form-group">
-        <label for="Email">Email</label>
-        <div class="input-group mb-2">
-          <div class="input-group-prepend">
-            <div class="input-group-text">
-              <fa name="envelope"></fa> 
-            </div>
-          </div>
-          <input type="email" class="form-control" id="email" name="email" [(ngModel)]="user.email" [disabled]="isDisabled">
-        </div>
-      </div>
+      <button type="button" class="btn btn-outline-primary" (click)="editProfile()">{{ buttonName }}</button>
     </div>
   </div>
-  <div class="row" [ngClass]="{'justify-content-center': isNewUser}">
-    <div class="col-12 col-sm-12 col-md-8">
-      <div class="form-group">
-        <label for="email">Address</label>
-        <div class="input-group mb-2">
-          <div class="input-group-prepend">
-            <div class="input-group-text">
-              <fa name="map-marker"></fa> 
-            </div>
-          </div>
-          <input type="address" class="form-control" id="address" name="address" [(ngModel)]="user.address" [disabled]="isDisabled">
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="row justify-content-center" *ngIf="isNewUser">
-    <div class="col-12 col-sm-12 col-md-8">
-      <div class="form-group">
-        <label for="password">Password</label>
-        <div class="input-group mb-2">
-          <div class="input-group-prepend">
-            <div class="input-group-text">
-              <fa name="key"></fa> 
-            </div>
-          </div>
-          <input type="password" class="form-control" id="password" name="password" [(ngModel)]="user.password" [disabled]="isDisabled">
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="row justify-content-center" *ngIf="isNewUser">
-    <div class="col-12 col-sm-12 col-md-8">
-      <div class="form-group">
-        <label for="repeatPassword">Repeat Password</label>
-        <div class="input-group mb-2">
-          <div class="input-group-prepend">
-            <div class="input-group-text">
-              <fa name="key"></fa> 
-            </div>
-          </div>
-          <input type="password" class="form-control" id="repeatPassword" name="repeatPassword" [(ngModel)]="user.repeatPassword" [disabled]="isDisabled">
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="row justify-content-center" *ngIf="!isDisabled && !isNewUser">
-    <div class="col-12 col-sm-12 col-md-8">
-      <button type="button" class="btn btn-primary" (click)="editProfile()">Save</button>
-    </div>
-  </div>
-  <div class="row justify-content-center" *ngIf="isNewUser">
-    <div class="col-12 col-sm-12 col-md-8">
-      <button type="button" class="btn btn-outline-primary" (click)="editProfile()">Register</button>
-    </div>
-  </div>
-  
 </form>

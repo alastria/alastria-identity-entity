@@ -17,7 +17,10 @@
       <app-user-form 
         [user]="user" 
         [isDisabled]="isDisabledProfileForm"
-        (handleEditProfile)="handleEditProfile($event)"></app-user-form>
+        [inputsForm]="inputsUserForm"
+        buttonName="Save"
+        (handleEditProfile)="handleEditProfile($event)">
+      </app-user-form>
       <div id="verified-button" class="row" *ngIf="isAlastriaVerified">
         <div class="col-12">
           <app-button-login 

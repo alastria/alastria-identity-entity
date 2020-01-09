@@ -46,6 +46,29 @@ export class ProfileComponent implements OnInit {
   isAlastriaVerified: boolean;
   qrDataFillProfile: any = '[]';
   isDisabledProfileForm = true;
+  inputsUserForm: Array<any> = [
+    {
+      label: 'Full name',
+      type: 'text',
+      name: 'fullName',
+      value: 'fullName',
+      icon: 'user'
+    },
+    {
+      label: 'Email',
+      type: 'email',
+      name: 'email',
+      value: 'email',
+      icon: 'envelope'
+    },
+    {
+      label: 'Address',
+      type: 'text',
+      name: 'address',
+      value: 'address',
+      icon: 'map-marker'
+    },
+  ];
 
   constructor(private userService: UserService,
               private socketService: SocketService,

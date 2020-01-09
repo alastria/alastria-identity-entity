@@ -12,7 +12,8 @@ export class UserFormComponent implements OnInit {
 
   @Input() user: User;
   @Input() isDisabled: boolean;
-  @Input() isNewUser: boolean;
+  @Input() buttonName: string;
+  @Input() inputsForm: Array<any>;
   @Output() handleEditProfile = new EventEmitter<User>();
   fullName: string;
 
@@ -20,6 +21,7 @@ export class UserFormComponent implements OnInit {
 
   ngOnInit() {
     this.generateFullName();
+    console.log(this.isDisabled);
   }
 
   /**

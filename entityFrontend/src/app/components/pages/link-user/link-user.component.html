@@ -6,11 +6,13 @@
           <h4>New user?</h4>
         </div>
       </div>
-      <app-user-form 
+      <app-user-form
+        [inputsForm]="inputsNewUserForm"
         [user]="user" 
-        [isDisabled]="false"
-        [isNewUser]="true"
-        (handleEditProfile)="handleEditProfile($event)"></app-user-form>
+        isDisabled="false"
+        buttonName="Register"
+        (handleEditProfile)="handleEditProfile($event)">
+      </app-user-form>
       <div id="qr-register" class="row justify-content-center">
         <div class="col-12 col-sm-12 col-md-4">
           <qrcode qrdata="test" size="128" level="M"></qrcode>
