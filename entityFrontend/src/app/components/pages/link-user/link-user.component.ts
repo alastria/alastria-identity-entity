@@ -1,11 +1,11 @@
+import { Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 
 // SERVICES
 import { UserService } from 'src/app/services/user/user.service';
 
 // MODELS
-import { User } from './../../../models/user/user.model';
-
+import { User } from 'src/app/models/user/user.model';
 
 @Component({
   selector: 'app-link-user',
@@ -68,7 +68,8 @@ export class LinkUserComponent implements OnInit {
     },
   ];
 
-  constructor() { }
+  constructor( private router: Router,
+               private userService: UserService) { }
 
   ngOnInit() {
     this.user = {
@@ -77,6 +78,24 @@ export class LinkUserComponent implements OnInit {
       surname: '',
       password: ''
     };
+  }
+
+  handleRegister(userRegister: User): void {
+    delete userRegister.repeatPassword;
+
+    // TODO: llamada al servidor para vincular el usuario
+    this.handleLogin(userRegister);
+  }
+
+  async handleLogin(userRegister: User) {
+    delete userRegister.repeatPassword;
+
+    // TODO: llamada al servidor para vincular el usuario
+    this.userService.setUserLoggedIn((userRegister));
+
+    const userLogin = await this.userService.login(userRegister);
+    this.userService.setUserLoggedIn(userLogin);
+    this.router.navigate(['/', 'home']);
   }
 
 }

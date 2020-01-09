@@ -35,7 +35,13 @@ export class UserFormComponent implements OnInit {
    */
   editProfile(): void {
     this.fullNameToNameOrSurname();
-    this.handleEditProfile.emit(this.user);
+    if (this.buttonName.toLowerCase() === 'register') {
+      if (this.user.password === this.user.repeatPassword) {
+        this.handleEditProfile.emit(this.user);
+      }
+    } else {
+      this.handleEditProfile.emit(this.user);
+    }
   }
 
   /**
