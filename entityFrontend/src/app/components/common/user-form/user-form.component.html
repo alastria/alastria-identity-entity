@@ -1,4 +1,4 @@
-<form>
+<form [formGroup]="userForm" [name]="buttonName">
   <div class="row" [ngClass]="{'justify-content-center': buttonName.toLowerCase() !== 'save' && !isDisabled}" *ngFor="let input of inputsForm">
     <div class="col-12 col-sm-12 col-md-8">
       <div class="form-group">
@@ -9,8 +9,11 @@
               <fa [name]="input.icon"></fa> 
             </div>
           </div>
-          <input *ngIf="input.value.toLowerCase() !== 'fullname'" [type]="input.type" class="form-control" [id]="input.name" [name]="input.name" [(ngModel)]="user[input.value]" [disabled]="isDisabled">
-          <input *ngIf="input.value.toLowerCase() === 'fullname'" [type]="input.type" class="form-control" [id]="input.name" [name]="input.name" [(ngModel)]="fullName" [disabled]="isDisabled">
+          <input *ngIf="input.value.toLowerCase() !== 'fullname'" [type]="input.type" class="form-control" [id]="input.name" [formControlName]="input.name">
+          <input *ngIf="input.value.toLowerCase() === 'fullname'" [type]="input.type" class="form-control" [id]="input.name" [formControlName]="input.name">
+        </div>
+        <div *ngIf="!userForm?.controls[input.name].valid && userForm?.controls[input.name].touched" class="alert alert-danger">
+          Please enter a {{ input.label }}
         </div>
       </div>
     </div>

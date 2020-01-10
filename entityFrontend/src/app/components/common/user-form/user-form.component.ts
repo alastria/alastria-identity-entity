@@ -1,7 +1,9 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 // MODELS
 import { User } from 'src/app/models/user/user.model';
+import { InputUserForm } from 'src/app/models/input-user-form/input-user-form.model';
 
 @Component({
   selector: 'app-user-form',
@@ -13,14 +15,17 @@ export class UserFormComponent implements OnInit {
   @Input() user: User;
   @Input() isDisabled: boolean;
   @Input() buttonName: string;
-  @Input() inputsForm: Array<any>;
+  @Input() inputsForm: Array<InputUserForm>;
   @Output() handleEditProfile = new EventEmitter<User>();
+  userForm: FormGroup;
   fullName: string;
 
-  constructor() { }
+  constructor(private fb: FormBuilder) {
+   }
 
   ngOnInit() {
     this.generateFullName();
+    this.generateForm();
   }
 
   /**
@@ -34,7 +39,7 @@ export class UserFormComponent implements OnInit {
    * Function for edit profile of user
    */
   editProfile(): void {
-    this.fullNameToNameOrSurname();
+    this.generateUser();
     if (this.buttonName.toLowerCase() === 'register') {
       if (this.user.password === this.user.repeatPassword) {
         this.handleEditProfile.emit(this.user);
@@ -45,10 +50,23 @@ export class UserFormComponent implements OnInit {
   }
 
   /**
+   * Function for get user objet for emit to father component
+   */
+  private generateUser() {
+    this.inputsForm.map((input: InputUserForm) => {
+      if (input && input.name.toLowerCase() === 'fullname') {
+        this.fullNameToNameOrSurname();
+      } else {
+        this.user[input.name] = this.userForm.get(input.name).value;
+      }
+    });
+  }
+
+  /**
    * Function for get name and surname of the fullName
    */
   private fullNameToNameOrSurname(): void {
-    const fullNameSplit = this.fullName.split(' ');
+    const fullNameSplit = this.userForm.get('fullname').value.split(' ');
     this.user.name = fullNameSplit[0];
     this.user.surname = '';
     fullNameSplit.map((word: string, index: number) => {
@@ -60,5 +78,17 @@ export class UserFormComponent implements OnInit {
         }
       }
     });
+  }
+
+  /*
+  * Generate userForm with inputsForm
+  */
+  private generateForm(): void {
+    const parametersForm: object = {};
+    this.inputsForm.map((input: InputUserForm ) => {
+      parametersForm[input.name] = [{ value: this.user[(input.name.toLowerCase() === 'fullname') ? this.fullName : input.value],
+        disabled: this.isDisabled }, Validators.required];
+    });
+    this.userForm = this.fb.group(parametersForm);
   }
 }
