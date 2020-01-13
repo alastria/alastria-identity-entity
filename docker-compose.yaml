@@ -17,15 +17,15 @@ services:
       - ./entityBackend/api:/app/api
     command: npm run start
 
-  spFrontend:
+  entityFrontend:
     restart: on-failure:5
-    build: spFrontend
-    image: serviceproviderfront
+    build: entityFrontend
+    image: entityfront
     ports:
       - "80:80"
     volumes:
-     - ./spFrontend/docker_conf/nginx.conf:/etc/nginx/nginx.conf
-     - ./spFrontend/dist:/usr/share/nginx/html
+     - ./entityFrontend/docker_conf/nginx.conf:/etc/nginx/nginx.conf
+     - ./entityFrontend/dist:/usr/share/nginx/html
     logging:
       driver: "json-file"
       options:
