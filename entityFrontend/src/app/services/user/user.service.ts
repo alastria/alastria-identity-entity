@@ -22,7 +22,7 @@ export class UserService {
       let isLogin = false;
       const authCredentials: any = await this.http.get(authUrl).toPromise();
 
-      if ((user.name === authCredentials.name || user.email === authCredentials.email)
+      if ((user.name === authCredentials.name || user.name === authCredentials.email || user.email === authCredentials.email)
           && user.password === authCredentials.password) {
         isLogin = true;
       } else {
