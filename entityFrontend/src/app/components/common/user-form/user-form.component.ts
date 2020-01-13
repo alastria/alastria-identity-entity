@@ -86,9 +86,26 @@ export class UserFormComponent implements OnInit {
   private generateForm(): void {
     const parametersForm: object = {};
     this.inputsForm.map((input: InputUserForm ) => {
-      parametersForm[input.name] = [{ value: this.user[(input.name.toLowerCase() === 'fullname') ? this.fullName : input.value],
-        disabled: this.isDisabled }, Validators.required];
+        parametersForm[input.name] = [{ value: this.user[(input.name.toLowerCase() === 'fullname') ? this.fullName : input.value],
+          disabled: this.isDisabled }, Validators.required];
     });
-    this.userForm = this.fb.group(parametersForm);
+    this.userForm = this.fb.group(parametersForm, {
+      validator : this.validateAreEqual.bind(this)
+    });
+  }
+
+  /*
+  * Check if passwords are equal
+  */
+  private validateAreEqual(): void {
+    if (this.userForm &&  this.userForm.get('repeatPassword') && this.userForm.get('password')
+      && this.userForm.get('repeatPassword').value !== '' && this.userForm.get('password').value !== ''
+      && this.userForm.get('repeatPassword').value !== this.userForm.get('password').value) {
+        this.userForm.get('repeatPassword').setErrors({mismatch: true});
+    } else {
+      if (this.userForm && this.userForm.get('repeatPassword')) {
+        this.userForm.get('repeatPassword').setErrors({mismatch: false});
+      }
+    }
   }
 }
