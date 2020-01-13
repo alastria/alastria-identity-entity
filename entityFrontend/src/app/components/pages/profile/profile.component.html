@@ -59,12 +59,13 @@
     [htmlContent]="htmlSuccessCreateAlastriaId"
     (handleOk)="handleOk()">
   </app-simple-modal>
-  <app-modal-fill-profile
-    (handleFillYourProfile)="handleFillYourProfile($event)">
-  </app-modal-fill-profile>
   <app-simple-modal *ngIf="isAlastriaVerified"
     (handleOk)="handleOkFillProfile()" 
     type="qr"
     [qrData]="qrDataFillProfile">
   </app-simple-modal>
+  <app-modal-create-alastria-id></app-modal-create-alastria-id>
+  <app-modal-fill-profile
+    (handleFillYourProfile)="handleFillYourProfile($event)">
+  </app-modal-fill-profile>
 </div>

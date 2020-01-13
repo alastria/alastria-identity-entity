@@ -31,7 +31,7 @@ export class ProfileComponent implements OnInit {
   user: User;
   qrAlastriaId: string;
   qrCredentials: any;
-  optionsMenu = ['Edit profile', 'Reset password'];
+  optionsMenu = ['Edit profile', 'Reset password', 'Alastria ID'];
   ioConnection: any; // websocket connection
   htmlSuccessCreateAlastriaId = `
     <img src="../../../../assets/images/success-icon.svg" alt="Success icon">
@@ -93,8 +93,11 @@ export class ProfileComponent implements OnInit {
       case this.optionsMenu[1]:
         this.resetPassword();
         break;
-      case this.optionsMenu[2]:
+      case 'Fill your profile':
         this.fillYourProfile();
+        break;
+      case 'Alastria ID':
+        $('#modalCreateAlastriaId').modal('show');
         break;
       default:
         break;

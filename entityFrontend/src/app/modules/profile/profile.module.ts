@@ -10,6 +10,7 @@ import { GenerateQrComponent } from 'src/app/components/common/generate-qr/gener
 import { MenuComponent } from 'src/app/components/common/menu/menu.component';
 import { CreateAlastriaIdComponent } from 'src/app/components/common/create-alastria-id/create-alastria-id.component';
 import { ModalFillProfileComponent } from 'src/app/components/common/modal-fill-profile/modal-fill-profile.component';
+import { ModalCreateAlastriaIdComponent } from 'src/app/components/common/modal-create-alastria-id/modal-create-alastria-id.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { ModalFillProfileComponent } from 'src/app/components/common/modal-fill-
     GenerateQrComponent,
     MenuComponent,
     CreateAlastriaIdComponent,
-    ModalFillProfileComponent
+    ModalFillProfileComponent,
+    ModalCreateAlastriaIdComponent
   ],
   imports: [
     CommonModule,
