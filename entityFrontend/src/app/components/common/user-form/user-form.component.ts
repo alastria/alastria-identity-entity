@@ -54,7 +54,7 @@ export class UserFormComponent implements OnInit {
    */
   private generateUser() {
     this.inputsForm.map((input: InputUserForm) => {
-      if (input && input.name.toLowerCase() === 'fullname') {
+      if (input && input.name.toLowerCase() === 'fullname' && this.userForm.get(input.name).value) {
         this.fullNameToNameOrSurname();
       } else {
         this.user[input.name] = this.userForm.get(input.name).value;
