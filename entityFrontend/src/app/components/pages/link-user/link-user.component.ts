@@ -14,6 +14,8 @@ import { User } from 'src/app/models/user/user.model';
 })
 export class LinkUserComponent implements OnInit {
   user: User;
+  errorPasswordNewUser: string;
+  errorPasswordLogin: string;
   inputsNewUserForm: Array<any> = [
     {
       label: 'Full name',
@@ -87,24 +89,48 @@ export class LinkUserComponent implements OnInit {
     };
   }
 
-  handleRegister(userRegister): void {
+  async handleRegister(userRegister) {
+    this.errorPasswordNewUser = '';
     delete userRegister.repeatPassword;
 
     // TODO: llamada al servidor para vincular el usuario
-    this.handleLogin(userRegister);
+    try {
+      await this.login(userRegister);
+    } catch (error) {
+      if (error && error.status === 403) {
+        this.errorPasswordNewUser = 'Incorrect email or password';
+      } else {
+        this.errorPasswordNewUser = (error && error.message) ? error.message : 'Internal server error';
+      }
+    }
   }
 
   async handleLogin(userRegister: any) {
+    this.errorPasswordLogin = '';
     delete userRegister.repeatPassword;
     userRegister.email = (userRegister.emailLogin) ? userRegister.emailLogin : userRegister.email;
     userRegister.password = (userRegister.passwordLogin) ? userRegister.passwordLogin : userRegister.password;
 
     // TODO: llamada al servidor para vincular el usuario
-    this.userService.setUserLoggedIn((userRegister));
+    try {
+      await this.login(userRegister);
+    } catch (error) {
+      if (error && error.status === 403) {
+        this.errorPasswordLogin = 'Incorrect email or password';
+      } else {
+        this.errorPasswordLogin = (error && error.message) ? error.message : 'Internal server error';
+      }
+    }
+  }
 
-    const userLogin = await this.userService.login(userRegister);
-    this.userService.setUserLoggedIn(userLogin);
-    this.router.navigate(['/', 'home']);
+  private async login(userRegister: any) {
+    try {
+      const userLogin = await this.userService.login(userRegister);
+      this.userService.setUserLoggedIn(userLogin);
+      this.router.navigate(['/', 'home']);
+    } catch (error) {
+      throw error;
+    }
   }
 
 }

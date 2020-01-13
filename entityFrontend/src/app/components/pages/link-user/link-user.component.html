@@ -12,6 +12,13 @@
         buttonName="REGISTER"
         (handleEditProfile)="handleRegister($event)">
       </app-user-form>
+      <div *ngIf="errorPasswordNewUser" class="row">
+        <div class="col-sm-12">
+          <div class="alert alert-danger">
+            {{ errorPasswordNewUser }}
+          </div>
+        </div>
+      </div>
       <div id="qr-register" class="row justify-content-center">
         <div class="col-12 col-sm-12 col-md-4">
           <qrcode qrdata="test" size="128" level="M"></qrcode>
@@ -34,6 +41,12 @@
         buttonName="LOGIN"
         (handleEditProfile)="handleLogin($event)">
       </app-user-form>
+    <div *ngIf="errorPasswordLogin" class="row">
+      <div class="col-sm-12">
+        <div class="alert alert-danger">
+          {{ errorPasswordLogin }}
+        </div>
+      </div>
     </div>
   </div>
 </div>

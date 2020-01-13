@@ -9,7 +9,7 @@
               <fa [name]="input.icon"></fa> 
             </div>
           </div>
-          <input *ngIf="input.value.toLowerCase() !== 'fullname'" [type]="text" class="form-control" [id]="input.name" [formControlName]="input.name">
+          <input *ngIf="input.value.toLowerCase() !== 'fullname'" [type]="input.type" class="form-control" [id]="input.name" [formControlName]="input.name">
           <input *ngIf="input.value.toLowerCase() === 'fullname'" [type]="input.type" class="form-control" [id]="input.name" [formControlName]="input.name">
         </div>
         <div *ngIf="userForm?.controls[input.name].errors?.required && userForm?.controls[input.name].touched" class="alert alert-danger">
