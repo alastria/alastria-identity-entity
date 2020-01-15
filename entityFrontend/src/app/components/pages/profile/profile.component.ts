@@ -3,6 +3,7 @@ import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 
 // COMPONENTS
 import { CreateAlastriaIdComponent } from '../../common/create-alastria-id/create-alastria-id.component';
+import { UserFormComponent } from 'src/app/components/common/user-form/user-form.component';
 
 // SERVICES
 import { UserService } from 'src/app/services/user/user.service';
@@ -32,6 +33,7 @@ declare var $: any;
 })
 export class ProfileComponent implements OnInit {
   @ViewChild(CreateAlastriaIdComponent) createAlastriaIdComponent: CreateAlastriaIdComponent;
+  @ViewChild(UserFormComponent) userFormComponent: UserFormComponent;
   user: User;
   qrAlastriaId: string;
   qrCredentials: any;
@@ -50,7 +52,6 @@ export class ProfileComponent implements OnInit {
   isAlastriaVerified: boolean;
   isCreateAlastriaId: boolean;
   qrDataFillProfile: any = '[]';
-  isDisabledProfileForm = true;
   inputsUserForm: Array<any> = [
     {
       label: 'Full name',
@@ -204,9 +205,9 @@ export class ProfileComponent implements OnInit {
   }
 
   private editProfile(): void {
-    this.isDisabledProfileForm = !this.isDisabledProfileForm;
+    this.userFormComponent.toggleFormState();
   }
- 
+
   private resetPassword(): void {
     console.log('RESET PASSWORD');
   }
