@@ -8,10 +8,10 @@
         </button>
       </div>
       <div class="modal-body">
-        <div *ngIf="type === 'qr'">
+        <div id="qr" *ngIf="type === 'qr'">
           <qrcode [qrdata]="qrData" [size]="'256'" [level]="'M'"></qrcode>
         </div>
-        <div *ngIf="type !== 'qr'" [innerHTML]="htmlContent">
+        <div id="htmlContent" *ngIf="type !== 'qr'" [innerHTML]="htmlContent">
         </div>
       </div>
       <div *ngIf="type === 'info'" class="modal-footer">

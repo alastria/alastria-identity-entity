@@ -37,9 +37,9 @@ export class ProfileComponent implements OnInit {
   optionsMenu = ['Edit profile', 'Reset password', 'Alastria ID'];
   ioConnection: any; // websocket connection
   htmlSuccessCreateAlastriaId = `
-    <img src="../../../../assets/images/success-icon.svg" alt="Success icon">
-    <h1> Success! </h1>
-    <p> Congratulations, your Alastria ID has been created and vinculated with your accouunt </p>
+      <img width="50%" src="../../../../assets/images/success-icon.svg" alt="Success icon">
+      <h1> Congratulations! </h1>
+      <p> Your Alastria ID has been created. Start to fill you new AlastriaID </p>
   `;
   styleButtonAlastriaId = {
     color: '#00CAD6',
@@ -97,7 +97,7 @@ export class ProfileComponent implements OnInit {
       case this.optionsMenu[1]:
         this.resetPassword();
         break;
-      case 'Fill your profile':
+      case 'Fill your AlastriaID profile':
         this.fillYourProfile();
         break;
       case 'Alastria ID':
@@ -174,8 +174,9 @@ export class ProfileComponent implements OnInit {
   }
 
   private addOptionInMenu() {
-    const titleOption = 'Fill your profile';
+    const titleOption = 'Fill your AlastriaID profile';
     if (this.isAlastriaVerified && !this.optionsMenu.includes(titleOption)) {
+      this.optionsMenu.splice(this.optionsMenu.length - 1, 1);
       this.optionsMenu.push(titleOption);
     }
   }

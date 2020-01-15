@@ -1,4 +1,4 @@
-.modal-body > div {
+.modal-body > div#qr {
     margin: auto !important;
     width: 50%;
 }
