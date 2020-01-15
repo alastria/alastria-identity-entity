@@ -256,6 +256,7 @@ export class ProfileComponent implements OnInit {
           <p> Your AlastriaID has been linked to your [entity] profile. Now you can login next times with your AlastriaID </p>
         `;
         $('#simpleModal').modal('show');
+        this.userService.setIsAlastriaIdVerified(true);
       });
 
     this.socketService.onEvent(Event.CONNECT)

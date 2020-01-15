@@ -10,8 +10,9 @@
     height: 200px;
 }
 
-#verified-button {
-    margin-top: 50px;
+#alastria-verified {
+    width: 20px;
+    margin-bottom: 10px;
 }
 
 h3, h4 {

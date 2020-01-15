@@ -10,8 +10,11 @@
   <div class="row">
     <div id="personal-data" class="col-md-6">
       <div class="row">
-        <div class="col-sm-12">
-          <h4>Personal Data</h4>
+        <div class="col-sm-11">
+          <h4>
+            <img *ngIf="isAlastriaVerified" id="alastria-verified" src="../../../../assets/images/alastria-icon.svg" alt="alastria-icon">
+            Personal Data
+          </h4>
         </div>
       </div>
       <app-user-form 
@@ -21,17 +24,6 @@
         buttonName="Save"
         (handleEditProfile)="handleEditProfile($event)">
       </app-user-form>
-      <div id="verified-button" class="row" *ngIf="isAlastriaVerified">
-        <div class="col-12">
-          <app-button-login 
-            title="Alastria Verified"
-            socialName="alastriaId"
-            [style]="styleButtonAlastriaId"
-            isDisabled=true
-            imgUrl="../../../assets/images/alastria-icon.svg">
-          </app-button-login>
-        </div>
-      </div>
     </div>
     <div class="col-md-6">
       <div *ngIf="!qrAlastriaId || isAlastriaVerified" id="actions-menu">
