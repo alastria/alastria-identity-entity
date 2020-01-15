@@ -1,5 +1,5 @@
 import { Identity } from './../../../models/identity/identity.model';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 
 // COMPONENTS
 import { CreateAlastriaIdComponent } from '../../common/create-alastria-id/create-alastria-id.component';
@@ -31,6 +31,7 @@ declare var $: any;
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
+  @ViewChild(CreateAlastriaIdComponent) createAlastriaIdComponent: CreateAlastriaIdComponent;
   user: User;
   qrAlastriaId: string;
   qrCredentials: any;
@@ -47,6 +48,7 @@ export class ProfileComponent implements OnInit {
     colorIcon: 'black'
   };
   isAlastriaVerified: boolean;
+  isCreateAlastriaId: boolean;
   qrDataFillProfile: any = '[]';
   isDisabledProfileForm = true;
   inputsUserForm: Array<any> = [
@@ -71,12 +73,12 @@ export class ProfileComponent implements OnInit {
       value: 'address',
       icon: 'map-marker'
     },
-  ];
-  @ViewChild(CreateAlastriaIdComponent) createAlastriaIdComponent: CreateAlastriaIdComponent;
+  ]
 
   constructor(private userService: UserService,
               private socketService: SocketService,
-              private entityService: EntityService) { }
+              private entityService: EntityService,
+              private changeDetector: ChangeDetectorRef) { }
 
   ngOnInit() {
     this.user = this.userService.getUserLoggedIn();
@@ -110,6 +112,8 @@ export class ProfileComponent implements OnInit {
 
   handleCreateAlastriaId() {
     $('#modalCreateAlastriaId').modal('hide');
+    this.isCreateAlastriaId = true;
+    this.changeDetector.detectChanges();
     this.createAlastriaIdComponent.createAlastriaId();
   }
 
@@ -139,6 +143,8 @@ export class ProfileComponent implements OnInit {
    */
   handleOk(): void {
     $('#simpleModal').modal('hide');
+    this.qrAlastriaId = null;
+    this.isCreateAlastriaId = false;
     this.checkAlastriaIdIsVerified();
     this.addOptionInMenu();
   }

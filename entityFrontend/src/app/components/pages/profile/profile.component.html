@@ -46,7 +46,7 @@
             </div>
           </div>
       </div>
-      <div *ngIf="!isAlastriaVerified" id="create-alastria-id" class="row" >
+      <div *ngIf="isCreateAlastriaId" id="create-alastria-id" class="row" >
         <div class="col-12">
           <app-create-alastria-id (handleGenerateQr)="handleGenerateQr($event)"></app-create-alastria-id>
         </div>
