@@ -7,3 +7,13 @@
     position: absolute;
     right: 15px;
 }
+
+p {
+    color: #AFAFAF;
+    font-size: medium;
+}
+
+a {
+    color: #325B8E;
+    font-size: large;
+}
