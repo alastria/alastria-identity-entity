@@ -13,9 +13,9 @@ import { InputUserForm } from 'src/app/models/input-user-form/input-user-form.mo
 export class UserFormComponent implements OnInit {
 
   @Input() user: User;
-  @Input() isDisabled: boolean;
   @Input() buttonName: string;
   @Input() inputsForm: Array<InputUserForm>;
+  @Input() isDisabled: boolean;
   @Output() handleEditProfile = new EventEmitter<User>();
   userForm: FormGroup;
   fullName: string;
@@ -47,6 +47,18 @@ export class UserFormComponent implements OnInit {
     } else {
       this.handleEditProfile.emit(this.user);
     }
+  }
+
+  /*
+   * Enable/disable form control
+  */
+  public toggleFormState() {
+    this.isDisabled = !this.isDisabled;
+    const state = this.isDisabled ? 'disable' : 'enable';
+
+    Object.keys(this.userForm.controls).forEach((controlName) => {
+        this.userForm.controls[controlName][state](); // disables/enables each form control based on 'this.isDisabled'
+    });
   }
 
   /**

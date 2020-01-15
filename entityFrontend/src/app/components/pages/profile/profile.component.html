@@ -16,8 +16,8 @@
       </div>
       <app-user-form 
         [user]="user" 
-        [isDisabled]="isDisabledProfileForm"
         [inputsForm]="inputsUserForm"
+        [isDisabled]=true
         buttonName="Save"
         (handleEditProfile)="handleEditProfile($event)">
       </app-user-form>
