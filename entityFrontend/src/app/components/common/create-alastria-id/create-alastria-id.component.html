@@ -2,14 +2,14 @@
   <div class="row" *ngIf="qrAlastriaId">
     <div class="col-12">
       <h3>
-        Create Your AlastriaID
+        {{ title }}
       </h3>
     </div>
   </div>
   <div id="subtitle" class="row" *ngIf="qrAlastriaId">
     <div class="col-12">
       <span>
-        Scan with your AlastriaID this QR Code to get your AlastriaId
+        {{ subtitle }}
       </span>
     </div>
   </div>
@@ -18,19 +18,19 @@
       <app-generate-qr *ngIf="qrAlastriaId"
         [qrData]="qrAlastriaId"
         [size]="200"
-        (handleGenerateQr)="createAlastriaId()"
+        (handleGenerateQr)="createOrSetUpAlastriaId()"
         (handleCloseQr)="closeQrAlastriaId()">
       </app-generate-qr>
     </div>
   </div>
 </div>
 
-<div id="text-info-downloads" class="row">
+<div id="text-info-downloads" class="row" *ngIf="type === 'C'">
   <div class="col-12">
     <span>You don´t hace your AlastriaID aplication yet</span>
   </div>
 </div>
-<div class="row">
+<div class="row" *ngIf="type === 'C'">
   <div class="col-12 col-sm-12 col-lg-6">
     <img (click)="goToStore(urlPlayStore)" src="../../../../assets/images/google-play-badge.svg" alt="google play logo">
     <qrcode [qrdata]="urlPlayStore" [size]="128" [level]="'M'"></qrcode>

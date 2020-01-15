@@ -25,14 +25,30 @@ export class SocketService {
     this.socket = socketIo(SERVER_URL);
   }
 
-  public send(message: any): void {
-    this.socket.emit('message', message);
+  public sendCreate(message: any): void {
+    this.socket.emit('createIdentity', message);
+  }
+
+  public sendSetUp(): void {
+    this.socket.emit('setUpAlastriaId');
   }
 
   public onMessage(): Observable<any> {
       return new Observable<any>(observer => {
           this.socket.on('message', (data: any) => observer.next(data));
       });
+  }
+
+  public onCreateIdentity(): Observable<any> {
+    return new Observable<any>(observer => {
+        this.socket.on('createIdentity', (data: any) => observer.next(data));
+    });
+  }
+
+  public onSetUpAlastriaId(): Observable<any> {
+    return new Observable<any>(observer => {
+        this.socket.on('setUpAlastriaId', (data: any) => observer.next(data));
+    });
   }
 
   public onEvent(event: Event): Observable<any> {

@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
@@ -15,6 +15,10 @@ import { HttpClient } from '@angular/common/http';
 })
 export class CreateAlastriaIdComponent implements OnInit {
   @Output() handleGenerateQr = new EventEmitter<string>();
+  @Input() title: string;
+  @Input() subtitle: string;
+  @Input() type: string; // C --> create alastria id ; S --> set up alastria id
+
   styleButtonAlastriaId = {
     color: '#00CAD6',
     backgroundIcon: 'white',
@@ -47,7 +51,7 @@ export class CreateAlastriaIdComponent implements OnInit {
   /**
    * When click in create alastria id button then active this function that generate qr and emit handleGenerateQr
    */
-  async createAlastriaId(): Promise<any> {
+  async createOrSetUpAlastriaId(): Promise<any> {
     try {
       this.qrAlastriaId = await this.generateQr();
       this.handleGenerateQr.emit(this.qrAlastriaId);
@@ -69,8 +73,14 @@ export class CreateAlastriaIdComponent implements OnInit {
    * @returns - config
    */
   private async  generateQr(): Promise<string> {
-    const configUrl = '../../../assets/configTest.json';
-    const config = await this.http.get(configUrl).toPromise();
-    return JSON.stringify(config);
+    let qr: string;
+    if (this.type === 'C') {
+      const configUrl = '../../../assets/configTest.json';
+      const config = await this.http.get(configUrl).toPromise();
+      qr = JSON.stringify(config);
+    } else {
+      qr = 'Set up alastria ID'; // POR DEFINIR
+    }
+    return qr;
   }
 }

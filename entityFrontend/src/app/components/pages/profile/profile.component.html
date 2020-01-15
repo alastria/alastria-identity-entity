@@ -48,14 +48,19 @@
       </div>
       <div *ngIf="isCreateAlastriaId" id="create-alastria-id" class="row" >
         <div class="col-12">
-          <app-create-alastria-id (handleGenerateQr)="handleGenerateQr($event)"></app-create-alastria-id>
+          <app-create-alastria-id
+          [title]="parametersForCreateAlastriaId.title"
+          [subtitle]="parametersForCreateAlastriaId.subtitle"
+          [type]="parametersForCreateAlastriaId.type"
+          (handleGenerateQr)="handleGenerateQr($event)">
+        </app-create-alastria-id>
         </div>
       </div>
     </div>
   </div>
   <app-simple-modal *ngIf="!isAlastriaVerified"
     type="info"
-    [htmlContent]="htmlSuccessCreateAlastriaId"
+    [htmlContent]="htmlSuccess"
     (handleOk)="handleOk()">
   </app-simple-modal>
   <app-simple-modal *ngIf="isAlastriaVerified"
