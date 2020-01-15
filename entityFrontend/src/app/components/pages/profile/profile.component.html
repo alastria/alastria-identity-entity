@@ -64,7 +64,11 @@
     type="qr"
     [qrData]="qrDataFillProfile">
   </app-simple-modal>
-  <app-modal-create-alastria-id></app-modal-create-alastria-id>
+  <app-modal-create-alastria-id
+  (handleCreateAlastriaId)="handleCreateAlastriaId()"
+  (handleSetUpAlastriaId)="handleSetUpAlastriaId()">
+  </app-modal-create-alastria-id>
+
   <app-modal-fill-profile
     (handleFillYourProfile)="handleFillYourProfile($event)">
   </app-modal-fill-profile>

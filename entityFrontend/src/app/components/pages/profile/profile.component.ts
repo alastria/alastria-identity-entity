@@ -1,5 +1,8 @@
 import { Identity } from './../../../models/identity/identity.model';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+
+// COMPONENTS
+import { CreateAlastriaIdComponent } from '../../common/create-alastria-id/create-alastria-id.component';
 
 // SERVICES
 import { UserService } from 'src/app/services/user/user.service';
@@ -69,6 +72,7 @@ export class ProfileComponent implements OnInit {
       icon: 'map-marker'
     },
   ];
+  @ViewChild(CreateAlastriaIdComponent) createAlastriaIdComponent: CreateAlastriaIdComponent;
 
   constructor(private userService: UserService,
               private socketService: SocketService,
@@ -102,6 +106,16 @@ export class ProfileComponent implements OnInit {
       default:
         break;
     }
+  }
+
+  handleCreateAlastriaId() {
+    $('#modalCreateAlastriaId').modal('hide');
+    this.createAlastriaIdComponent.createAlastriaId();
+  }
+
+  handleSetUpAlastriaId() {
+    $('#modalCreateAlastriaId').modal('hide');
+    console.log('handleSetUpAlastriaId');
   }
 
   /**
