@@ -1,3 +1,4 @@
+import { environment } from './../../../../environments/environment';
 import { Identity } from './../../../models/identity/identity.model';
 import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 
@@ -74,7 +75,7 @@ export class ProfileComponent implements OnInit {
       value: 'address',
       icon: 'map-marker'
     },
-  ]
+  ];
 
   constructor(private userService: UserService,
               private socketService: SocketService,
@@ -127,7 +128,7 @@ export class ProfileComponent implements OnInit {
     $('#modalCreateAlastriaId').modal('hide');
     this.isCreateAlastriaId = true;
     this.parametersForCreateAlastriaId = {
-      title: 'Set up your Alastria ID for [entity]',
+      title: `Set up your Alastria ID for ${environment.entityName}`,
       subtitle: 'Scan this QR with your AlastriaID',
       type: 'S'
     };
@@ -253,7 +254,7 @@ export class ProfileComponent implements OnInit {
         this.htmlSuccess = `
           <img width="50%" src="../../../../assets/images/success-icon.svg" alt="Success icon">
           <h1> Congratulations! </h1>
-          <p> Your AlastriaID has been linked to your [entity] profile. Now you can login next times with your AlastriaID </p>
+          <p> Your AlastriaID has been linked to your ${environment.entityName} profile. Now you can login next times with your AlastriaID </p>
         `;
         $('#simpleModal').modal('show');
         this.userService.setIsAlastriaIdVerified(true);

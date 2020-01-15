@@ -1,4 +1,5 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { environment } from './../../../../environments/environment';
 
 @Component({
   selector: 'app-modal-create-alastria-id',
@@ -8,6 +9,7 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 export class ModalCreateAlastriaIdComponent implements OnInit {
   @Output() handleCreateAlastriaId = new EventEmitter();
   @Output() handleSetUpAlastriaId = new EventEmitter();
+  entityName = environment.entityName;
 
   constructor() { }
 
