@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 // MODELS
 import { Service } from 'src/app/models/services/services.model';
@@ -12,9 +13,10 @@ import { HomeService } from 'src/app/services/home/home.service';
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
-  services: Array<Service> =  []
+  services: Array<Service>;
 
-  constructor(private homeService: HomeService) { }
+  constructor(private homeService: HomeService,
+              private router: Router) { }
 
   ngOnInit() {
     this.getServices();
@@ -22,6 +24,7 @@ export class HomeComponent implements OnInit {
 
   selectService(serviceId: number) {
     console.log({serviceId});
+    this.router.navigate(['/', 'service', serviceId]);
   }
 
   async getServices() {
