@@ -2,6 +2,8 @@
     width: 345px;
     text-align: justify;
     height: 335px;
+    margin: auto;
+    margin-bottom: 25px;
 }
 
 img {

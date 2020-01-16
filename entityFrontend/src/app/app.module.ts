@@ -1,3 +1,4 @@
+import { HomeModule } from './modules/home/home.module';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
@@ -13,7 +14,6 @@ import { LinkUserModule } from './modules/link-user/link-user.module';
 // COMPONENTS
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './components/shared/header/header.component';
-import { HomeComponent } from './components/pages/home/home.component';
 
 // SERVICES
 import { AuthGuardService } from './services/auth/auth-guard.service';
@@ -21,7 +21,6 @@ import { AuthGuardService } from './services/auth/auth-guard.service';
 @NgModule({
   declarations: [
     AppComponent,
-    HomeComponent,
     HeaderComponent,
   ],
   imports: [
@@ -31,6 +30,7 @@ import { AuthGuardService } from './services/auth/auth-guard.service';
     HttpClientModule,
     AngularFontAwesomeModule,
     LoginModule,
+    HomeModule,
     ProfileModule,
     LinkUserModule
   ],
