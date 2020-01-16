@@ -27,7 +27,8 @@ import { AngularFontAwesomeModule } from 'angular-font-awesome';
     UserFormComponent,
     FormsModule,
     ReactiveFormsModule,
-    AngularFontAwesomeModule
+    AngularFontAwesomeModule,
+    QRCodeModule
   ]
 })
 export class SharedModule { }

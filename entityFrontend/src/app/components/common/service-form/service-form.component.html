@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-3">
       <div class="float-right">
-        <qrcode id="qr" [qrdata]="qrData" size="64" level="M"></qrcode>
+         <qrcode id="qr" [qrdata]="qrData" size="64" level="M"></qrcode>
       </div>
     </div>
     <div class="col-5">
@@ -14,4 +14,49 @@
       </div>
     </div>
   </div>
+  <form [formGroup]="serviceForm" (ngSubmit)="onSubmit($event)" novalidate>
+    <div class="row">
+      <div class="col-1 hidden-sm"></div>
+      <div class="col-sm-12 col-md-12 col-lg-9">
+        <div class="form-group">
+          <label for="creditCard">Credit card</label>
+          <input type="text" class="form-control" id="creditCard" formControlName="creditCard" class="form-control">
+        </div>
+        <div *ngIf="!serviceForm?.controls.creditCard.valid && serviceForm?.controls.creditCard.touched" class="alert alert-danger">
+          Please enter your credit card
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-1 hidden-sm"></div>
+      <div class="col-sm-12 col-md-12 col-lg-9">
+        <div class="form-group">
+          <label for="bloodGroup">Blood group</label>
+          <input type="text" class="form-control" id="bloodGroup" formControlName="bloodGroup" class="form-control">
+        </div>
+        <div *ngIf="!serviceForm?.controls.bloodGroup.valid && serviceForm?.controls.bloodGroup.touched" class="alert alert-danger">
+          Please enter your blood group
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-1 hidden-sm"></div>
+      <div class="col-sm-12 col-md-12 col-lg-9">
+        <div class="form-group">
+           <label for="bloodGroup">Over-18</label><br>
+          <label>
+            <input type="checkbox" id="over18" formControlName="over18">
+            Yes, I am over-18
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="col-12">
+      <div class="form-group text-center">
+        <button class="btn btn-outline-primary" type="submit" [disabled]="!serviceForm?.controls.creditCard.valid  || !serviceForm?.controls.bloodGroup.valid"> 
+          CONTRACT 
+        </button>
+      </div>
+    </div>
+  </form>
 </div>

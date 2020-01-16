@@ -7,12 +7,9 @@ import { HomeComponent } from './../../components/pages/home/home.component';
 import { ServiceDetailComponent } from 'src/app/components/pages/service-detail/service-detail.component';
 import { ServiceFormComponent } from 'src/app/components/common/service-form/service-form.component';
 
-// MODULES
-import { AngularFontAwesomeModule } from 'angular-font-awesome';
-
 // SERVICES
 import { HomeService } from './../../services/home/home.service';
-import { QRCodeModule } from 'angularx-qrcode';
+import { SharedModule } from '../shared/shared.module';
 
 @NgModule({
   declarations: [
@@ -23,8 +20,7 @@ import { QRCodeModule } from 'angularx-qrcode';
   ],
   imports: [
     CommonModule,
-    AngularFontAwesomeModule,
-    QRCodeModule
+    SharedModule
   ],
   providers: [
     HomeService

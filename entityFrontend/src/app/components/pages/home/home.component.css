@@ -14,3 +14,15 @@ fa {
 h4 {
     margin-top: 20px;
 }
+
+button {
+    color: #325B8E;
+    border-color: #325B8E;
+}
+
+button:hover,
+button:focus,
+button:active {
+    border-color: #325B8E;
+    background-color: #325B8E;
+}
