@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
+// SERVICES
+import { SocketService } from 'src/app/services/socket/socket.service';
+
 @Component({
   selector: 'app-service-form',
   templateUrl: './service-form.component.html',
@@ -10,7 +13,8 @@ export class ServiceFormComponent implements OnInit {
   qrData = 'Service form';
   serviceForm: FormGroup;
 
-  constructor(private fb: FormBuilder) { }
+  constructor(private fb: FormBuilder,
+              private socketService: SocketService) { }
 
   ngOnInit() {
     this.generateForm();
@@ -18,6 +22,16 @@ export class ServiceFormComponent implements OnInit {
 
   onSubmit() {
     console.log('service form ', this.serviceForm);
+  }
+
+  getServiceForm() {
+    this.socketService.sendServiceForm();
+  }
+
+  setValuesForm(formNewValues: any) {
+    this.serviceForm.get('creditCard').setValue(formNewValues.creditCard);
+    this.serviceForm.get('bloodGroup').setValue(formNewValues.bloodGroup);
+    this.serviceForm.get('over18').setValue(formNewValues.over18);
   }
 
   /*

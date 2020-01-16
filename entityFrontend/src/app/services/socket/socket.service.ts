@@ -33,6 +33,10 @@ export class SocketService {
     this.socket.emit('setUpAlastriaId');
   }
 
+  public sendServiceForm(): void {
+    this.socket.emit('setServiceFormValues');
+  }
+
   public onMessage(): Observable<any> {
       return new Observable<any>(observer => {
           this.socket.on('message', (data: any) => observer.next(data));
@@ -48,6 +52,12 @@ export class SocketService {
   public onSetUpAlastriaId(): Observable<any> {
     return new Observable<any>(observer => {
         this.socket.on('setUpAlastriaId', (data: any) => observer.next(data));
+    });
+  }
+
+  public onSetServiceFormValues(): Observable<any> {
+    return new Observable<any>(observer => {
+        this.socket.on('setServiceFormValues', (data: any) => observer.next(data));
     });
   }
 
