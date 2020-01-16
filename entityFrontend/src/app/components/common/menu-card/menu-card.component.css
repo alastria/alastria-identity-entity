@@ -1,17 +1,17 @@
 .card {
     width: 345px;
     text-align: justify;
-    height: 310px;
+    height: 335px;
 }
 
 img {
     position: absolute;
-    height: 250px
+    height: 175px
 }
 
 .card-body {
     position: relative;
-    top: 89px;
+    top: 105px;
 }
 
 h3 {
@@ -27,6 +27,6 @@ h3 {
     width: 345px;
     position: relative;
     right: 21px;
-    height: 45px;
+    height: 50px;
     display: table;
 }
