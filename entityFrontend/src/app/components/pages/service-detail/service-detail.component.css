@@ -33,3 +33,7 @@ img {
 .row {
     margin-bottom: 30px;
 }
+
+#success-icon {
+    height: 134px;
+}

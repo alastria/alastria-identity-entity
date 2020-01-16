@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 // SERVICES
@@ -10,6 +10,7 @@ import { SocketService } from 'src/app/services/socket/socket.service';
   styleUrls: ['./service-form.component.css']
 })
 export class ServiceFormComponent implements OnInit {
+  @Output() handleSubmit = new EventEmitter();
   qrData = 'Service form';
   serviceForm: FormGroup;
 
@@ -21,7 +22,7 @@ export class ServiceFormComponent implements OnInit {
   }
 
   onSubmit() {
-    console.log('service form ', this.serviceForm);
+    this.handleSubmit.emit();
   }
 
   getServiceForm() {

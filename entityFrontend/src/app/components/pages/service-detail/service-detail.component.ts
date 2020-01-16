@@ -16,10 +16,11 @@ import { ServiceFormComponent } from '../../common/service-form/service-form.com
   styleUrls: ['./service-detail.component.css']
 })
 export class ServiceDetailComponent implements OnInit {
+  @ViewChild(ServiceFormComponent) serviceFormComponent: ServiceFormComponent;
   service: Service;
   detailImageUrl: string;
   detailImageAlt: string;
-  @ViewChild(ServiceFormComponent) serviceFormComponent: ServiceFormComponent;
+  isContractServiceSuccess: boolean;
 
   constructor(private route: ActivatedRoute,
               private homeService: HomeService,
@@ -28,6 +29,10 @@ export class ServiceDetailComponent implements OnInit {
   ngOnInit() {
     this.getServiceById();
     this.initIoConnection();
+  }
+
+  handleSubmit() {
+    this.isContractServiceSuccess = true;
   }
 
   async getServiceById() {
