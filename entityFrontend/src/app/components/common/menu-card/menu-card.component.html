@@ -1,0 +1,10 @@
+<div class="card">
+  <img class="card-img-top" [src]="imageUrl" [alt]="imageAlt">
+  <div class="card-body">
+    <div class="card-title">
+      <h3>{{ title }}</h3>
+    </div>
+    <p class="card-text">{{ description }}</p>
+    <button type="button" class="btn btn-outline-primary" (click)="selectCard()">{{ buttonText }}</button>
+  </div>
+</div>
