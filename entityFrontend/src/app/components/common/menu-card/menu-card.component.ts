@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Service } from 'src/app/models/services/services.model';
 
 @Component({
   selector: 'app-menu-card',
@@ -6,20 +7,18 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
   styleUrls: ['./menu-card.component.css']
 })
 export class MenuCardComponent implements OnInit {
-  @Input() imageUrl: string;
-  @Input() title: string;
-  @Input() description: string;
-  @Input() buttonText: string;
-  @Output() handleSelectCard = new EventEmitter<string>();
-  imageAlt = `Image of ${this.title}`;
+  @Input() service: Service;
+  @Output() handleSelectCard = new EventEmitter<number>();
+  imageAlt = `Image of card`;
 
   constructor() { }
 
   ngOnInit() {
+    this.imageAlt = `Image of ${this.service.title}`;
   }
 
   selectCard() {
-    this.handleSelectCard.emit(this.title);
+    this.handleSelectCard.emit(this.service.id);
   }
 
 }

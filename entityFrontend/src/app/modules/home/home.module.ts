@@ -8,6 +8,9 @@ import { HomeComponent } from './../../components/pages/home/home.component';
 // MODULES
 import { AngularFontAwesomeModule } from 'angular-font-awesome';
 
+// SERVICES
+import { HomeService } from './../../services/home/home.service';
+
 @NgModule({
   declarations: [
     HomeComponent,
@@ -16,6 +19,9 @@ import { AngularFontAwesomeModule } from 'angular-font-awesome';
   imports: [
     CommonModule,
     AngularFontAwesomeModule,
+  ],
+  providers: [
+    HomeService
   ]
 })
 export class HomeModule { }

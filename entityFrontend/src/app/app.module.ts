@@ -17,11 +17,13 @@ import { HeaderComponent } from './components/shared/header/header.component';
 
 // SERVICES
 import { AuthGuardService } from './services/auth/auth-guard.service';
+import { ServiceDetailComponent } from './components/pages/service-detail/service-detail.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HeaderComponent,
+    ServiceDetailComponent,
   ],
   imports: [
     BrowserModule,
