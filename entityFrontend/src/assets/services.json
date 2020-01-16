@@ -2,6 +2,7 @@
     {
         "id": 1,
         "imageUrl": "../../../assets/images/service1.jpg",
+        "detailImageUrl": "../../../assets/images/service-general1.jpg",
         "title": "Service 1",
         "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque ac faucibus lectus erdiet.",
         "buttonText": "CONTRACT"

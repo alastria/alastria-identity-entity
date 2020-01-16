@@ -1,3 +1,17 @@
-<p>
-  service-detail works!
-</p>
+<div>
+  <div class="row">
+    <div class="col-12">
+      <h3>
+        <fa name="home"></fa>
+        Home
+      </h3>
+    </div>
+  </div>
+  <div *ngIf="service">
+    <div class="row">
+      <div id="image-col" class="col-12">
+        <img [src]="detailImageUrl" alt="">
+      </div>
+    </div>
+  </div>
+</div>
