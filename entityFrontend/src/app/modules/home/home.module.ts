@@ -12,6 +12,7 @@ import { AngularFontAwesomeModule } from 'angular-font-awesome';
 
 // SERVICES
 import { HomeService } from './../../services/home/home.service';
+import { QRCodeModule } from 'angularx-qrcode';
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import { HomeService } from './../../services/home/home.service';
   imports: [
     CommonModule,
     AngularFontAwesomeModule,
+    QRCodeModule
   ],
   providers: [
     HomeService

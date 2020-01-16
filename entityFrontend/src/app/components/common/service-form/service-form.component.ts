@@ -6,6 +6,7 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./service-form.component.css']
 })
 export class ServiceFormComponent implements OnInit {
+  qrData = 'Service form';
 
   constructor() { }
 

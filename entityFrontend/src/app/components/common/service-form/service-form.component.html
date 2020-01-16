@@ -1,3 +1,17 @@
-<p>
-  service-form works!
-</p>
+<div class="container">
+  <div class="row">
+    <div class="col-3">
+      <div class="float-right">
+        <qrcode id="qr" [qrdata]="qrData" size="64" level="M"></qrcode>
+      </div>
+    </div>
+    <div class="col-5">
+      <p>Scan this QR with the Alastria ID app to fill in the form</p>
+    </div>
+    <div class="col-3">
+      <div class="float-left">
+        <img src="../../../../assets/images/alastria-icon.svg" alt="alastria-icon">
+      </div>
+    </div>
+  </div>
+</div>
