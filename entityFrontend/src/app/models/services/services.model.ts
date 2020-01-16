@@ -1,4 +1,5 @@
-export class Services {
+export class Service {
+    id: number;
     imageUrl: string;
     title: string;
     description: string;
