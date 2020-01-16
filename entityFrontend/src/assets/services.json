@@ -1,0 +1,23 @@
+[
+    {
+        "id": 1,
+        "imageUrl": "../../../assets/images/service1.jpg",
+        "title": "Service 1",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque ac faucibus lectus erdiet.",
+        "buttonText": "CONTRACT"
+    },
+    {
+        "id": 2,
+        "imageUrl": "../../../assets/images/service2.jpg",
+        "title": "Service 2",
+        "description": "Ut lobortis dui. Quisque non diam lobortis, maximus sem vitae, condimentum eros in ornare",
+        "buttonText": "CONTRACT"
+    },
+    {
+        "id": 3,
+        "imageUrl": "../../../assets/images/service3.jpg",
+        "title": "Service 3",
+        "description": "Venenatis elit eget faucibus.  Proin egestas id nisl quis faucibus. Mauris efficitur  sit amet sem id illit",
+        "buttonText": "CONTRACT"
+    }
+]
