@@ -24,3 +24,12 @@ img {
     padding-left: 50px;
     padding-right: 50px;
 }
+
+.float-right {
+    width: 80%;
+    text-align: end;
+}
+
+.row {
+    margin-bottom: 30px;
+}

@@ -13,6 +13,7 @@ import { Service } from 'src/app/models/services/services.model';
 export class ServiceDetailComponent implements OnInit {
   service: Service;
   detailImageUrl: string;
+  detailImageAlt: string;
 
   constructor(private route: ActivatedRoute,
               private homeService: HomeService) { }
@@ -25,6 +26,7 @@ export class ServiceDetailComponent implements OnInit {
     const serviceId = parseInt(this.route.snapshot.params.id, 0);
     this.service =  await this.homeService.getServicesById(serviceId);
     this.detailImageUrl = (this.service.detailImageUrl) ? this.service.detailImageUrl : this.service.imageUrl;
+    this.detailImageAlt = `Image of ${this.service.title}`;
   }
 
 }
