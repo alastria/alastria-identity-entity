@@ -20,6 +20,156 @@ produces:
   - application/json
   - text/plain
 paths:
+  /login:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: entity.controller
+    get:
+      description: Get current public keys for all service providers
+      operationId: getUser
+      parameters:
+        - name: email
+          in: query
+          type: string
+          description: email of the user
+          required: true
+        - name: username
+          in: query
+          type: string
+          description: username of the user
+          required: true
+        - name: password
+          in: query
+          type: string
+          description: password of the user
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/userTokenAccess"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "503":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /user:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: entity.controller
+    post:
+      description: Create a new User in the database
+      # used as the method name of the controller
+      operationId: addUser
+      parameters:
+        - name: body
+          in: body
+          description: Necessary data to create a new user in database
+          required: false
+          schema: 
+            $ref: "#/definitions/userData"
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/alastriaIdentityResponse"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "503":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    put:
+      description: Update use data in the database
+      # used as the method name of the controller
+      operationId: updateUser
+      parameters:
+        - name: body
+          in: body
+          description: Necessary data to update an user in database
+          required: false
+          schema: 
+            $ref: "#/definitions/userData"
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/alastriaIdentityResponse"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "503":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /user/checkAuth:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: entity.controller
+    get:
+      description: check if user is authenticated
+      operationId: checkUserAuth
+      parameters:
+        - name: authToken
+          in: query
+          type: string
+          description: tokoen to check
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/userAuthenticated"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "503":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+      
   /identity:
     # binds a127 app logic to a route
     x-swagger-router-controller: entity.controller
@@ -532,6 +682,36 @@ paths:
     x-swagger-pipe: swagger_raw
 # complex objects have schema definitions
 definitions:
+  userAuthenticated:
+    properties:
+      status:
+        type: boolean
+  userTokenAccess:
+    properties:
+      token:
+        type: string
+  userData:
+    properties:
+      name:
+        type: string
+      surname:
+        type: string
+      email:
+        type: string
+      address:
+        type: string
+      password:
+        type: string
+      vinculated:
+        type: boolean
+  credential:
+    properties:
+      header:
+        type: "object"
+      payload:
+        type: "object"
+      signature:
+        type: "object"
   alastriaIdentityResponse:
     properties:
       alastriaDID:
