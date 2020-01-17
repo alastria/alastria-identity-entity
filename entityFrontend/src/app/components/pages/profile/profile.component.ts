@@ -39,11 +39,8 @@ export class ProfileComponent implements OnInit {
   qrAlastriaId: string;
   qrCredentials: any;
   optionsMenu = ['Edit profile', 'Reset password', 'Alastria ID'];
-  htmlSuccess = `
-      <img width="50%" src="../../../../assets/images/success-icon.svg" alt="Success icon">
-      <h1> Congratulations! </h1>
-      <p> Your Alastria ID has been created. Start to fill you new AlastriaID </p>
-  `;
+  successTitle = 'Congratulations! ';
+  successDescription = 'Your Alastria ID has been created. Start to fill you new AlastriaID';
   styleButtonAlastriaId = {
     color: '#00CAD6',
     backgroundIcon: 'white',
@@ -161,6 +158,14 @@ export class ProfileComponent implements OnInit {
    */
   handleOk(): void {
     $('#simpleModal').modal('hide');
+  }
+
+  /**
+   * When click in 'ok' in simple modal then active this function that hide
+   * the modal and check alastria id is verified
+   */
+  handleSuccessOk(): void {
+    $('#success').modal('hide');
     this.qrAlastriaId = null;
     this.isCreateAlastriaId = false;
     this.checkAlastriaIdIsVerified();
@@ -169,6 +174,9 @@ export class ProfileComponent implements OnInit {
 
   handleOkFillProfile(): void {
     $('#simpleModal').modal('hide');
+    this.successTitle = 'Success';
+    this.successDescription = 'Now use your Alastria ID wherever you want and keep the control of your information';
+    $('#success').modal('show');
   }
 
   /**
@@ -238,7 +246,7 @@ export class ProfileComponent implements OnInit {
               userChange.proxyAddress = result.proxyAddress;
               userChange.did = result.did;
               this.userService.setUserLoggedIn(userChange);
-              $('#simpleModal').modal('show');
+              $('#success').modal('show');
             } else {
               this.userService.setIsAlastriaIdVerified(true);
             }
@@ -250,13 +258,9 @@ export class ProfileComponent implements OnInit {
 
     this.socketService.onSetUpAlastriaId()
       .subscribe(() => {
-        console.log('Set up');
-        this.htmlSuccess = `
-          <img width="50%" src="../../../../assets/images/success-icon.svg" alt="Success icon">
-          <h1> Congratulations! </h1>
-          <p> Your AlastriaID has been linked to your ${environment.entityName} profile. Now you can login next times with your AlastriaID </p>
-        `;
-        $('#simpleModal').modal('show');
+        this.successTitle = 'Congratulations!';
+        this.successDescription = `Your AlastriaID has been linked to your ${environment.entityName} profile. Now you can login next times with your AlastriaID`;
+        $('#success').modal('show');
         this.userService.setIsAlastriaIdVerified(true);
       });
 

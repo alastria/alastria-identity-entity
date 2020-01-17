@@ -11,6 +11,7 @@ import { MenuComponent } from 'src/app/components/common/menu/menu.component';
 import { CreateAlastriaIdComponent } from 'src/app/components/common/create-alastria-id/create-alastria-id.component';
 import { ModalFillProfileComponent } from 'src/app/components/common/modal-fill-profile/modal-fill-profile.component';
 import { ModalCreateAlastriaIdComponent } from 'src/app/components/common/modal-create-alastria-id/modal-create-alastria-id.component';
+import { ModalSuccessComponent } from 'src/app/components/common/modal-success/modal-success.component';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { ModalCreateAlastriaIdComponent } from 'src/app/components/common/modal-
     MenuComponent,
     CreateAlastriaIdComponent,
     ModalFillProfileComponent,
-    ModalCreateAlastriaIdComponent
+    ModalCreateAlastriaIdComponent,
+    ModalSuccessComponent
   ],
   imports: [
     CommonModule,

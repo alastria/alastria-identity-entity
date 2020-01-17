@@ -1,0 +1,20 @@
+<div class="modal" tabindex="-1" role="dialog" id="success">
+  <div class="modal-dialog" [ngClass]="{'modal-xl': size === 'xl', 'modal-lg': size === 'lg', 'modal-sm': size === 'sm'}" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Alastria Id</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <img width="50%" src="../../../../assets/images/success-icon.svg" alt="Success icon">
+        <h1> {{ title }} </h1>
+        <p> {{ description }} </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)=ok()>Ok!</button>
+      </div>
+    </div>
+  </div>
+</div>
