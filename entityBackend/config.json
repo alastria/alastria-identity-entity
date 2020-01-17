@@ -6,6 +6,7 @@
     "local": "http://localhost:8545",
     "alastria": "http://63.33.206.111/rpc"
   },
+  "socketPort": 8080,
   "identityKeystore": {
     "address": "ad88f1a89cf02a32010b971d8c8af3a2c7b3bd94",
     "crypto": {

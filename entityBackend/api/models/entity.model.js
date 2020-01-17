@@ -20,8 +20,6 @@ let issuerIdentity, issuerPrivateKey
 let subjectKeystore = myConfig.subjectKeystore
 let subjectIdentity, subjectPrivateKey
 
-
-
 /////////////////////////////////////////////////////////
 ///////             PRIVATE FUNCTIONS             ///////
 /////////////////////////////////////////////////////////

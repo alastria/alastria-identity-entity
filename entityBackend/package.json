@@ -12,6 +12,7 @@
     "cors": "2.8.3",
     "express": "4.12.3",
     "log4js": "6.1.0",
+    "socket.io": "^2.3.0",
     "swagger-express-mw": "0.1.0"
   },
   "devDependencies": {

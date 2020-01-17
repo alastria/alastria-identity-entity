@@ -8,6 +8,8 @@ const Log = require('log4js')
 const entityModel = require('../models/entity.model')
 const configHelper = require('../helpers/config.helper')
 const myConfig = configHelper.getConfig()
+const wsHelper = require('../helpers/ws.helper')
+const io = wsHelper.getWSObject()
 const log = Log.getLogger()
 log.level = myConfig.Log.level
 const controller_name = '[Entity Controller]'
@@ -39,12 +41,15 @@ function createAlastriaID(req, res) {
     .then(alastriaID => {
       if (alastriaID) {
         log.debug(`${controller_name}[${createAlastriaID.name}] -----> Successfully created new AlastriaId`)
+        io.emit('createAlastriaId', 'Identidad de Alastria creada correctamente.')
         res.status(200).send(alastriaID)
       }
       else {
         let msg = {
           message: 'Error creating new AlastriaID'
         }
+        io.emit('error', {status: 404,
+                          message: msg.message})
         res.status(404).send(msg)
       }
     })
@@ -52,6 +57,8 @@ function createAlastriaID(req, res) {
       let msg = {
         message: `${error}`
       }
+      io.emit('error', {status: 400,
+                        message: msg.message})
       res.status(400).send(msg)
     })
   }
@@ -60,6 +67,8 @@ function createAlastriaID(req, res) {
     let msg = {
       message: `${error}`
     }
+    io.emit('error', {status: 503,
+                      message: msg.message})
     res.status(503).send(msg)
    }
 }

@@ -4,21 +4,22 @@
 ///////                 CONSTANTS                 ///////
 /////////////////////////////////////////////////////////
 
-var SwaggerExpress = require('swagger-express-mw');
-const Log = require('log4js')
 const web3Helper = require('./api/helpers/web3.helper')
 const configHelper = require('./api/helpers/config.helper')
+const SwaggerExpress = require('swagger-express-mw');
+const app = require('express')();
+const Log = require('log4js')
 const loadJsonFile = require('load-json-file')
 const cors = require('cors')
 const pathFile = 'config.json'
 const log = Log.getLogger()
-log.level = 'debug'
+const wsHelper = require('./api/helpers/ws.helper')
 
 /////////////////////////////////////////////////////////
 ///////              PUBLIC FUNCTIONS             ///////
 /////////////////////////////////////////////////////////
 
-let app = require('express')();
+log.level = 'debug'
 let myConfig = {}
 let nodeurl = ''
 
@@ -43,6 +44,14 @@ loadJsonFile(pathFile)
   web3Helper.instanceWeb3(nodeurl)
   .then(web3Instantiated => {
 
+    const server = myConfig.socketPort
+    const io = require('socket.io')(server)
+
+    io.on('connect', () => {
+      log.debug(`[App] -----> WebSocket connection attached`)
+    })
+    wsHelper.setWSObject(io)
+
     var config = {
       appRoot: __dirname // required config
     };
@@ -57,7 +66,9 @@ loadJsonFile(pathFile)
       swaggerExpress.register(app);
     
       var port = process.env.PORT || 10010;
-      app.listen(port);
+      app.listen(port, function(){
+        log.debug(`[App] -----> Server started in http://localhost:${port}`)
+      });
   
       // Enable CORS
       app.use(cors());
