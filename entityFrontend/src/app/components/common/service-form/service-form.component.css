@@ -1,0 +1,26 @@
+p {
+    text-align: justify;
+    font-weight: bold;
+}
+
+form {
+    margin-top: 30px;
+    text-align: left;
+}
+
+input {
+    margin-left: 5px;
+}
+
+button {
+    color: #325B8E;
+    border-color: #325B8E;
+}
+
+button:hover:not(:disabled),
+button:focus:not(:disabled),
+button:active:not(:disabled) {
+    border-color: #325B8E;
+    background-color: #325B8E;
+    color: white;
+}

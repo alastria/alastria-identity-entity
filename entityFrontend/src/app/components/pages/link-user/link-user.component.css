@@ -1,0 +1,17 @@
+h4 {
+    color: #325B8E;
+    border-color: #325B8E;
+}
+
+#personal-data {
+    border-right: solid 1px;
+}
+
+#qr-register {
+    margin-top: 40px;
+}
+
+.alert {
+    margin-top: 20px;
+}
+

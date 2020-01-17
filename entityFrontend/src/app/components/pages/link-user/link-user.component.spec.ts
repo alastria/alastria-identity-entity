@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DisabledFormComponent } from './disabled-form.component';
+import { LinkUserComponent } from './link-user.component';
 
-describe('DisabledFormComponent', () => {
-  let component: DisabledFormComponent;
-  let fixture: ComponentFixture<DisabledFormComponent>;
+describe('LinkUserComponent', () => {
+  let component: LinkUserComponent;
+  let fixture: ComponentFixture<LinkUserComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ DisabledFormComponent ]
+      declarations: [ LinkUserComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(DisabledFormComponent);
+    fixture = TestBed.createComponent(LinkUserComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

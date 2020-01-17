@@ -1,4 +1,4 @@
-<div class="container">
+<div>
   <div class="row">
     <div class="col-12">
       <h3>
@@ -10,25 +10,20 @@
   <div class="row">
     <div id="personal-data" class="col-md-6">
       <div class="row">
-        <div class="col-sm-12">
-          <h4>Personal Data</h4>
+        <div class="col-sm-11">
+          <h4>
+            <img *ngIf="isAlastriaVerified" id="alastria-verified" src="../../../../assets/images/alastria-icon.svg" alt="alastria-icon">
+            Personal Data
+          </h4>
         </div>
       </div>
-      <app-disabled-form 
+      <app-user-form 
         [user]="user" 
-        [isDisabled]="isDisabledProfileForm"
-        (handleEditProfile)="handleEditProfile($event)"></app-disabled-form>
-      <div id="verified-button" class="row" *ngIf="isAlastriaVerified">
-        <div class="col-12">
-          <app-button-login 
-            title="Alastria Verified"
-            socialName="alastriaId"
-            [style]="styleButtonAlastriaId"
-            isDisabled=true
-            imgUrl="../../../assets/images/alastria-icon.svg">
-          </app-button-login>
-        </div>
-      </div>
+        [inputsForm]="inputsUserForm"
+        [isDisabled]=true
+        buttonName="Save"
+        (handleEditProfile)="handleEditProfile($event)">
+      </app-user-form>
     </div>
     <div class="col-md-6">
       <div *ngIf="!qrAlastriaId || isAlastriaVerified" id="actions-menu">
@@ -43,25 +38,34 @@
             </div>
           </div>
       </div>
-      <div *ngIf="!isAlastriaVerified" id="create-alastria-id" class="row" >
+      <div *ngIf="isCreateAlastriaId" id="create-alastria-id" class="row" >
         <div class="col-12">
-          <app-create-alastria-id (handleGenerateQr)="handleGenerateQr($event)"></app-create-alastria-id>
+          <app-create-alastria-id
+          [title]="parametersForCreateAlastriaId.title"
+          [subtitle]="parametersForCreateAlastriaId.subtitle"
+          [type]="parametersForCreateAlastriaId.type"
+          (handleGenerateQr)="handleGenerateQr($event)">
+        </app-create-alastria-id>
         </div>
       </div>
     </div>
   </div>
   <app-simple-modal *ngIf="!isAlastriaVerified"
-    size="lg"
     type="info"
-    [htmlContent]="htmlSuccessCreateAlastriaId"
+    [htmlContent]="htmlSuccess"
     (handleOk)="handleOk()">
   </app-simple-modal>
-  <app-modal-fill-profile
-    (handleFillYourProfile)="handleFillYourProfile($event)">
-  </app-modal-fill-profile>
   <app-simple-modal *ngIf="isAlastriaVerified"
     (handleOk)="handleOkFillProfile()" 
     type="qr"
     [qrData]="qrDataFillProfile">
   </app-simple-modal>
+  <app-modal-create-alastria-id
+  (handleCreateAlastriaId)="handleCreateAlastriaId()"
+  (handleSetUpAlastriaId)="handleSetUpAlastriaId()">
+  </app-modal-create-alastria-id>
+
+  <app-modal-fill-profile
+    (handleFillYourProfile)="handleFillYourProfile($event)">
+  </app-modal-fill-profile>
 </div>

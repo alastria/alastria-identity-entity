@@ -1,0 +1,34 @@
+.card {
+    width: 345px;
+    text-align: justify;
+    height: 335px;
+    margin: auto;
+    margin-bottom: 25px;
+}
+
+img {
+    position: absolute;
+    height: 175px
+}
+
+.card-body {
+    position: relative;
+    top: 105px;
+}
+
+h3 {
+    color: white;
+    display: table-cell;
+    vertical-align: middle;
+    left: 20px;
+    position: relative;
+}
+
+.card-title {
+    background-color: rgba(196,196,196,0.5);
+    width: 345px;
+    position: relative;
+    right: 21px;
+    height: 50px;
+    display: table;
+}

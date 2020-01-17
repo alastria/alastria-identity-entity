@@ -1,0 +1,52 @@
+<div>
+  <div class="row">
+    <div id="personal-data" class="col-md-6">
+      <div class="row">
+        <div class="col-sm-12">
+          <h4>New user?</h4>
+        </div>
+      </div>
+      <app-user-form
+        [inputsForm]="inputsNewUserForm"
+        [user]="user" 
+        buttonName="REGISTER"
+        (handleEditProfile)="handleRegister($event)">
+      </app-user-form>
+      <div *ngIf="errorPasswordNewUser" class="row">
+        <div class="col-sm-12">
+          <div class="alert alert-danger">
+            {{ errorPasswordNewUser }}
+          </div>
+        </div>
+      </div>
+      <div id="qr-register" class="row justify-content-center">
+        <div class="col-12 col-sm-12 col-md-4">
+          <qrcode qrdata="test" size="128" level="M"></qrcode>
+        </div>
+        <div class="col-12 col-sm-12 col-md-4">
+          <img src="../../../../assets/images/alastria-icon.svg" alt="alastria-icon">
+          <h5>Scan this QR with the Alastria ID app to fill in the form</h5>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="row">
+        <div class="col-12">
+          <h4>Already have an account?</h4>
+        </div>
+      </div>
+      <app-user-form
+        [inputsForm]="inputsLoginForm"
+        [user]="user"
+        buttonName="LOGIN"
+        (handleEditProfile)="handleLogin($event)">
+      </app-user-form>
+    <div *ngIf="errorPasswordLogin" class="row">
+      <div class="col-sm-12">
+        <div class="alert alert-danger">
+          {{ errorPasswordLogin }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

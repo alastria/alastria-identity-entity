@@ -1,0 +1,39 @@
+h3, h4 {
+    position: relative;
+    float: left;
+}
+
+h3 {
+    color: #325B8E;
+}
+
+fa {
+    color: #00CAD6;
+}
+
+h4 {
+    margin-top: 20px;
+}
+
+img {
+    width: inherit;
+    height: 260px;
+}
+
+#image-col {
+    padding-left: 50px;
+    padding-right: 50px;
+}
+
+.float-right {
+    width: 80%;
+    text-align: end;
+}
+
+.row {
+    margin-bottom: 30px;
+}
+
+#success-icon {
+    height: 134px;
+}
