@@ -13,3 +13,20 @@ h3, fa {
 #icons {
     margin: auto;
 }
+
+#qrDiv {
+    position: relative;
+    top: 20px;
+}
+
+#border {
+    margin: auto;
+    position: absolute;
+    border: 40px solid transparent;
+    padding: 15px;
+    border-image: url(../../../../assets/images/Vector.svg) 130 round;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+}
