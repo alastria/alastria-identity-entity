@@ -65,7 +65,7 @@ export class LoginComponent implements OnInit {
     } catch (error) {
       console.log('Error ', error);
       if (error && error.status === 403) {
-        this.errorLogin = 'Usuario o contraseña incorrectos';
+        this.errorLogin = 'User or password incorrect';
       } else {
         this.errorLogin = (error && error.message) ? error.message : 'Internal server error';
       }
@@ -102,7 +102,7 @@ export class LoginComponent implements OnInit {
     } catch (error) {
       console.log('Error ', error);
       if (error && error.status === 403) {
-        this.errorLogin = 'Usuario o contraseña incorrectos';
+        this.errorLogin = 'User or password incorrect';
       } else {
         this.errorLogin = (error && error.message) ? error.message : 'Internal server error';
       }
