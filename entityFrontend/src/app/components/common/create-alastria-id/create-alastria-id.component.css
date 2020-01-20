@@ -9,12 +9,18 @@
     height: 180px;
 }
 
-#qr h3, #qr span {
+#qr h3, #qr span, fa {
     color: #325B8E;
 }
 
 #subtitle {
     margin-bottom: 8px;
+}
+
+fa {
+    margin-left: 5px;
+    cursor: pointer;
+    font-size: x-large;
 }
 
 p {

@@ -22,21 +22,10 @@ export class GenerateQrComponent implements OnInit {
     @Input() qrData: any;
     @Input() size = 256;
     @Input() level = 'M';
-    @Output() handleGenerateQr = new EventEmitter();
-    @Output() handleCloseQr = new EventEmitter();
 
-    titleStyle: string;
   constructor() { }
 
   ngOnInit() {
-  }
-
-  generateQr(): void {
-    this.handleGenerateQr.emit();
-  }
-
-  closeQr(): void {
-    this.handleCloseQr.emit();
   }
 
 }

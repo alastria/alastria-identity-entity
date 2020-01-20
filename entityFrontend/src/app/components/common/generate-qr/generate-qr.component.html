@@ -2,8 +2,4 @@
 </div>
 <div id="qrDiv" [@fadeInOut]>
     <qrcode *ngIf="qrData" id="qr" [qrdata]="qrData" [size]="size" [level]="level"></qrcode>
-  <!-- <div id="icons" [style.width.px]="size">
-    <fa name="times" (click)="closeQr()"></fa>
-    <fa name="refresh" (click)="generateQr()"></fa>
-  </div> -->
 </div>

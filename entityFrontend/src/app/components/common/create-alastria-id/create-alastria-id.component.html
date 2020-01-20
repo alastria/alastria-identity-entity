@@ -3,6 +3,8 @@
     <div class="col-12">
       <h3>
         {{ title }}
+          <fa name="times" (click)="closeQrAlastriaId()"></fa>
+          <fa name="refresh" (click)="createOrSetUpAlastriaId()"></fa>
       </h3>
     </div>
   </div>
@@ -17,14 +19,11 @@
     <div class="col-12">
       <app-generate-qr *ngIf="qrAlastriaId"
         [qrData]="qrAlastriaId"
-        [size]="200"
-        (handleGenerateQr)="createOrSetUpAlastriaId()"
-        (handleCloseQr)="closeQrAlastriaId()">
+        [size]="200">
       </app-generate-qr>
     </div>
   </div>
 </div>
-
 <div id="text-info-downloads" class="row" *ngIf="type === 'C'">
   <div class="col-12">
     <span>You don´t hace your AlastriaID aplication yet</span>
