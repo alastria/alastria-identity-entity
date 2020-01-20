@@ -24,8 +24,8 @@ paths:
     # binds a127 app logic to a route
     x-swagger-router-controller: entity.controller
     get:
-      description: Get current public keys for all service providers
-      operationId: getUser
+      description: check if user has account into the platform
+      operationId: login
       parameters:
         - name: email
           in: query
@@ -54,7 +54,7 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
         "404":
-          description: Address not found
+          description: User not found
           schema:
             $ref: "#/definitions/ErrorResponse"
         "503":
@@ -81,17 +81,13 @@ paths:
             $ref: "#/definitions/userData"
       responses:
         "200":
-          description: Success
+          description: User creation success
           schema:
             # a pointer to a definition
-            $ref: "#/definitions/alastriaIdentityResponse"
+            $ref: "#/definitions/userCreatedSuccess"
         # responses may fall through to errors
         "400":
           description: Bad Request
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "404":
-          description: Address not found
           schema:
             $ref: "#/definitions/ErrorResponse"
         "503":
@@ -125,7 +121,7 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
         "404":
-          description: Address not found
+          description: User not found
           schema:
             $ref: "#/definitions/ErrorResponse"
         "503":
@@ -759,6 +755,12 @@ definitions:
       list:
         type: "object"
   ErrorResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  userCreatedSuccess:
     required:
       - message
     properties:
