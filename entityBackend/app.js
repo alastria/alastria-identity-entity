@@ -15,6 +15,8 @@ const pathFile = 'config.json'
 const log = Log.getLogger()
 const wsHelper = require('./api/helpers/ws.helper')
 
+const mongoHelper = require('./api/helpers/mongo.helper')
+
 /////////////////////////////////////////////////////////
 ///////              PUBLIC FUNCTIONS             ///////
 /////////////////////////////////////////////////////////

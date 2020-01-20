@@ -37,3 +37,9 @@ services:
     image: trufflesuite/ganache-cli
     ports:
       - "8545:8545"
+  
+  mongo:
+    restart: on-failure:5
+    image: mongo
+    ports:
+      - 27017:27017

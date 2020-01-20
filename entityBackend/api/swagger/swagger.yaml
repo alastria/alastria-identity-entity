@@ -20,22 +20,18 @@ produces:
   - application/json
   - text/plain
 paths:
+  # START only for user and login
   /login:
     # binds a127 app logic to a route
-    x-swagger-router-controller: entity.controller
+    x-swagger-router-controller: user.controller
     get:
       description: check if user has account into the platform
       operationId: login
       parameters:
-        - name: email
+        - name: user
           in: query
           type: string
-          description: email of the user
-          required: true
-        - name: username
-          in: query
-          type: string
-          description: username of the user
+          description: username or email of the user
           required: true
         - name: password
           in: query
@@ -53,7 +49,7 @@ paths:
           description: Bad Request
           schema:
             $ref: "#/definitions/ErrorResponse"
-        "404":
+        "401":
           description: User not found
           schema:
             $ref: "#/definitions/ErrorResponse"
@@ -67,7 +63,7 @@ paths:
             $ref: "#/definitions/ErrorResponse"
   /user:
     # binds a127 app logic to a route
-    x-swagger-router-controller: entity.controller
+    x-swagger-router-controller: user.controller
     post:
       description: Create a new User in the database
       # used as the method name of the controller
@@ -134,7 +130,7 @@ paths:
             $ref: "#/definitions/ErrorResponse"
   /user/checkAuth:
     # binds a127 app logic to a route
-    x-swagger-router-controller: entity.controller
+    x-swagger-router-controller: user.controller
     get:
       description: check if user is authenticated
       operationId: checkUserAuth
@@ -165,7 +161,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-      
+  # END Only for user and login
   /identity:
     # binds a127 app logic to a route
     x-swagger-router-controller: entity.controller
