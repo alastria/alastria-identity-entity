@@ -9,7 +9,10 @@
       </div>
       <div class="modal-body">
         <div id="qr" *ngIf="type === 'qr'">
-          <qrcode [qrdata]="qrData" [size]="'256'" [level]="'M'"></qrcode>
+          <app-generate-qr id="qr"
+            [qrData]="qrData"
+            [size]="200">
+          </app-generate-qr>
         </div>
         <div id="htmlContent" *ngIf="type !== 'qr'" [innerHTML]="htmlContent">
         </div>

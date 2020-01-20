@@ -1,11 +1,17 @@
 import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import {style, animate, transition, trigger} from '@angular/animations';
-import { CreateAlastriaIdComponent } from '../create-alastria-id/create-alastria-id.component';
 
 @Component({
   selector: 'app-generate-qr',
   templateUrl: './generate-qr.component.html',
   styleUrls: ['./generate-qr.component.css'],
+  styles: [
+    `
+    :host ::ng-deep qrcode > img{
+      margin: auto;
+    }
+    `
+  ],
   animations: [
     trigger('fadeInOut', [
       transition(':enter', [   // :enter is alias to 'void => *'
