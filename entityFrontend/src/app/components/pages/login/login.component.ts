@@ -1,10 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { SocketService } from './../../../services/socket/socket.service';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 // SERVICES
 import { UserService } from 'src/app/services/user/user.service';
 import { User } from 'src/app/models/user/user.model';
+import { Event } from 'src/app/models/enums/enums.model';
 
 declare var $: any;
 
@@ -13,8 +16,9 @@ declare var $: any;
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent implements OnInit {
+  export class LoginComponent implements OnInit {
 
+  private subscription: Subscription = new Subscription();
   formLogin: FormGroup;
   errorLogin: string;
   styleButtonFacebook = {
@@ -36,7 +40,8 @@ export class LoginComponent implements OnInit {
 
   constructor(private router: Router,
               private fb: FormBuilder,
-              private userService: UserService) { }
+              private userService: UserService,
+              private socketService: SocketService) { }
 
   ngOnInit() {
     sessionStorage.clear();
@@ -79,16 +84,21 @@ export class LoginComponent implements OnInit {
    */
   handleLoginSocial(socialName: string): void {
     if (socialName === 'alastriaId') {
+      this.initIoConnection();
       $('#simpleModal').modal('show');
     } else {
       console.log(socialName);
     }
   }
 
+  handleOk() {
+    this.socketService.sendLogin();
+  }
+
   /**
    * Function handle when click ok in modal simple
    */
-  async handleOk(): Promise<any> {
+  async onLogin(): Promise<any> {
     try {
       const user: User = {
         name: 'Samuel',
@@ -107,5 +117,37 @@ export class LoginComponent implements OnInit {
         this.errorLogin = (error && error.message) ? error.message : 'Internal server error';
       }
     }
+  }
+
+  /**
+   * Function for init connection with websocket and subscribe in differents events
+   */
+  private initIoConnection(): void {
+    this.socketService.initSocket();
+
+    this.subscription.add(this.socketService.onLogin()
+      .subscribe(() => {
+        this.onLogin();
+        this.socketService.sendDisconnect();
+      })
+    );
+
+    this.subscription.add(this.socketService.onEvent(Event.CONNECT)
+      .subscribe(() => {
+        console.log('connected - websocket');
+      })
+    );
+
+    this.subscription.add(this.socketService.onEvent(Event.DISCONNECT)
+      .subscribe(() => {
+        console.log('disconnected - websocket');
+      })
+    );
+  }
+
+  // tslint:disable-next-line: use-life-cycle-interface
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+    this.socketService.sendDisconnect();
   }
 }

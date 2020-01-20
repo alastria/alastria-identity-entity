@@ -1,11 +1,17 @@
+import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 
 // SERVICES
 import { UserService } from 'src/app/services/user/user.service';
+import { SocketService } from 'src/app/services/socket/socket.service';
 
 // MODELS
 import { User } from 'src/app/models/user/user.model';
+import { Event } from 'src/app/models/enums/enums.model';
+
+// COMPONENTS
+import { UserFormComponent } from '../../common/user-form/user-form.component';
 
 @Component({
   selector: 'app-link-user',
@@ -13,6 +19,8 @@ import { User } from 'src/app/models/user/user.model';
   styleUrls: ['./link-user.component.css']
 })
 export class LinkUserComponent implements OnInit {
+  private subscription: Subscription = new Subscription();
+  @ViewChild(UserFormComponent) userFormComponent: UserFormComponent;
   user: User;
   errorPasswordNewUser: string;
   errorPasswordLogin: string;
@@ -78,7 +86,8 @@ export class LinkUserComponent implements OnInit {
   ];
 
   constructor( private router: Router,
-               private userService: UserService) { }
+               private userService: UserService,
+               private socketService: SocketService) { }
 
   ngOnInit() {
     this.user = {
@@ -87,6 +96,7 @@ export class LinkUserComponent implements OnInit {
       surname: '',
       password: ''
     };
+    this.initIoConnection();
   }
 
   async handleRegister(userRegister) {
@@ -123,6 +133,10 @@ export class LinkUserComponent implements OnInit {
     }
   }
 
+  sendNewUser() {
+    this.socketService.sendNewUser();
+  }
+
   private async login(userRegister: any) {
     try {
       const userLogin = await this.userService.login(userRegister);
@@ -131,6 +145,38 @@ export class LinkUserComponent implements OnInit {
     } catch (error) {
       throw error;
     }
+  }
+
+  /**
+   * Function for init connection with websocket and subscribe in differents events
+   */
+  private initIoConnection(): void {
+    this.socketService.initSocket();
+
+    this.subscription.add(this.socketService.onGetNewUser()
+      .subscribe((newUser: User) => {
+        this.user = newUser;
+        this.userFormComponent.setValuesForm(newUser);
+      })
+    );
+
+    this.subscription.add(this.socketService.onEvent(Event.CONNECT)
+      .subscribe(() => {
+        console.log('connected - websocket');
+      })
+    );
+
+    this.subscription.add(this.socketService.onEvent(Event.DISCONNECT)
+      .subscribe(() => {
+        console.log('disconnected - websocket');
+      })
+    );
+  }
+
+  // tslint:disable-next-line: use-life-cycle-interface
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+    this.socketService.sendDisconnect();
   }
 
 }

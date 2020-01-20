@@ -21,7 +21,7 @@ export class UserFormComponent implements OnInit {
   fullName: string;
 
   constructor(private fb: FormBuilder) {
-   }
+  }
 
   ngOnInit() {
     this.generateFullName();
@@ -47,6 +47,20 @@ export class UserFormComponent implements OnInit {
     } else {
       this.handleEditProfile.emit(this.user);
     }
+  }
+
+  setValuesForm(newUser: any) {
+    Object.keys(newUser).map(field => {
+      this.user = newUser;
+      if (this.userForm.get(field)) {
+        this.userForm.get(field).setValue(newUser[field]);
+      } else {
+        if (field === 'name') {
+          this.generateFullName();
+          this.userForm.get('fullname').setValue(this.fullName);
+        }
+      }
+    });
   }
 
   /*
