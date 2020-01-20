@@ -8,13 +8,15 @@ import { ButtonLoginComponent } from 'src/app/components/common/button-login/but
 import { SimpleModalComponent } from 'src/app/components/common/simple-modal/simple-modal.component';
 import { UserFormComponent } from 'src/app/components/common/user-form/user-form.component';
 import { GenerateQrComponent } from 'src/app/components/common/generate-qr/generate-qr.component';
+import { ModalResultComponent } from 'src/app/components/common/modal-result/modal-result.component';
 
 @NgModule({
   declarations: [
     ButtonLoginComponent,
     SimpleModalComponent,
     UserFormComponent,
-    GenerateQrComponent
+    GenerateQrComponent,
+    ModalResultComponent
   ],
   imports: [
     CommonModule,
@@ -31,7 +33,8 @@ import { GenerateQrComponent } from 'src/app/components/common/generate-qr/gener
     FormsModule,
     ReactiveFormsModule,
     AngularFontAwesomeModule,
-    QRCodeModule
+    QRCodeModule,
+    ModalResultComponent
   ]
 })
 export class SharedModule { }

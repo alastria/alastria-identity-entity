@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ModalSuccessComponent } from './modal-success.component';
+import { ModalSuccessComponent } from './modal-result.component';
 
 describe('ModalSuccessComponent', () => {
   let component: ModalSuccessComponent;
