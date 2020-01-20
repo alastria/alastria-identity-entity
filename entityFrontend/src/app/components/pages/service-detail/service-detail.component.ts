@@ -11,6 +11,11 @@ import { Event } from 'src/app/models/enums/enums.model';
 // COMPONENTS
 import { ServiceFormComponent } from '../../common/service-form/service-form.component';
 
+// MODALS
+import { ResultModal } from './../../../models/result-modal/result-modal';
+
+declare var $: any;
+
 @Component({
   selector: 'app-service-detail',
   templateUrl: './service-detail.component.html',
@@ -19,6 +24,11 @@ import { ServiceFormComponent } from '../../common/service-form/service-form.com
 export class ServiceDetailComponent implements OnInit {
   private subscription: Subscription = new Subscription();
   @ViewChild(ServiceFormComponent) serviceFormComponent: ServiceFormComponent;
+  resultModal: ResultModal = {
+    type: 'error',
+    title: '',
+    description: ''
+  }
   service: Service;
   detailImageUrl: string;
   detailImageAlt: string;
@@ -37,6 +47,10 @@ export class ServiceDetailComponent implements OnInit {
     this.isContractServiceSuccess = true;
   }
 
+  handleResultOK() {
+    $('#modal-result').modal('hide');
+  }
+
   async getServiceById() {
     const serviceId = parseInt(this.route.snapshot.params.id, 0);
     this.service =  await this.homeService.getServicesById(serviceId);
@@ -53,6 +67,18 @@ export class ServiceDetailComponent implements OnInit {
     this.subscription.add(this.socketService.onGetDetailUser()
       .subscribe((detailUser: any) => {
         this.serviceFormComponent.setValuesForm(detailUser);
+      })
+    );
+
+    this.subscription.add(this.socketService.onError()
+      .subscribe((error: any) => {
+        this.socketService.sendDisconnect();
+        this.resultModal = {
+          type: 'error',
+          title: `Error! - error.status`,
+          description: error.message
+        };
+        $('#modal-result').modal('show');
       })
     );
 

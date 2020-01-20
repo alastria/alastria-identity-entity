@@ -15,6 +15,7 @@ import { EntityService } from 'src/app/services/entity/entity.service';
 // MODELS
 import { User } from 'src/app/models/user/user.model';
 import { Event } from 'src/app/models/enums/enums.model';
+import { ResultModal } from './../../../models/result-modal/result-modal';
 
 declare var $: any;
 
@@ -41,8 +42,11 @@ export class ProfileComponent implements OnInit {
   qrAlastriaId: string;
   qrCredentials: any;
   optionsMenu = ['Edit profile', 'Reset password', 'Alastria ID'];
-  successTitle = 'Congratulations! ';
-  successDescription = 'Your Alastria ID has been created. Start to fill you new AlastriaID';
+  resultModal: ResultModal = {
+    type: 'success',
+    title: '',
+    description: ''
+  };
   styleButtonAlastriaId = {
     color: '#00CAD6',
     backgroundIcon: 'white',
@@ -168,8 +172,8 @@ export class ProfileComponent implements OnInit {
    * When click in 'ok' in simple modal then active this function that hide
    * the modal and check alastria id is verified
    */
-  handleSuccessOk(): void {
-    $('#success').modal('hide');
+  handleResultModalOk(): void {
+    $('#modal-result').modal('hide');
     this.qrAlastriaId = null;
     this.isCreateAlastriaId = false;
     this.checkAlastriaIdIsVerified();
@@ -249,7 +253,12 @@ export class ProfileComponent implements OnInit {
               userChange.proxyAddress = result.proxyAddress;
               userChange.did = result.did;
               this.userService.setUserLoggedIn(userChange);
-              $('#success').modal('show');
+              this.resultModal = {
+                type: 'success',
+                title: 'Congratulations!',
+                description: 'Your Alastria ID has been created. Start to fill you new AlastriaID'
+              };
+              $('#modal-result').modal('show');
             } else {
               this.userService.setIsAlastriaIdVerified(true);
             }
@@ -263,19 +272,39 @@ export class ProfileComponent implements OnInit {
     this.subscription.add(this.socketService.onSetUpAlastriaId()
       .subscribe(() => {
         this.socketService.sendDisconnect();
-        this.successTitle = 'Congratulations!';
-        this.successDescription = `Your AlastriaID has been linked to your ${environment.entityName} profile. Now you can login next times with your AlastriaID`;
-        $('#success').modal('show');
+        this.resultModal = {
+          type: 'success',
+          title: 'Congratulations!',
+          description: `Your AlastriaID has been linked to your ${environment.entityName} profile. Now you can login next times with your AlastriaID`
+        };
+        $('#modal-result').modal('show');
         this.userService.setIsAlastriaIdVerified(true);
       })
     );
 
     this.subscription.add(this.socketService.onFillYourProfile()
       .subscribe(() => {
+        this.socketService.sendDisconnect();
         $('#simpleModal').modal('hide');
-        this.successTitle = 'Success';
-        this.successDescription = 'Now use your Alastria ID wherever you want and keep the control of your information';
-        $('#success').modal('show');
+        this.resultModal = {
+          type: 'success',
+          title: 'Success!',
+          description: 'Now use your Alastria ID wherever you want and keep the control of your information'
+        };
+        $('#modal-result').modal('show');
+      })
+    );
+
+    this.subscription.add(this.socketService.onError()
+      .subscribe((error: any) => {
+        this.socketService.sendDisconnect();
+        $('#simpleModal').modal('hide');
+        this.resultModal = {
+          type: 'error',
+          title: `Error! - error.status`,
+          description: error.message
+        };
+        $('#modal-result').modal('show');
       })
     );
 

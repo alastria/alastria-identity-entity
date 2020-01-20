@@ -39,4 +39,10 @@
       </div>
     </div>
   </div>
+  <app-modal-result
+    [type]="resultModal.type"
+    [title]="resultModal.title"
+    [description]="resultModal.description"
+    (handleOk)="handleResultModalOk()">
+  </app-modal-result>
 </div>

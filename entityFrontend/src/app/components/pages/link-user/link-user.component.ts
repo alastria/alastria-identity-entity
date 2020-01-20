@@ -1,3 +1,4 @@
+import { ResultModal } from './../../../models/result-modal/result-modal';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { Component, OnInit, ViewChild } from '@angular/core';
@@ -13,6 +14,8 @@ import { Event } from 'src/app/models/enums/enums.model';
 // COMPONENTS
 import { UserFormComponent } from '../../common/user-form/user-form.component';
 
+declare var $: any;
+
 @Component({
   selector: 'app-link-user',
   templateUrl: './link-user.component.html',
@@ -21,6 +24,11 @@ import { UserFormComponent } from '../../common/user-form/user-form.component';
 export class LinkUserComponent implements OnInit {
   private subscription: Subscription = new Subscription();
   @ViewChild(UserFormComponent) userFormComponent: UserFormComponent;
+  resultModal: ResultModal = {
+    type: 'error',
+    title: '',
+    description: ''
+  };
   user: User;
   errorPasswordNewUser: string;
   errorPasswordLogin: string;
@@ -137,6 +145,10 @@ export class LinkUserComponent implements OnInit {
     this.socketService.sendNewUser();
   }
 
+  handleResultOK() {
+    $('#modal-result').modal('hide');
+  }
+
   private async login(userRegister: any) {
     try {
       const userLogin = await this.userService.login(userRegister);
@@ -157,6 +169,19 @@ export class LinkUserComponent implements OnInit {
       .subscribe((newUser: User) => {
         this.user = newUser;
         this.userFormComponent.setValuesForm(newUser);
+      })
+    );
+
+    this.subscription.add(this.socketService.onError()
+      .subscribe((error: any) => {
+        this.socketService.sendDisconnect();
+        $('#simpleModal').modal('hide');
+        this.resultModal = {
+          type: 'error',
+          title: `Error! - error.status`,
+          description: error.message
+        };
+        $('#modal-result').modal('show');
       })
     );
 

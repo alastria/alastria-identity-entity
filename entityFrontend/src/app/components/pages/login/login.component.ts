@@ -1,3 +1,4 @@
+import { ResultModal } from './../../../models/result-modal/result-modal';
 import { SocketService } from './../../../services/socket/socket.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
@@ -21,6 +22,11 @@ declare var $: any;
   private subscription: Subscription = new Subscription();
   formLogin: FormGroup;
   errorLogin: string;
+  resultModal: ResultModal = {
+    type: 'error',
+    title: '',
+    description: ''
+  };
   styleButtonFacebook = {
     color: '#5C7DC2',
     backgroundIcon: '#45619D',
@@ -95,6 +101,10 @@ declare var $: any;
     this.socketService.sendLogin();
   }
 
+  handleResultOK() {
+    $('#modal-result').modal('hide');
+  }
+
   /**
    * Function handle when click ok in modal simple
    */
@@ -129,6 +139,19 @@ declare var $: any;
       .subscribe(() => {
         this.onLogin();
         this.socketService.sendDisconnect();
+      })
+    );
+
+    this.subscription.add(this.socketService.onError()
+      .subscribe((error: any) => {
+        $('#simpleModal').modal('hide');
+        this.socketService.sendDisconnect();
+        this.resultModal = {
+          type: 'error',
+          title: `Error! - error.status`,
+          description: error.message
+        };
+        $('#modal-result').modal('show');
       })
     );
 

@@ -50,11 +50,12 @@
       </div>
     </div>
   </div>
-  <app-modal-success
-    [title]="successTitle"
-    [description]="successDescription"
-    (handleOk)="handleSuccessOk()">
-  </app-modal-success>
+  <app-modal-result
+    [type]="resultModal.type"
+    [title]="resultModal.title"
+    [description]="resultModal.description"
+    (handleOk)="handleResultModalOk()">
+  </app-modal-result>
   <app-simple-modal *ngIf="isAlastriaVerified"
     (handleOk)="handleOkFillYourProfile()" 
     type="qr"
