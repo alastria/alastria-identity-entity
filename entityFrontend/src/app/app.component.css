@@ -57,3 +57,13 @@ div > img{
     position: absolute;
     width: 40%;
 }
+
+@media only screen and (max-width: 900px) {
+    #alastria-background-login {
+      display: none;
+    }
+
+    .app-login {
+        width: 100%;
+    }
+}
