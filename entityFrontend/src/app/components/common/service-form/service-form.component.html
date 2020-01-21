@@ -1,15 +1,15 @@
 <div class="container">
   <div class="row" style="height: 104px">
-    <div class="col-3">
-      <app-generate-qr id="qr"
+    <div id="generate-qr" class="col-12 col-sm-5 col-md-4 col-lg-3">
+      <app-generate-qr
         [qrData]="qrData"
         [size]="64">
       </app-generate-qr>
     </div>
-    <div class="col-5 my-auto">
+    <div class="col-10 col-sm-5 col-md-6 col-lg-6 my-auto">
         <p>Scan this QR with the Alastria ID app to fill in the form</p>
     </div>
-    <div class="col-3 my-auto">
+    <div class="col-2 col-sm-2 col-md-2 col-lg-3 my-auto">
       <div class="float-left">
         <img src="../../../../assets/images/alastria-icon.svg" alt="alastria-icon" (click)="getServiceForm()">
       </div>
