@@ -77,3 +77,10 @@ li {
 
 /* Change the background color of the dropdown button when the dropdown content is shown */
 .dropdown:hover .dropbtn {background-color: #343a40;}
+
+@media only screen and (max-width: 766px) {
+    h2 {
+      text-align: left;
+      margin-left: 45px;
+    }
+}
