@@ -99,6 +99,11 @@ paths:
       # used as the method name of the controller
       operationId: updateUser
       parameters:
+        - name: id
+          in: query
+          description: Id of the user to update
+          required: true
+          type: string
         - name: body
           in: body
           description: Necessary data to update an user in database
@@ -118,6 +123,36 @@ paths:
             $ref: "#/definitions/ErrorResponse"
         "404":
           description: User not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "503":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    get:
+      description: Get data saved in the database
+      operationId: getUser
+      parameters:
+        - name: userID
+          in: query
+          type: string
+          description: Id of the user
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/userData"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
           schema:
             $ref: "#/definitions/ErrorResponse"
         "503":
@@ -680,10 +715,12 @@ definitions:
         type: boolean
   userTokenAccess:
     properties:
-      token:
-        type: string
+      authTtoken:
+        type: object
   userData:
     properties:
+      username:
+        type: string
       name:
         type: string
       surname:

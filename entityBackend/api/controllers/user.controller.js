@@ -20,7 +20,8 @@ const controller_name = '[User Controller]'
 
 module.exports = {
   login,
-  addUser
+  addUser,
+  updateUser
 }
 
 /////////////////////////////////////////////////////////
@@ -30,17 +31,23 @@ module.exports = {
 function login(req, res) {
   try {
     log.debug(`${controller_name}[${login.name}] -----> IN ...`)
-    console.log(req.swagger.params)
     let params = req.swagger.params
     log.debug(`${controller_name}[${login.name}] -----> Sending params: ${JSON.stringify(params)}`)
     userModel.login(params)
     .then(authenticated => {
       console.log(authenticated)
-      let result = {
-        token: authenticated
+      if (authenticated == null) {
+        log.error(`${controller_name}[${login.name}] -----> Usuario no autorizado`)
+        let msg = {
+          message: `Usuario no autorizado`
+        }
+        io.emit('error', {status: 401,
+                          message: msg.message})
+        res.status(200).send(msg)
+      } else {
+        io.emit('login', authenticated)
+        res.status(200).send(authenticated)
       }
-      io.emit('login', authenticated)
-      res.status(200).send(result)
     })
     .catch(error => {
       log.error(`${controller_name}[${login.name}] -----> ${error}`)
@@ -85,6 +92,40 @@ function addUser(req, res) {
   }
   catch(error) {
     log.error(`${controller_name}[${addUser.name}] -----> Error: ${error}`)
+    let msg = {
+      message: `${error}`
+    }
+    io.emit('error', {status: 503,
+                      message: msg.message})
+    res.status(503).send(msg)
+  }
+}
+
+function updateUser(req, res) {
+  try {
+    log.debug(`${controller_name}[${updateUser.name}] -----> IN ...`)
+    let id = req.swagger.params.id.value
+    let params = req.swagger.params.body.value
+    log.debug(`${controller_name}[${updateUser.name}] -----> Sending params: ${JSON.stringify(params)}`)
+    userModel.updateUser(id, params)
+    .then(updated => {
+      if(updated == 0){
+        log.error(`${controller_name}[${updateUser.name}] -----> No records updated`)
+        let msg = {
+          message: `No se ha actualizado ningun registro`
+        }
+        res.status(200).send(msg)
+      } else {
+        log.debug(`${controller_name}[${updateUser.name}] -----> Records updated`)
+        let msg = {
+          message: `Exito al actulaizar el usuario`
+        }
+        res.status(200).send(msg)
+      }
+    })
+  }
+  catch(error) {
+    log.error(`${controller_name}[${updateUser.name}] -----> Error: ${error}`)
     let msg = {
       message: `${error}`
     }

@@ -12,8 +12,8 @@ const log = Log.getLogger()
 const mongoHelper = require('../helpers/mongo.helper')
 log.level = myConfig.Log.level
 const moduleName = '[Entity Model]'
+const ObjectId = require('mongodb').ObjectID
 
-let mongoUrl = myConfig.mongo.url
 let mongoDatabase = myConfig.mongo.dbName
 let mongoCollection = myConfig.mongo.collection
 
@@ -23,14 +23,17 @@ let mongoCollection = myConfig.mongo.collection
 
 module.exports = {
   login,
-  createUser
+  createUser,
+  updateUser
 }
 
 /////////////////////////////////////////////////////////
 ///////             PRIVATE FUNCTIONS             ///////
 /////////////////////////////////////////////////////////
 
+function getuser() {
 
+}
 
 /////////////////////////////////////////////////////////
 ///////              PUBLIC FUNCTIONS             ///////
@@ -45,27 +48,41 @@ function login(params){
     mongoHelper.connect(myConfig.mongo)
     .then(connected => {
       let db = connected.db(mongoDatabase)
-      db.collection(mongoCollection).findOne({"$or":[{"name": username}, {"email": username}], "password": pwd})
+      db.collection(mongoCollection).findOne({"$or":[{"username": username}, {"email": username}], "password": pwd})
       .then(found => {
+        if(found == null) {
+          resolve(found)
+        }
+        console.log(found)
         let jsonObjet = {
           user: username,
           password: pwd
         }
         let token = jwt.sign({data: jsonObjet}, pwd, { expiresIn: 60 * 60})
         log.debug(`${moduleName}[${login.name}] -----> JWT created`);
+        let userObject = {
+          userdata: {
+            id: found._id,
+            username: found.username,
+            email: found.email,
+            address: found.address,
+            vinculated: found.vinculated
+          },
+          authToken: token
+        }
         connected.close();
-        resolve(token)
+        resolve(userObject)
+      })
+      .catch(error => {
+        log.error(`${moduleName}[${login.name}] Error -> ${error}`);
+        reject(error)
       })
     })
     .catch(error => {
-      log.error(`${moduleName} Error -> ${error}`);
+      log.error(`${moduleName}[${login.name}] Error -> ${error}`);
       reject(error);
     });
   });
-}
-
-function getuser() {
-
 }
 
 function createUser(params) {
@@ -99,26 +116,31 @@ function createUser(params) {
   })
 }
 
-function updateUser(id){
+function updateUser(id, params) {
   return new Promise((resolve, reject) => {
-
-    log.debug(`${nameModule} getPayment: IN`);
-
-    connect()
-    .then(db =>{
-      db.collection(mongoConfig.collection, function(err, collection){
-        var miId = id;
-        collection.find({$or: [{'payment_id': miId},{'additional_info.secondary_id': miId}]}).toArray(function(err, data){
-          log.debug(`${nameModule} getPayment: Obtaining payment`);
-          MongoClient.close();
-          resolve(data);
-        });
-      });
+    log.debug(`${moduleName}[${updateUser.name}] -----> IN...`)
+    mongoHelper.connect(myConfig.mongo)
+    .then(connected => {
+      let db = connected.db(mongoDatabase)
+      db.collection(mongoCollection).updateOne(
+        {"_id": new ObjectId(id)},
+        {
+          "$set": {"username": params.username,
+                   "name": params.name,
+                   "surname": params.surname,
+                   "email": params.email,
+                   "address": params.address,
+                   "password": params.password
+                  }
+      })
+      .then(updated => {
+        log.debug(`${moduleName}[${updateUser.name}] -----> Updated Records: ${updated.result.nModified}`)
+        resolve(updated.result.nModified)
+      })
+      .catch(error => {
+        log.error(`${moduleName}[${updateUser.name}] -----> Error: ${error}`)
+        reject(error)
+      })
     })
-    .catch(err => {
-      log.error(`${nameModule} getPayment: Error -> ${err}`);
-      MongoClient.close();
-      reject(err);
-    });
-  });
+  })
 }
