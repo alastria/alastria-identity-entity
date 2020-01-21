@@ -25,7 +25,37 @@ module.exports = {
   login,
   createUser,
   updateUser,
-  getUser
+  getUser,
+  checkAuth
+}
+
+/////////////////////////////////////////////////////////
+///////             PRIVATE FUNCTIONS             ///////
+/////////////////////////////////////////////////////////
+
+function isAuth(data) {
+  return new Promise((resolve, reject) => {
+    log.debug(`${moduleName}[${isAuth.name}] -----> IN...`);
+    mongoHelper.connect(myConfig.mongo)
+    .then(connected => {
+      log.debug(`${moduleName}[${isAuth.name}] -----> Checking if user is authenticated`);
+      let db = connected.db(mongoDatabase)
+      db.collection(mongoCollection).findOne({"$or":[{"username": data.user}, {"email": data.user}], "password": data.password})
+      .then(found => {
+        connected.close();
+        resolve(found)
+      })
+      .catch(error => {
+        log.error(`${moduleName}[${isAuth.name}] Error -> ${error}`);
+        connected.close()
+        reject(error)
+      })
+    })
+    .catch(error => {
+      log.error(`${moduleName}[${isAuth.name}] Error -> ${error}`);
+      reject(error)
+    })
+  })
 }
 
 /////////////////////////////////////////////////////////
@@ -170,6 +200,23 @@ function getUser(id) {
     })
     .catch(error => {
       log.error(`${moduleName}[${getUser.name}] -----> Error: ${error}`)
+      reject(error)
+    })
+  })
+}
+
+function checkAuth(token) {
+  return new Promise((resolve, reject) => {
+    log.debug(`${moduleName}[${checkAuth.name}] -----> IN...`)
+    let decoded = jwt.decode(token)
+    log.debug(`${moduleName}[${checkAuth.name}] -----> Decoded token`)
+    isAuth(decoded.data)
+    .then(auth => {
+      log.debug(`${moduleName}[${checkAuth.name}] -----> Sending result`)
+      resolve(auth)
+    })
+    .catch(error => {
+      log.error(`${moduleName}[${checkAuth.name}] -----> Error: ${error}`)
       reject(error)
     })
   })

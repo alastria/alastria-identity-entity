@@ -22,7 +22,8 @@ module.exports = {
   login,
   addUser,
   updateUser,
-  getUser
+  getUser,
+  checkUserAuth
 }
 
 /////////////////////////////////////////////////////////
@@ -36,7 +37,6 @@ function login(req, res) {
     log.debug(`${controller_name}[${login.name}] -----> Sending params: ${JSON.stringify(params)}`)
     userModel.login(params)
     .then(authenticated => {
-      console.log(authenticated)
       if (authenticated == null) {
         log.error(`${controller_name}[${login.name}] -----> Usuario no autorizado`)
         let msg = {
@@ -165,6 +165,38 @@ function getUser(req, res) {
   }
   catch(error) {
     log.error(`${controller_name}[${getUser.name}] -----> Error: ${error}`)
+    let msg = {
+      message: `${error}`
+    }
+    res.status(503).send(msg)
+  }
+}
+
+function checkUserAuth(req, res) {
+  try {
+    log.debug(`${controller_name}[${checkUserAuth.name}] -----> IN ...`)
+    let token = req.swagger.params.authToken.value
+    log.debug(`${controller_name}[${checkUserAuth.name}] -----> Sending params: ${JSON.stringify(token)}`)
+    userModel.checkAuth(token)
+    .then(isAuth => {
+      if(isAuth == null) {
+        log.debug(`${controller_name}[${checkUserAuth.name}] -----> User not authenticated`)
+        res.status(200).send({ status: false })
+      } else {
+        log.debug(`${controller_name}[${checkUserAuth.name}] -----> User Authenticated`)
+        res.status(200).send({ status: true })
+      }
+    })
+    .catch(error => {
+      log.error(`${controller_name}[${checkUserAuth.name}] -----> Error: ${error}`)
+      let msg = {
+        message: `${error}`
+      }
+      res.status(400).send(msg)
+    })
+  }
+  catch(error) {
+    log.error(`${controller_name}[${checkUserAuth.name}] -----> Error: ${error}`)
     let msg = {
       message: `${error}`
     }
