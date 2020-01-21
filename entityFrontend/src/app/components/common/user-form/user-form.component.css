@@ -13,3 +13,9 @@ button:active {
     border-color: #325B8E;
     background-color: #325B8E;
 }
+
+@media only screen and (max-width: 767px) {
+    button {
+        margin-bottom: 20px;
+    }
+}
