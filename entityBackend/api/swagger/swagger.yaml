@@ -146,7 +146,7 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: "#/definitions/userData"
+            $ref: "#/definitions/userInfo"
         "400":
           description: Bad Request
           schema:
@@ -716,6 +716,10 @@ definitions:
   userTokenAccess:
     properties:
       authTtoken:
+        type: object
+  userInfo:
+    properties:
+      data:
         type: object
   userData:
     properties:

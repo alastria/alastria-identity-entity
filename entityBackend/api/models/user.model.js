@@ -24,15 +24,8 @@ let mongoCollection = myConfig.mongo.collection
 module.exports = {
   login,
   createUser,
-  updateUser
-}
-
-/////////////////////////////////////////////////////////
-///////             PRIVATE FUNCTIONS             ///////
-/////////////////////////////////////////////////////////
-
-function getuser() {
-
+  updateUser,
+  getUser
 }
 
 /////////////////////////////////////////////////////////
@@ -75,6 +68,7 @@ function login(params){
       })
       .catch(error => {
         log.error(`${moduleName}[${login.name}] Error -> ${error}`);
+        connected.close()
         reject(error)
       })
     })
@@ -108,9 +102,14 @@ function createUser(params) {
         connected.close()
         resolve(msg)
       })
+      .catch(error => {
+        log.error(`${moduleName}[${createUser.name}] -----> Error: ${error}`)
+        connected.close()
+        reject(error)
+      })
     })
     .catch(error => {
-      log.error(`${moduleName}[${createUser.name}] -----> ${error}`)
+      log.error(`${moduleName}[${createUser.name}] -----> Error: ${error}`)
       reject(error)
     })
   })
@@ -135,12 +134,43 @@ function updateUser(id, params) {
       })
       .then(updated => {
         log.debug(`${moduleName}[${updateUser.name}] -----> Updated Records: ${updated.result.nModified}`)
+        connected.close()
         resolve(updated.result.nModified)
       })
       .catch(error => {
         log.error(`${moduleName}[${updateUser.name}] -----> Error: ${error}`)
+        connected.close()
         reject(error)
       })
+    })
+    .catch(error => {
+      log.error(`${moduleName}[${updateUser.name}] -----> Error: ${error}`)
+      reject(error)
+    })
+  })
+}
+
+function getUser(id) {
+  return new Promise((resolve, reject) => {
+    log.debug(`${moduleName}[${getUser.name}] -----> IN...`)
+    mongoHelper.connect(myConfig.mongo)
+    .then(connected => {
+      let db = connected.db(mongoDatabase)
+      db.collection(mongoCollection).findOne({"_id": new ObjectId(id)})
+      .then(user => {
+        log.debug(`${moduleName}[${getUser.name}] -----> Data obtained`)
+        connected.close()
+        resolve(user)
+      })
+      .catch(error => {
+        log.error(`${moduleName}[${getUser.name}] -----> Error: ${error}`)
+        connected.close()
+        reject(error)
+      })
+    })
+    .catch(error => {
+      log.error(`${moduleName}[${getUser.name}] -----> Error: ${error}`)
+      reject(error)
     })
   })
 }

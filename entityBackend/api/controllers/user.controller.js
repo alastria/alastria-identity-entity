@@ -21,7 +21,8 @@ const controller_name = '[User Controller]'
 module.exports = {
   login,
   addUser,
-  updateUser
+  updateUser,
+  getUser
 }
 
 /////////////////////////////////////////////////////////
@@ -129,8 +130,44 @@ function updateUser(req, res) {
     let msg = {
       message: `${error}`
     }
-    io.emit('error', {status: 503,
-                      message: msg.message})
+    res.status(503).send(msg)
+  }
+}
+
+function getUser(req, res) {
+  try {
+    log.debug(`${controller_name}[${getUser.name}] -----> IN ...`)
+    let id = req.swagger.params.userID.value
+    log.debug(`${controller_name}[${getUser.name}] -----> Sending params: ${JSON.stringify(id)}`)
+    userModel.getUser(id)
+    .then(userData => {
+      if (userData == null) {
+        log.debug(`${controller_name}[${getUser.name}] -----> User not found`)
+        let msg = {
+          message: `User not found`
+        }
+        res.status(404).send(msg)
+      } else {
+        log.debug(`${controller_name}[${getUser.name}] -----> User found`)
+        let userInfo = {
+          user: userData
+        }
+        res.status(200).send(userInfo)
+      }
+    })
+    .catch(error => {
+      log.debug(`${controller_name}[${getUser.name}] -----> Error: ${error}`)
+      let msg = {
+        message: `${error}`
+      }
+      res.status(404).send(msg)
+    })
+  }
+  catch(error) {
+    log.error(`${controller_name}[${getUser.name}] -----> Error: ${error}`)
+    let msg = {
+      message: `${error}`
+    }
     res.status(503).send(msg)
   }
 }
