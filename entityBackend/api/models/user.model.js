@@ -76,7 +76,6 @@ function login(params){
         if(found == null) {
           resolve(found)
         }
-        console.log(found)
         let jsonObjet = {
           user: username,
           password: pwd
@@ -89,7 +88,7 @@ function login(params){
             username: found.username,
             email: found.email,
             address: found.address,
-            vinculated: found.vinculated
+            vinculated: (found.vinculated == null) ? false : found.vinculated
           },
           authToken: token
         }
@@ -115,12 +114,13 @@ function createUser(params) {
     mongoHelper.connect(myConfig.mongo)
     .then(connected => {
       let userData = {
+        username: params.username,
         name: params.name,
         surname: params.surname,
         email: params.email,
         address: params.address,
         password: params.password,
-        vinculated: params.vinculated
+        vinculated: (params.vinculated == null) ? false : params.vinculated
       }
       let db = connected.db(mongoDatabase)
       db.collection(mongoCollection).insertOne(userData)
@@ -189,8 +189,17 @@ function getUser(id) {
       db.collection(mongoCollection).findOne({"_id": new ObjectId(id)})
       .then(user => {
         log.debug(`${moduleName}[${getUser.name}] -----> Data obtained`)
+        let userData = {
+          id: user._id,
+          username: user.username,
+          name: user.name,
+          surname: user.surname,
+          email: user.email,
+          address: user.address,
+          vinculated: (user.vinculated == null) ? false : user.vinculated
+        }
         connected.close()
-        resolve(user)
+        resolve(userData)
       })
       .catch(error => {
         log.error(`${moduleName}[${getUser.name}] -----> Error: ${error}`)
