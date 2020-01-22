@@ -13,4 +13,8 @@ export class AlastriaLibService {
       header.kid, payload.iss, payload.pr['@context'], payload.pr.procUrl, payload.pr.procHash, payload.pr.data, payload.nbf, payload.jti
     );
   }
+
+  signPresentationRequest(presentationRequest: any, key: any) {
+    return tokensFactory.tokens.signJWT(presentationRequest, key);
+  }
 }

@@ -1,3 +1,4 @@
+import { EntityService } from './../../../services/entity/entity.service';
 import { HttpClient } from '@angular/common/http';
 import { ResultModal } from './../../../models/result-modal/result-modal';
 import { Subscription } from 'rxjs';
@@ -32,6 +33,7 @@ export class LinkUserComponent implements OnInit {
     description: ''
   };
   user: User;
+  qrData: any = '';
   errorPasswordNewUser: string;
   errorPasswordLogin: string;
   inputsNewUserForm: Array<any> = [
@@ -99,6 +101,7 @@ export class LinkUserComponent implements OnInit {
                private userService: UserService,
                private socketService: SocketService,
                private alastriaLibService: AlastriaLibService,
+               private entityService: EntityService,
                private http: HttpClient) { }
 
   ngOnInit() {
@@ -169,25 +172,14 @@ export class LinkUserComponent implements OnInit {
           '@context': 'JWT',
           levelOfAssurance: 'High',
           required: true,
-          field_name: 'surname'
+          field_name: 'email'
         },
-        // {
-        //   '@context': 'JWT',
-        //   levelOfAssurance: 'High',
-        //   required: true,
-        //   field_name: 'email'
-        // },
-        // {
-        //     '@context': 'JWT',
-        //     levelOfAssurance: 'High',
-        //     required: true,
-        //     field_name: 'address'
-        // }
       ];
 
-      console.log(alastriaLibJson);
       const presentationRequest = this.alastriaLibService.createPresentationRequest(alastriaLibJson.header, alastriaLibJson.payload);
-      console.log('presentation --> ', presentationRequest);
+      // TODO GET PRIVATE KEY
+      const presentationRequestSigned = this.alastriaLibService.signPresentationRequest(presentationRequest, alastriaLibJson.privateKey);
+      this.qrData = presentationRequestSigned;
     } catch (error) {
       console.error(error);
     }

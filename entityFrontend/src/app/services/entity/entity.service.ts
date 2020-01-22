@@ -57,8 +57,11 @@ export class EntityService {
    * @returns {*}
    */
   getPublicKey(alastriaId: string): any {
-    return this.http.get(`${this.apiUrl}/${this.path}/${alastriaId}`).toPromise()
-      .then((res) => res)
+    return this.http.get(`${this.apiUrl}/${this.path}/identity/${alastriaId}`).toPromise()
+      .then((res) => {
+        console.log('res --> ', res);
+        return res;
+      })
       .catch((error: any) => {
         throw error;
       });

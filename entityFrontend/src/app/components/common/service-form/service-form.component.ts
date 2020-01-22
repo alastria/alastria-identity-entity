@@ -13,7 +13,7 @@ import { AlastriaLibService } from 'src/app/services/alastria-lib/alastria-lib.s
 })
 export class ServiceFormComponent implements OnInit {
   @Output() handleSubmit = new EventEmitter();
-  qrData = 'Service form';
+  qrData = '';
   serviceForm: FormGroup;
 
   constructor(private fb: FormBuilder,
@@ -56,18 +56,13 @@ export class ServiceFormComponent implements OnInit {
           '@context': 'JWT',
           levelOfAssurance: 'High',
           required: true,
-          field_name: 'bloodGroup'
+          field_name: 'over18'
         },
-        // {
-        //   '@context': 'JWT',
-        //   levelOfAssurance: 'High',
-        //   required: true,
-        //   field_name: 'over18'
-        // },
       ];
-      console.log(alastriaLibJson);
+
       const presentationRequest = this.alastriaLibService.createPresentationRequest(alastriaLibJson.header, alastriaLibJson.payload);
-      console.log('presentation --> ', presentationRequest);
+      this.qrData = JSON.stringify(presentationRequest);
+
     } catch (error) {
       console.error(error);
     }
