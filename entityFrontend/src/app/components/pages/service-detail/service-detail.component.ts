@@ -4,15 +4,16 @@ import { ActivatedRoute } from '@angular/router';
 
 // SERVICES
 import { HomeService } from 'src/app/services/home/home.service';
-import { Service } from 'src/app/models/services/services.model';
 import { SocketService } from 'src/app/services/socket/socket.service';
-import { Event } from 'src/app/models/enums/enums.model';
+import { AlastriaLibService } from 'src/app/services/alastria-lib/alastria-lib.service';
 
 // COMPONENTS
 import { ServiceFormComponent } from '../../common/service-form/service-form.component';
 
 // MODALS
 import { ResultModal } from './../../../models/result-modal/result-modal';
+import { Event } from 'src/app/models/enums/enums.model';
+import { Service } from 'src/app/models/services/services.model';
 
 declare var $: any;
 
