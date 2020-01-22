@@ -10,6 +10,7 @@ import { ServiceFormComponent } from 'src/app/components/common/service-form/ser
 
 // SERVICES
 import { HomeService } from './../../services/home/home.service';
+import { AlastriaLibService } from './../../services/alastria-lib/alastria-lib.service';
 
 @NgModule({
   declarations: [
@@ -23,7 +24,8 @@ import { HomeService } from './../../services/home/home.service';
     SharedModule
   ],
   providers: [
-    HomeService
+    HomeService,
+    AlastriaLibService
   ]
 })
 export class HomeModule { }
