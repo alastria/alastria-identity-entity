@@ -142,7 +142,7 @@ export class LinkUserComponent implements OnInit {
   }
 
   sendNewUser() {
-    this.socketService.sendNewUser();
+    this.socketService.sendGetPresentationData();
   }
 
   handleResultOK() {
@@ -165,7 +165,7 @@ export class LinkUserComponent implements OnInit {
   private initIoConnection(): void {
     this.socketService.initSocket();
 
-    this.subscription.add(this.socketService.onGetNewUser()
+    this.subscription.add(this.socketService.onGetPresentationData()
       .subscribe((newUser: User) => {
         this.user = newUser;
         this.userFormComponent.setValuesForm(newUser);

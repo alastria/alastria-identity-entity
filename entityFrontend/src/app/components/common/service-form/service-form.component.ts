@@ -26,7 +26,7 @@ export class ServiceFormComponent implements OnInit {
   }
 
   getServiceForm() {
-    this.socketService.sendGetDetailUser();
+    this.socketService.sendGetPresentationData();
   }
 
   setValuesForm(formNewValues: any) {
