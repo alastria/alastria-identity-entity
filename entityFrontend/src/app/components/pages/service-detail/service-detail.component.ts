@@ -29,7 +29,7 @@ export class ServiceDetailComponent implements OnInit {
     type: 'error',
     title: '',
     description: ''
-  }
+  };
   service: Service;
   detailImageUrl: string;
   detailImageAlt: string;
@@ -41,7 +41,6 @@ export class ServiceDetailComponent implements OnInit {
 
   ngOnInit() {
     this.getServiceById();
-    this.initIoConnection();
   }
 
   handleSubmit() {
@@ -62,12 +61,14 @@ export class ServiceDetailComponent implements OnInit {
   /**
    * Function for init connection with websocket and subscribe in differents events
    */
-  private initIoConnection(): void {
+  initIoConnection(): void {
     this.socketService.initSocket();
 
     this.subscription.add(this.socketService.onGetPresentationData()
       .subscribe((detailUser: any) => {
         this.serviceFormComponent.setValuesForm(detailUser);
+        $('#simpleModal').modal('hide');
+        this.socketService.sendDisconnect();
       })
     );
 

@@ -6,6 +6,8 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { SocketService } from 'src/app/services/socket/socket.service';
 import { AlastriaLibService } from 'src/app/services/alastria-lib/alastria-lib.service';
 
+declare var $: any;
+
 @Component({
   selector: 'app-service-form',
   templateUrl: './service-form.component.html',
@@ -13,8 +15,15 @@ import { AlastriaLibService } from 'src/app/services/alastria-lib/alastria-lib.s
 })
 export class ServiceFormComponent implements OnInit {
   @Output() handleSubmit = new EventEmitter();
+  @Output() handleInitConnection = new EventEmitter();
   qrData = '';
+  qrSize = 256;
   serviceForm: FormGroup;
+  styleButtonAlastriaId = {
+    color: '#00CAD6',
+    backgroundIcon: 'white',
+    colorIcon: 'black'
+  };
 
   constructor(private fb: FormBuilder,
               private http: HttpClient,
@@ -22,8 +31,8 @@ export class ServiceFormComponent implements OnInit {
               private alastriaLibService: AlastriaLibService) { }
 
   ngOnInit() {
-    this.createPresentationRequest();
     this.generateForm();
+    this.createPresentationRequest();
   }
 
   onSubmit() {
@@ -40,6 +49,10 @@ export class ServiceFormComponent implements OnInit {
     this.serviceForm.get('over18').setValue(formNewValues.over18);
   }
 
+  showModalQr() {
+    this.handleInitConnection.emit();
+    $('#simpleModal').modal('show');
+  }
 
   private async createPresentationRequest() {
     try {
@@ -61,7 +74,9 @@ export class ServiceFormComponent implements OnInit {
       ];
 
       const presentationRequest = this.alastriaLibService.createPresentationRequest(alastriaLibJson.header, alastriaLibJson.payload);
-      this.qrData = JSON.stringify(presentationRequest);
+      // TODO GET PRIVATE KEY
+      const presentationRequestSigned = this.alastriaLibService.signPresentationRequest(presentationRequest, alastriaLibJson.privateKey);
+      this.qrData = JSON.stringify(presentationRequestSigned);
 
     } catch (error) {
       console.error(error);

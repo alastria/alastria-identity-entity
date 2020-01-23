@@ -29,8 +29,9 @@
       </div>
       <div class="col-12 col-sm-12 col-md-12 col-lg-6" *ngIf="!isContractServiceSuccess">
         <app-service-form
-        (handleSubmit)="handleSubmit()"></app-service-form
-          >
+        (handleSubmit)="handleSubmit()"
+        (handleInitConnection)="initIoConnection()">
+        </app-service-form>
       </div>
       <div class="col-12 col-sm-12 col-md-6 col-lg-6" *ngIf="isContractServiceSuccess">
         <p><img id="success-icon" src="../../../../assets/images/success-icon.svg" alt="Success image"></p>
