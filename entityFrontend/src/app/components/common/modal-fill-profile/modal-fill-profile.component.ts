@@ -1,5 +1,5 @@
 import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
-import { FormGroup, FormArray, FormBuilder, FormControl } from '@angular/forms';
+import { FormGroup, FormBuilder, FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-modal-fill-profile',
@@ -29,22 +29,12 @@ export class ModalFillProfileComponent implements OnInit {
 
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
-      options: new FormArray([])
+      options: this.fb.array(this.addCheckboxes(), this.maxLengthArray(1, 2))
     });
 
     if (this.options) {
       this.addCheckboxes();
     }
-  }
-
-  /**
-   * function for add checkboxes in the form
-   */
-  private addCheckboxes(): void {
-      this.options.forEach((o, i) => {
-      const control = new FormControl(false); // if first item set to true, else false
-      (this.form.controls.options as FormArray).push(control);
-    });
   }
 
   ngOnInit() {
@@ -54,9 +44,39 @@ export class ModalFillProfileComponent implements OnInit {
    * Function for emit information when click ok
    */
   fillYourProfile(): void {
-    const selectedOptionsIds = this.form.value.options
+    const selectedOptionsValue = this.form.value.options
       .map((v, i) => v ? this.options[i].value : null)
       .filter(v => v !== null);
-    this.handleFillYourProfile.emit(selectedOptionsIds);
+    this.handleFillYourProfile.emit(selectedOptionsValue);
+  }
+
+
+  /**
+   * function for add checkboxes in the form
+   */
+  private addCheckboxes(): Array<any> {
+    const controls = [];
+    this.options.forEach((o, i) => {
+      controls.push(new FormControl(false));
+    });
+    return controls;
+  }
+
+  maxLengthArray(min: number, max: number) {
+    return function validate(formGroup: FormGroup) {
+      let checked = 0;
+      Object.keys(formGroup.controls).forEach(key => {
+        const control = formGroup.controls[key];
+        if (control.value === true) {
+          checked++;
+        }
+      });
+      if (checked < min || checked > max) {
+        return {
+          limit: true,
+        };
+      }
+      return null;
+    }
   }
 }
