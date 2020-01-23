@@ -25,7 +25,8 @@ module.exports = {
   getpresentationStatus,
   updateReceiverPresentationStatus,
   addSubjectPresentation,
-  getCredentialStatus
+  getCredentialStatus,
+  recivePresentationData
 }
 
 /////////////////////////////////////////////////////////
@@ -133,17 +134,18 @@ function getCurrentPublicKey(req, res) {
     let alastriaId = req.swagger.params.alastriaDID.value
     log.debug(`${controller_name}[${getCurrentPublicKey.name}] -----> Sending params: ${JSON.stringify(alastriaId)}`)
     entityModel.getCurrentPublicKey(alastriaId)
-    .then(credential => {
-      if (credential) {
-        log.info(`${controller_name}[${getCurrentPublicKey.name}] -----> Successfully obtained Public Key: ${credential}`)
+    .then(publickey => {
+      if (publickey) {
+        log.debug(`${controller_name}[${getCurrentPublicKey.name}] -----> Successfully obtained Public Key: ${publickey}`)
         let result = {
-          publicKey: credential.substr(31)
+          publicKey: publickey[0]
         }
         res.status(200).send(result)
       }
       else {
+        log.debug(`${controller_name}[${getCurrentPublicKey.name}] -----> Error getting publicKey`)
         let msg = {
-          message: 'Error getting credential'
+          message: 'Error getting Public Key'
         }
         res.status(404).send(msg)
       }
@@ -199,8 +201,8 @@ function updateReceiverPresentationStatus(req, res){
     let newStatus = req.swagger.params.body.value;    
     entityModel.updateReceiverPresentationStatus(presentationHash,newStatus)
       .then(() => { 
-          log.debug(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> Successfully updated status presentation`);
-          res.status(200).send();
+        log.debug(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> Successfully updated status presentation`);
+        res.status(200).send();
       })
       .catch(error => {
         let msg = {
@@ -219,28 +221,68 @@ function getCredentialStatus(req, res){
     let credentialHash = req.swagger.params.credentialHash.value;
     let issuer = req.swagger.params.issuer.value;
     let subject = req.swagger.params.subject.value;
-    log.debug(`${controller_name}[${getCredentialStatus.name}] -----> Sending params eeeee: ${JSON.stringify(credentialHash, issuer, subject)}`)
+    log.debug(`${controller_name}[${getCredentialStatus.name}] -----> Sending params: ${JSON.stringify(credentialHash, issuer, subject)}`)
     entityModel.getCredentialStatus(credentialHash, issuer, subject)
       .then(credentialStatus => { 
-        if (credentialStatus != null){
-          log.debug(`${controller_name}[${getCredentialStatus.name}] -----> Successfully obtained presentation status: ${credentialStatus}`);
+        log.debug(`${controller_name}[${getCredentialStatus.name}] -----> Successfully obtained presentation status: ${JSON.stringify(credentialStatus)}`)
+        if (credentialStatus.exists == true){
+          log.debug(`${controller_name}[${getCredentialStatus.name}] -----> Successfully saved the credential`)
+          io.emit('fillYourProfile', {status: 200,
+                                      message: 'Guardada correctamente las credenciales.'})
           res.status(200).send(credentialStatus);
-        }
-        else {
+        } else {
           let msg = {
             message: 'Error getting presentation status'
           }
+          io.emit('error', {status: 404,
+                            message: 'No se ha guardado correctamente la credencial. Vuelva a intentarlo.'})
           res.status(404).send(msg)
         }        
       })
       .catch(error => {
-        let msg = {
-          message: `Insternal Server Error: ${error}`
-        }
-        res.status(503).send(msg)
+        
       })         
   } catch (error) {
     log.error(`${controller_name}[${getCredentialStatus.name}] -----> ${error}`)
+    let msg = {
+      message: `Insternal Server Error: ${error}`
+    }
+    res.status(503).send(msg)
+  }
+}
+
+function recivePresentationData(req, res) {
+  try {
+    log.debug(`${controller_name}[${recivePresentationData.name}] -----> IN ...`);
+    let signedTx = req.swagger.params.presentation.value.signedPresentation
+    let subjectPubkey = req.swagger.params.presentation.value.subjectPublicKey
+    log.debug(`${controller_name}[${recivePresentationData.name}] -----> Sending params: ${JSON.stringify(req.swagger.params.presentation.value)}`)
+    entityModel.getSubjectData(subjectPubkey, signedTx)
+    .then(subjectData => {
+      log.debug(`${controller_name}[${recivePresentationData.name}] -----> Successfully obtained presentation data`);
+      io.emit('getPresentationData', {status: 200,
+                                      message: subjectData})
+      res.status(200).send(subjectData)
+    })
+    .catch(error => {
+      let message = (error == false) ? 'Clave pública no válida' : 'Error obteniendo los datos de la presentación'
+      let msg = {
+        message: `${error}`
+      }
+      log.error(`${controller_name}[${recivePresentationData.name}] -----> Error: ${msg.message}`);
+      io.emit('error', {status: 400,
+                        message: message})
+      res.status(400).send(msg)
+    })
+  }
+  catch(error) {
+    log.error(`${controller_name}[${recivePresentationData.name}] -----> Error: ${error}`);
+      let msg = {
+        message: 'Internal server error'
+      }
+      io.emit('error', {status: 503,
+                        message: msg.message})
+      res.status(503).send(msg)
   }
 }
 

@@ -5,7 +5,7 @@ info:
 # during dev, should point to your local machine
 host: localhost:10010
 # basePath prefixes all resource paths 
-basePath: /alastria/entity
+basePath: /entity
 # 
 schemes:
   # tip: remove http to make production-grade
@@ -163,6 +163,43 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /presentation:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: entity.controller
+    post:
+      description: Get data from a presentation
+      # used as the method name of the controller
+      operationId: recivePresentationData
+      parameters:
+        - name: presentation
+          in: body
+          description: Necessary data to create a new Alastria ID
+          required: false
+          schema: 
+            $ref: "#/definitions/Presentation"
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/PresentationData"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "503":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /user/checkAuth:
     # binds a127 app logic to a route
     x-swagger-router-controller: user.controller
@@ -197,7 +234,7 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
   # END Only for user and login
-  /identity:
+  /alastria/identity:
     # binds a127 app logic to a route
     x-swagger-router-controller: entity.controller
     post:
@@ -234,7 +271,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /identity/serviceProviders:
+  /alastria/identity/serviceProviders:
     # binds a127 app logic to a route
     x-swagger-router-controller: entity.controller
     get:
@@ -263,7 +300,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /identity/issuers:
+  /alastria/identity/issuers:
     # binds a127 app logic to a route
     x-swagger-router-controller: entity.controller
     get:
@@ -292,7 +329,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /identity/{alastriaDID}:
+  /alastria/identity/{alastriaDID}:
     # binds a127 app logic to a route
     x-swagger-router-controller: entity.controller
     get:
@@ -327,7 +364,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /identity/{alastriaDID}/list:
+  /alastria/identity/{alastriaDID}/list:
     # binds a127 app logic to a route
     x-swagger-router-controller: entity.controller
     get:
@@ -362,7 +399,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /credential:
+  /alastria/credential:
     # binds a127 app logic to a route
     x-swagger-router-controller: entity.controller
     get:
@@ -427,7 +464,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /credential/{identityDID}:
+  /alastria/credential/{identityDID}:
     get:
       x-swagger-router-controller: entity.controller
       description: Get all the credentials available for the Subject (IdentityDID) with the status {available, valid, expired}
@@ -461,7 +498,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /credential/status/{credentialHash}:
+  /alastria/credential/status/{credentialHash}:
     get:
       x-swagger-router-controller: entity.controller
       description: get current Issuer or Subject status for the given credential
@@ -546,7 +583,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /presentation:
+  /alastria/presentation:
     # binds a127 app logic to a route
     x-swagger-router-controller: entity.controller
     post:
@@ -584,7 +621,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /presentation/{identityDID}:
+  /alastria/presentation/{identityDID}:
     get:
       x-swagger-router-controller: entity.controller
       description: Get all the presentations available for the user with the status {Valid, Received, AskDeletion, DeletionConfirmation}
@@ -618,7 +655,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /presentation/status/{presentationHash}:
+  /alastria/presentation/status/{presentationHash}:
     get:
       x-swagger-router-controller: entity.controller
       description: get current Subject or Service Provider (Receiver) status for the given presentation
@@ -737,6 +774,16 @@ definitions:
         type: string
       vinculated:
         type: boolean
+  PresentationData:
+    properties:
+      data:
+        type: object
+  Presentation:
+    properties:
+      subjectPublicKey:
+        type: string
+      signedPresentation:
+        type: string
   credential:
     properties:
       header:

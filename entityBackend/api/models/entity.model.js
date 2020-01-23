@@ -103,7 +103,8 @@ module.exports = {
   getpresentationStatus,
   updateReceiverPresentationStatus,
   addSubjectPresentation,
-  getCredentialStatus
+  getCredentialStatus,
+  getSubjectData
 }
 
 /////////////////////////////////////////////////////////
@@ -221,8 +222,8 @@ function getCurrentPublicKey(subject) {
     web3.eth.call(currentPubKey)
       .then(result => {
         log.debug(`${moduleName}[${getCurrentPublicKey.name}] -----> Success`)
-        let publicKey = web3.utils.hexToUtf8(result)
-        resolve(publicKey.substr(1))
+        let pubKey = web3.eth.abi.decodeParameters(['string'], result)
+        resolve(pubKey)
       })
       .catch(error => {
         log.error(`${moduleName}[${getCurrentPublicKey.name}] -----> ${error}`)
@@ -303,5 +304,26 @@ function getCredentialStatus(credentialHash, issuer, subject) {
           reject(error)
         })
     }
-  });
+  })
+}
+
+function getSubjectData(pubkey, presentationSigned) {
+  return new Promise((resolve, reject) => {
+    log.debug(`${moduleName}[${getSubjectData.name}] -----> IN ...`)
+    let verified = tokensFactory.tokens.verifyJWT(presentationSigned, `04${pubkey.substr(2)}`)
+    if (verified == true) {
+      log.debug(`${moduleName}[${getSubjectData.name}] -----> Subject presentation verified`)
+      let presentationData = tokensFactory.tokens.decodeJWT(presentationSigned)
+      if (presentationData.payload) {
+        log.debug(`${moduleName}[${getSubjectData.name}] -----> JWT decoded successfuly`)
+        resolve(presentationData)
+      } else {
+        log.error(`${moduleName}[${getSubjectData.name}] -----> Error decoding JWT`)
+        reject(presentationData)
+      }
+    } else {
+      log.error(`${moduleName}[${getSubjectData.name}] -----> Error verifying JWT`)
+      reject(verified)
+    }
+  })
 }

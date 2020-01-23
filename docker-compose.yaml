@@ -9,8 +9,9 @@ services:
     environment: 
       #- NODE_ENDPOINT=localEndpoint
       - NODE_ENDPOINT=alastria
-    # links:
+    links:
     #   - ganache:ganache  // if you are using local endpoint uncomment this two lines
+      - mongo:mongo
     ports:
       - "10010:10010"
     volumes:
