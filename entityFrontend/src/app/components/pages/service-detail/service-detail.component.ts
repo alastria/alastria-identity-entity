@@ -65,7 +65,7 @@ export class ServiceDetailComponent implements OnInit {
   private initIoConnection(): void {
     this.socketService.initSocket();
 
-    this.subscription.add(this.socketService.onGetDetailUser()
+    this.subscription.add(this.socketService.onGetPresentationData()
       .subscribe((detailUser: any) => {
         this.serviceFormComponent.setValuesForm(detailUser);
       })

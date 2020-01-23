@@ -38,12 +38,8 @@ export class SocketService {
     this.socket.emit('setUpAlastriaId');
   }
 
-  public sendGetDetailUser(): void {
-    this.socket.emit('getDetailUser');
-  }
-
-  public sendNewUser(): void {
-    this.socket.emit('getNewUser');
+  public sendGetPresentationData(): void {
+    this.socket.emit('getPresentationData');
   }
 
   public sendFillYourProfile(): void {
@@ -51,7 +47,9 @@ export class SocketService {
   }
 
   public sendDisconnect(): void {
-    this.socket.close();
+    if (this.socket) {
+      this.socket.close();
+    }
   }
 
   public onMessage(): Observable<any> {
@@ -66,15 +64,9 @@ export class SocketService {
     });
   }
 
-  public onGetNewUser(): Observable<any> {
+  public onGetPresentationData(): Observable<any> {
     return new Observable<any>(observer => {
-        this.socket.on('getNewUser', (data: any) => observer.next(data));
-    });
-  }
-
-  public onGetDetailUser(): Observable<any> {
-    return new Observable<any>(observer => {
-        this.socket.on('getDetailUser', (data: any) => observer.next(data));
+        this.socket.on('getPresentationData', (data: any) => observer.next(data));
     });
   }
 
