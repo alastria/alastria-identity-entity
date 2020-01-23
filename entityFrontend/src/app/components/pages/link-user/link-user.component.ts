@@ -34,6 +34,7 @@ export class LinkUserComponent implements OnInit {
   };
   user: User;
   qrData: any = '';
+  qrSize = 256;
   errorPasswordNewUser: string;
   errorPasswordLogin: string;
   inputsNewUserForm: Array<any> = [
@@ -96,6 +97,12 @@ export class LinkUserComponent implements OnInit {
       required: true
     },
   ];
+  styleButtonAlastriaId = {
+    color: '#00CAD6',
+    backgroundIcon: 'white',
+    colorIcon: 'black'
+  };
+
 
   constructor( private router: Router,
                private userService: UserService,
@@ -147,6 +154,10 @@ export class LinkUserComponent implements OnInit {
         this.errorPasswordLogin = (error && error.message) ? error.message : 'Internal server error';
       }
     }
+  }
+
+  showModalQr() {
+    $('#simpleModal').modal('show');
   }
 
   sendNewUser() {
@@ -205,6 +216,8 @@ export class LinkUserComponent implements OnInit {
       .subscribe((newUser: User) => {
         this.user = newUser;
         this.userFormComponent.setValuesForm(newUser);
+        this.socketService.sendDisconnect();
+        $('#simpleModal').modal('hide');
       })
     );
 

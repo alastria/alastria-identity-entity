@@ -20,17 +20,15 @@
         </div>
       </div>
       <div id="qr-register" class="row justify-content-center">
-        <div class="col-12 col-sm-12 col-md-5 col-lg-4">
-          <app-generate-qr
-            [qrData]="qrData"
-            [size]="128">
-          </app-generate-qr>
-        </div>
-        <div class="col-12 col-sm-12 col-md-7 col-lg-4">
-          <div id="text-qr">
-            <img src="../../../../assets/images/alastria-icon.svg" alt="alastria-icon" (click)="sendNewUser()">
-            <h5>Scan this QR with the Alastria ID app to fill in the form</h5>
-          </div>
+        <div class="col-12">
+          <app-button-login 
+            iconClass="fa fa-google" 
+            title="Click for show qr to fill"
+            socialName="alastriaId"
+            [style]="styleButtonAlastriaId"
+            imgUrl="../../../assets/images/alastria-icon.svg"
+            (handleLoginSocial)="showModalQr($event)">
+          </app-button-login>
         </div>
       </div>
     </div>
@@ -61,4 +59,9 @@
     [description]="resultModal.description"
     (handleOk)="handleResultModalOk()">
   </app-modal-result>
+  <app-simple-modal 
+    [qrSize]="qrSize"
+    [qrData]="qrData" 
+    type="qr"
+    (handleOk)="sendNewUser()"></app-simple-modal>
 </div>
