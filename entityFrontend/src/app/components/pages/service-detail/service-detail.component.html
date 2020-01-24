@@ -14,7 +14,7 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+      <div class="col-12 col-sm-12 col-md-12 col-lg-6">
         <div class="float-right">
           <p>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas sit amet augue ac nunc euismod luctus vel at elit. Donec commodo finibus nisi a bibendum. Nullam mollis ultricies urna a feugiat. Nam elementum eleifend turpis.
@@ -27,7 +27,7 @@
           </p>
         </div>
       </div>
-      <div class="col-12 col-sm-12 col-md-6 col-lg-6" *ngIf="!isContractServiceSuccess">
+      <div class="col-12 col-sm-12 col-md-12 col-lg-6" *ngIf="!isContractServiceSuccess">
         <app-service-form
         (handleSubmit)="handleSubmit()"></app-service-form
           >
@@ -39,4 +39,10 @@
       </div>
     </div>
   </div>
+  <app-modal-result
+    [type]="resultModal.type"
+    [title]="resultModal.title"
+    [description]="resultModal.description"
+    (handleOk)="handleResultModalOk()">
+  </app-modal-result>
 </div>

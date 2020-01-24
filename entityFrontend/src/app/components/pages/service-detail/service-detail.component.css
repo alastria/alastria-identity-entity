@@ -37,3 +37,10 @@ img {
 #success-icon {
     height: 134px;
 }
+
+@media only screen and (max-width: 991px) {
+    .float-right {
+        width: 100%;
+        text-align: center;
+    }
+}

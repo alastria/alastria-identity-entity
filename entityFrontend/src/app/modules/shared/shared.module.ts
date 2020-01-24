@@ -2,17 +2,21 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { QRCodeModule } from 'angularx-qrcode';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AngularFontAwesomeModule } from 'angular-font-awesome';
 
 import { ButtonLoginComponent } from 'src/app/components/common/button-login/button-login.component';
 import { SimpleModalComponent } from 'src/app/components/common/simple-modal/simple-modal.component';
 import { UserFormComponent } from 'src/app/components/common/user-form/user-form.component';
-import { AngularFontAwesomeModule } from 'angular-font-awesome';
+import { GenerateQrComponent } from 'src/app/components/common/generate-qr/generate-qr.component';
+import { ModalResultComponent } from 'src/app/components/common/modal-result/modal-result.component';
 
 @NgModule({
   declarations: [
     ButtonLoginComponent,
     SimpleModalComponent,
-    UserFormComponent
+    UserFormComponent,
+    GenerateQrComponent,
+    ModalResultComponent
   ],
   imports: [
     CommonModule,
@@ -25,10 +29,12 @@ import { AngularFontAwesomeModule } from 'angular-font-awesome';
     ButtonLoginComponent,
     SimpleModalComponent,
     UserFormComponent,
+    GenerateQrComponent,
     FormsModule,
     ReactiveFormsModule,
     AngularFontAwesomeModule,
-    QRCodeModule
+    QRCodeModule,
+    ModalResultComponent
   ]
 })
 export class SharedModule { }

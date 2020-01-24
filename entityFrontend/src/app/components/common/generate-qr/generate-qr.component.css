@@ -1,15 +1,16 @@
-fa {
+#qrDiv {
     position: relative;
-    float: right;
-    margin-left: 5px;
-    cursor: pointer;
-    font-size: x-large;
+    top: 20px;
 }
 
-h3, fa {
-    color: #325B8E;
-}
-
-#icons {
+#border {
     margin: auto;
+    position: absolute;
+    border: 40px solid transparent;
+    padding: 15px;
+    border-image: url(../../../../assets/images/Vector.svg) 130 round;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
 }

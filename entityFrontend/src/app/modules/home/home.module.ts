@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { SharedModule } from '../shared/shared.module';
 
 // COMPONENTS
 import { MenuCardComponent } from './../../components/common/menu-card/menu-card.component';
@@ -9,7 +10,6 @@ import { ServiceFormComponent } from 'src/app/components/common/service-form/ser
 
 // SERVICES
 import { HomeService } from './../../services/home/home.service';
-import { SharedModule } from '../shared/shared.module';
 
 @NgModule({
   declarations: [

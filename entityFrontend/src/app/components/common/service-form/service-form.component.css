@@ -1,10 +1,11 @@
 p {
     text-align: justify;
     font-weight: bold;
+    margin-top: 15px;
 }
 
 form {
-    margin-top: 30px;
+    margin-top: 50px;
     text-align: left;
 }
 
@@ -23,4 +24,14 @@ button:active:not(:disabled) {
     border-color: #325B8E;
     background-color: #325B8E;
     color: white;
+}
+
+@media only screen and (max-width: 574px) {
+    #generate-qr {
+        margin-bottom: 40px;
+    }
+
+    .container > div.row {
+        margin-bottom: 100px;
+    }
 }

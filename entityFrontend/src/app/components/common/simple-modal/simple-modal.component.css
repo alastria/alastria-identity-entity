@@ -1,6 +1,5 @@
 .modal-body > div#qr {
-    margin: auto !important;
-    width: 50%;
+    margin-bottom: 40px;
 }
 
 h5 {

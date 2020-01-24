@@ -1,3 +1,4 @@
+import { Subscription } from 'rxjs';
 import { environment } from './../../../../environments/environment';
 import { Identity } from './../../../models/identity/identity.model';
 import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
@@ -14,6 +15,7 @@ import { EntityService } from 'src/app/services/entity/entity.service';
 // MODELS
 import { User } from 'src/app/models/user/user.model';
 import { Event } from 'src/app/models/enums/enums.model';
+import { ResultModal } from './../../../models/result-modal/result-modal';
 
 declare var $: any;
 
@@ -33,17 +35,18 @@ declare var $: any;
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
+  private subscription: Subscription = new Subscription();
   @ViewChild(CreateAlastriaIdComponent) createAlastriaIdComponent: CreateAlastriaIdComponent;
   @ViewChild(UserFormComponent) userFormComponent: UserFormComponent;
   user: User;
   qrAlastriaId: string;
   qrCredentials: any;
   optionsMenu = ['Edit profile', 'Reset password', 'Alastria ID'];
-  htmlSuccess = `
-      <img width="50%" src="../../../../assets/images/success-icon.svg" alt="Success icon">
-      <h1> Congratulations! </h1>
-      <p> Your Alastria ID has been created. Start to fill you new AlastriaID </p>
-  `;
+  resultModal: ResultModal = {
+    type: 'success',
+    title: '',
+    description: ''
+  };
   styleButtonAlastriaId = {
     color: '#00CAD6',
     backgroundIcon: 'white',
@@ -122,6 +125,7 @@ export class ProfileComponent implements OnInit {
     };
     this.changeDetector.detectChanges();
     this.createAlastriaIdComponent.createOrSetUpAlastriaId();
+    this.initIoConnection();
   }
 
   handleSetUpAlastriaId() {
@@ -134,6 +138,7 @@ export class ProfileComponent implements OnInit {
     };
     this.changeDetector.detectChanges();
     this.createAlastriaIdComponent.createOrSetUpAlastriaId();
+    this.initIoConnection();
   }
 
   /**
@@ -161,14 +166,18 @@ export class ProfileComponent implements OnInit {
    */
   handleOk(): void {
     $('#simpleModal').modal('hide');
+  }
+
+  /**
+   * When click in 'ok' in simple modal then active this function that hide
+   * the modal and check alastria id is verified
+   */
+  handleResultModalOk(): void {
+    $('#modal-result').modal('hide');
     this.qrAlastriaId = null;
     this.isCreateAlastriaId = false;
     this.checkAlastriaIdIsVerified();
     this.addOptionInMenu();
-  }
-
-  handleOkFillProfile(): void {
-    $('#simpleModal').modal('hide');
   }
 
   /**
@@ -182,6 +191,10 @@ export class ProfileComponent implements OnInit {
     this.editProfile();
   }
 
+  handleOkFillYourProfile() {
+    this.socketService.sendFillYourProfile();
+  }
+
   /**
    * Handle when click in fill your profile button of modal form then
    * hide modalFillProfile and show simple modal with qr
@@ -190,6 +203,7 @@ export class ProfileComponent implements OnInit {
   async handleFillYourProfile(profileFields: Array<string>) {
     await $('#modalFillProfile').modal('hide');
     this.qrDataFillProfile = JSON.stringify(profileFields);
+    this.initIoConnection();
     $('#simpleModal').modal('show');
   }
 
@@ -223,8 +237,9 @@ export class ProfileComponent implements OnInit {
   private initIoConnection(): void {
     this.socketService.initSocket();
 
-    this.socketService.onCreateIdentity()
+    this.subscription.add(this.socketService.onCreateIdentity()
       .subscribe((message: any) => {
+        this.socketService.sendDisconnect();
         const identity: Identity = {
           signedTX: message,
           address: ''
@@ -238,7 +253,12 @@ export class ProfileComponent implements OnInit {
               userChange.proxyAddress = result.proxyAddress;
               userChange.did = result.did;
               this.userService.setUserLoggedIn(userChange);
-              $('#simpleModal').modal('show');
+              this.resultModal = {
+                type: 'success',
+                title: 'Congratulations!',
+                description: 'Your Alastria ID has been created. Start to fill you new AlastriaID'
+              };
+              $('#modal-result').modal('show');
             } else {
               this.userService.setIsAlastriaIdVerified(true);
             }
@@ -246,28 +266,64 @@ export class ProfileComponent implements OnInit {
         .catch((error: any) => {
           console.error(error);
         });
-      });
+      })
+    );
 
-    this.socketService.onSetUpAlastriaId()
+    this.subscription.add(this.socketService.onSetUpAlastriaId()
       .subscribe(() => {
-        console.log('Set up');
-        this.htmlSuccess = `
-          <img width="50%" src="../../../../assets/images/success-icon.svg" alt="Success icon">
-          <h1> Congratulations! </h1>
-          <p> Your AlastriaID has been linked to your ${environment.entityName} profile. Now you can login next times with your AlastriaID </p>
-        `;
-        $('#simpleModal').modal('show');
+        this.socketService.sendDisconnect();
+        this.resultModal = {
+          type: 'success',
+          title: 'Congratulations!',
+          description: `Your AlastriaID has been linked to your ${environment.entityName} profile. Now you can login next times with your AlastriaID`
+        };
+        $('#modal-result').modal('show');
         this.userService.setIsAlastriaIdVerified(true);
-      });
+      })
+    );
 
-    this.socketService.onEvent(Event.CONNECT)
+    this.subscription.add(this.socketService.onFillYourProfile()
+      .subscribe(() => {
+        this.socketService.sendDisconnect();
+        $('#simpleModal').modal('hide');
+        this.resultModal = {
+          type: 'success',
+          title: 'Success!',
+          description: 'Now use your Alastria ID wherever you want and keep the control of your information'
+        };
+        $('#modal-result').modal('show');
+      })
+    );
+
+    this.subscription.add(this.socketService.onError()
+      .subscribe((error: any) => {
+        this.socketService.sendDisconnect();
+        $('#simpleModal').modal('hide');
+        this.resultModal = {
+          type: 'error',
+          title: `Error! - error.status`,
+          description: error.message
+        };
+        $('#modal-result').modal('show');
+      })
+    );
+
+    this.subscription.add(this.socketService.onEvent(Event.CONNECT)
       .subscribe(() => {
         console.log('connected - websocket');
-      });
+      })
+    );
 
-    this.socketService.onEvent(Event.DISCONNECT)
+    this.subscription.add(this.socketService.onEvent(Event.DISCONNECT)
       .subscribe(() => {
         console.log('disconnected - websocket');
-      });
+      })
+    );
+  }
+
+  // tslint:disable-next-line: use-life-cycle-interface
+  ngOnDestroy() {
+    this.socketService.sendDisconnect();
+    this.subscription.unsubscribe();
   }
 }

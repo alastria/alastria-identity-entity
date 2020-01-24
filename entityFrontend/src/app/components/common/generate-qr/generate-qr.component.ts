@@ -1,11 +1,17 @@
 import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import {style, animate, transition, trigger} from '@angular/animations';
-import { CreateAlastriaIdComponent } from '../create-alastria-id/create-alastria-id.component';
 
 @Component({
   selector: 'app-generate-qr',
   templateUrl: './generate-qr.component.html',
   styleUrls: ['./generate-qr.component.css'],
+  styles: [
+    `
+    :host ::ng-deep qrcode > img{
+      margin: auto;
+    }
+    `
+  ],
   animations: [
     trigger('fadeInOut', [
       transition(':enter', [   // :enter is alias to 'void => *'
@@ -22,21 +28,10 @@ export class GenerateQrComponent implements OnInit {
     @Input() qrData: any;
     @Input() size = 256;
     @Input() level = 'M';
-    @Output() handleGenerateQr = new EventEmitter();
-    @Output() handleCloseQr = new EventEmitter();
 
-    titleStyle: string;
   constructor() { }
 
   ngOnInit() {
-  }
-
-  generateQr(): void {
-    this.handleGenerateQr.emit();
-  }
-
-  closeQr(): void {
-    this.handleCloseQr.emit();
   }
 
 }

@@ -25,6 +25,11 @@ export class SocketService {
     this.socket = socketIo(SERVER_URL);
   }
 
+  public sendLogin(): void {
+    this.socket.emit('login');
+  }
+
+
   public sendCreate(message: any): void {
     this.socket.emit('createIdentity', message);
   }
@@ -33,14 +38,34 @@ export class SocketService {
     this.socket.emit('setUpAlastriaId');
   }
 
-  public sendServiceForm(): void {
-    this.socket.emit('setServiceFormValues');
+  public sendGetPresentationData(): void {
+    this.socket.emit('getPresentationData');
+  }
+
+  public sendFillYourProfile(): void {
+    this.socket.emit('fillYourProfile');
+  }
+
+  public sendDisconnect(): void {
+    this.socket.close();
   }
 
   public onMessage(): Observable<any> {
       return new Observable<any>(observer => {
           this.socket.on('message', (data: any) => observer.next(data));
       });
+  }
+
+  public onLogin(): Observable<any> {
+    return new Observable<any>(observer => {
+        this.socket.on('login', (data: any) => observer.next(data));
+    });
+  }
+
+  public onGetPresentationData(): Observable<any> {
+    return new Observable<any>(observer => {
+        this.socket.on('getPresentationData', (data: any) => observer.next(data));
+    });
   }
 
   public onCreateIdentity(): Observable<any> {
@@ -55,9 +80,15 @@ export class SocketService {
     });
   }
 
-  public onSetServiceFormValues(): Observable<any> {
+  public onFillYourProfile(): Observable<any> {
     return new Observable<any>(observer => {
-        this.socket.on('setServiceFormValues', (data: any) => observer.next(data));
+        this.socket.on('fillYourProfile', (data: any) => observer.next(data));
+    });
+  }
+
+  public onError(): Observable<any> {
+    return new Observable<any>(observer => {
+        this.socket.on('onError', (data: any) => observer.next(data));
     });
   }
 
