@@ -105,7 +105,8 @@ module.exports = {
   getpresentationStatus,
   updateReceiverPresentationStatus,
   addSubjectPresentation,
-  getCredentialStatus
+  getCredentialStatus,
+  createAlastriaToken
 }
 
 /////////////////////////////////////////////////////////
@@ -306,4 +307,20 @@ function getCredentialStatus(credentialHash, issuer, subject) {
         })
     }
   });
+}
+
+function createAlastriaToken(at) {
+  log.debug(`${moduleName}[${createAlastriaToken.name}] -----> IN ...`)
+
+  let issuerPrivateKey
+  try {
+    issuerPrivateKey = keythereum.recover(myConfig.addressPassword, myConfig.issuerKeystore)
+  } catch (error) {
+    log.error(`${moduleName}[${createAlastriaToken.name}] -----> Culdnt get the issuers private key`)
+  }
+  let alastriaToken = tokensFactory.tokens.createAlastriaToken(at.didIsssuer, at.providerURL, at.callbackURL, 
+    at.alastriaNetId, at.tokenExpTime, at.tokenActivationDate, at.jsonTokenId)
+  let signedAT = tokensFactory.tokens.signJWT(alastriaToken, issuerPrivateKey)
+  log.debug(`${moduleName}[${createAlastriaToken.name}] -----> Success`)
+  return signedAT
 }
