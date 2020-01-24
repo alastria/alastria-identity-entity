@@ -39,6 +39,14 @@ export class LinkUserComponent implements OnInit {
       name: 'fullname',
       value: 'fullname',
       icon: 'user',
+      required: false
+    },
+    {
+      label: 'Username',
+      type: 'text',
+      name: 'username',
+      value: 'username',
+      icon: 'user',
       required: true
     },
     {
@@ -113,6 +121,7 @@ export class LinkUserComponent implements OnInit {
 
     // TODO: llamada al servidor para vincular el usuario
     try {
+      const userRegisterResult = await this.userService.createUser(userRegister);
       await this.login(userRegister);
     } catch (error) {
       if (error && error.status === 403) {

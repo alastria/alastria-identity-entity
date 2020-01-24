@@ -64,8 +64,8 @@ declare var $: any;
   async onSubmit(): Promise<any> {
     try {
       this.errorLogin = '';
-      const user: User = {
-        name: this.formLogin.get('name').value,
+      const user = {
+        username: this.formLogin.get('name').value,
         password: this.formLogin.get('password').value
       };
 

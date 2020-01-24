@@ -47,7 +47,9 @@ export class SocketService {
   }
 
   public sendDisconnect(): void {
-    this.socket.close();
+    if (this.socket) {
+      this.socket.close();
+    }
   }
 
   public onMessage(): Observable<any> {

@@ -13,7 +13,7 @@ import { ServiceDetailComponent } from './components/pages/service-detail/servic
 
 const APP_ROUTES: Routes = [
   { path: 'login', component: LoginComponent,  pathMatch: 'full'},
-  { path: 'vinculate', component: LinkUserComponent,  pathMatch: 'full', canActivate: [ AuthGuardService ]},
+  { path: 'vinculate', component: LinkUserComponent,  pathMatch: 'full'},
   { path: 'home', component: HomeComponent,  pathMatch: 'full', canActivate: [ AuthGuardService ]},
   { path: 'service/:id', component: ServiceDetailComponent, pathMatch: 'full', canActivate: [ AuthGuardService ]},
   { path: 'profile', component: ProfileComponent,  pathMatch: 'full', canActivate: [ AuthGuardService ]},
