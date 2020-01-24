@@ -11,7 +11,10 @@
     "alastria-identity-lib": "github:alastria/alastria-identity-lib#develop",
     "cors": "2.8.3",
     "express": "4.12.3",
+    "jsonwebtoken": "^8.5.1",
     "log4js": "6.1.0",
+    "mongodb": "^3.5.1",
+    "socket.io": "^2.3.0",
     "swagger-express-mw": "0.1.0"
   },
   "devDependencies": {
