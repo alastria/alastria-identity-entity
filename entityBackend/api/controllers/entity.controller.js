@@ -23,7 +23,8 @@ module.exports = {
   getpresentationStatus,
   updateReceiverPresentationStatus,
   addSubjectPresentation,
-  getCredentialStatus
+  getCredentialStatus,
+  createAlastriaToken
 }
 
 /////////////////////////////////////////////////////////
@@ -235,3 +236,19 @@ function getCredentialStatus(req, res){
   }
 }
 
+function createAlastriaToken(req, res) {
+  try {
+    log.debug(`${controller_name}[${createAlastriaToken.name}] -----> IN ...`)
+    let params = req.swagger.params.body.value
+    log.debug(`${controller_name}[${createAlastriaToken.name}] -----> Sending params: ${JSON.stringify(params)}`)
+    let signedAT = entityModel.createAlastriaToken(params)
+    log.debug(`${controller_name}[${createAlastriaToken.name}] -----> Successfully created Alastria Token`)
+    res.status(200).send({"signedAT": signedAT})
+  } catch (error) {
+    log.error(`${controller_name}[${createAlastriaToken.name}] -----> ${error}`)
+    let msg = {
+      message: `Unauthorized: ${error}`
+    }
+    res.status(401).send(msg)
+  }
+}

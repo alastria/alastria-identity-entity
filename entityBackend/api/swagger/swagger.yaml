@@ -528,6 +528,31 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /createAlastriaToken:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: entity.controller
+    post:
+      description: Creates an Alastria Token
+      operationId: createAlastriaToken
+      parameters:
+        - name: body
+          in: body
+          description: Necessary data to create the Alastria Token
+          required: true
+          schema: 
+            $ref: "#/definitions/createAlastriaTokenData"  
+      produces:
+        - text/html          
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/createAlastriaTokenResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"    
   /swagger:
     x-swagger-pipe: swagger_raw
 # complex objects have schema definitions
@@ -614,4 +639,26 @@ definitions:
       "subject":
         type: string
         example: "0xde7ab34219563ac50ccc7b51d23b9a61d22a383e"
+  createAlastriaTokenResponse:
+    properties:
+      signedAT:
+        type: string     
+  createAlastriaTokenData:
+    required: [didIsssuer, providerURL, callbackURL, alastriaNetId, tokenExpTime, tokenActivationDate, jsonTokenId]
+    properties:
+      didIsssuer:
+        type: string
+      providerURL:
+        type: string
+      callbackURL:
+        type: string
+      alastriaNetId:
+        type: string
+      tokenExpTime:
+        type: integer
+      tokenActivationDate:
+        type: integer
+      jsonTokenId:
+        type: string                                
+  
 
