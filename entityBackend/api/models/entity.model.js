@@ -116,7 +116,8 @@ module.exports = {
 function createAlastriaID(params) {
   return new Promise((resolve, reject) => {
     log.debug(`${moduleName}[${createAlastriaID.name}] -----> IN ...`)
-    let signedCreateTransaction = params.signedTX
+    let decodedAIC = tokensFactory.tokens.decodeJWT(params.signedAIC)
+    let signedCreateTransaction = decodedAIC.payload.createAlastriaTX
     let preparedId = preparedAlastriaId()
     issuerGetKnownTransaction(preparedId)
       .then(signedPreparedTransaction => {
