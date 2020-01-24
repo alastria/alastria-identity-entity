@@ -13,7 +13,7 @@ import { environment } from '../../../environments/environment';
 export class EntityService {
 
   apiUrl = environment.apiUrl;
-  path = 'alastria/entity';
+  path = 'entity/alastria';
 
   constructor(private http: HttpClient) { }
 
