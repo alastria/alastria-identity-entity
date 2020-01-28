@@ -26,7 +26,7 @@ module.exports = {
   updateReceiverPresentationStatus,
   addSubjectPresentation,
   getCredentialStatus,
-  recivePresentationData
+  recivePresentationData,
   createAlastriaToken
 }
 
