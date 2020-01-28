@@ -110,7 +110,7 @@ declare var $: any;
    */
   async onLogin(): Promise<any> {
     try {
-      const user: User = {
+      const user = {
         name: 'Samuel',
         password: 'test'
       };

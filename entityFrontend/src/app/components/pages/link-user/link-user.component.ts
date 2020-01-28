@@ -107,6 +107,7 @@ export class LinkUserComponent implements OnInit {
 
   ngOnInit() {
     this.user = {
+      id: '',
       name: '',
       email: '',
       surname: '',

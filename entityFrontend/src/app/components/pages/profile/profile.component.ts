@@ -60,8 +60,8 @@ export class ProfileComponent implements OnInit {
     {
       label: 'Full name',
       type: 'text',
-      name: 'fullName',
-      value: 'fullName',
+      name: 'fullname',
+      value: 'fullname',
       icon: 'user'
     },
     {
@@ -99,7 +99,7 @@ export class ProfileComponent implements OnInit {
   handleSelectOption(option: string): void {
     switch (option) {
       case this.optionsMenu[0]:
-        this.editProfile();
+        this.userFormComponent.toggleFormState();
         break;
       case this.optionsMenu[1]:
         this.resetPassword();
@@ -182,13 +182,15 @@ export class ProfileComponent implements OnInit {
 
   /**
    * handle when click in 'save' of edit profile then set user from
-   * userService and call editProfile()
+   * userService
    * @param user - new data of user for change
    */
-  handleEditProfile(user: User): void {
-    this.userService.setUserLoggedIn(user);
+  async handleEditProfile(user: User): Promise<any> {
+    const userResult = await this.userService.updateUser(user);
+    userResult.authToken = this.user.authToken;
+    this.userService.setUserLoggedIn(userResult);
     this.user = this.userService.getUserLoggedIn();
-    this.editProfile();
+    this.userFormComponent.toggleFormState();
   }
 
   handleOkFillYourProfile() {
@@ -207,7 +209,7 @@ export class ProfileComponent implements OnInit {
     $('#simpleModal').modal('show');
   }
 
- private checkAlastriaIdIsVerified() {
+  private checkAlastriaIdIsVerified() {
     this.isAlastriaVerified = this.userService.getIsAlastriaIdVerified();
   }
 
@@ -217,10 +219,6 @@ export class ProfileComponent implements OnInit {
       this.optionsMenu.splice(this.optionsMenu.length - 1, 1);
       this.optionsMenu.push(titleOption);
     }
-  }
-
-  private editProfile(): void {
-    this.userFormComponent.toggleFormState();
   }
 
   private resetPassword(): void {
