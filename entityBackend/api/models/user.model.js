@@ -86,6 +86,8 @@ function login(params){
           userdata: {
             id: found._id,
             username: found.username,
+            name: found.name,
+            surname: found.surname,
             email: found.email,
             address: found.address,
             vinculated: (found.vinculated == null) ? false : found.vinculated
