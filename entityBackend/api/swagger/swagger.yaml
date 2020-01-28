@@ -752,7 +752,7 @@ definitions:
         type: boolean
   userTokenAccess:
     properties:
-      authTtoken:
+      authtoken:
         type: object
   userInfo:
     properties:

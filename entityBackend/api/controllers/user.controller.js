@@ -44,10 +44,10 @@ function login(req, res) {
         }
         io.emit('error', {status: 401,
                           message: msg.message})
-        res.status(200).send(msg)
+        res.status(401).send(msg)
       } else {
         io.emit('login', authenticated)
-        res.status(401).send(authenticated)
+        res.status(200).send(authenticated)
       }
     })
     .catch(error => {
