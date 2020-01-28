@@ -5,7 +5,7 @@
 /////////////////////////////////////////////////////////
 
 const Log = require('log4js')
-const entityModel = require('../models/entity.model')
+const entityService = require('../../services/entity.service')
 const configHelper = require('../helpers/config.helper')
 const myConfig = configHelper.getConfig()
 const wsHelper = require('../helpers/ws.helper')
@@ -38,7 +38,7 @@ function createAlastriaID(req, res) {
     log.debug(`${controller_name}[${createAlastriaID.name}] -----> IN ...`)
     let params = req.swagger.params.body.value
     log.debug(`${controller_name}[${createAlastriaID.name}] -----> Sending params: ${JSON.stringify(params)}`)
-    entityModel.createAlastriaID(params)
+    entityService.createAlastriaID(params)
     .then(alastriaID => {
       if (alastriaID) {
         log.debug(`${controller_name}[${createAlastriaID.name}] -----> Successfully created new AlastriaId`)
@@ -79,7 +79,7 @@ function addIssuerCredential(req, res) {
     log.debug(`${controller_name}[${addIssuerCredential.name}] -----> IN ...`)
     let params = req.swagger.params.body.value
     log.debug(`${controller_name}[${addIssuerCredential.name}] -----> Sending params: ${JSON.stringify(params)}`)
-    entityModel.addIssuerCredential(params)
+    entityService.addIssuerCredential(params)
     .then(addSubjectPres => {
       log.debug(`${controller_name}[${addIssuerCredential.name}] -----> Successfully added credential: ${JSON.stringify(addSubjectPres)}`)
       res.status(200).send(addSubjectPres)
@@ -106,7 +106,7 @@ function addSubjectPresentation(req, res) {
     log.debug(`${controller_name}[${addSubjectPresentation.name}] -----> IN ...`)
     let params = req.swagger.params.body.value
     log.debug(`${controller_name}[${addSubjectPresentation.name}] -----> Sending params: ${JSON.stringify(params)}`)
-    entityModel.addSubjectPresentation(params)
+    entityService.addSubjectPresentation(params)
     .then(addSubjectPres => {
       log.debug(`${controller_name}[${addSubjectPresentation.name}] -----> Successfully added subject presentation: ${JSON.stringify(addSubjectPres)}`)
       res.status(200).send(addSubjectPres)
@@ -133,7 +133,7 @@ function getCurrentPublicKey(req, res) {
     log.debug(`${controller_name}[${getCurrentPublicKey.name}] -----> IN ...`)
     let alastriaId = req.swagger.params.alastriaDID.value
     log.debug(`${controller_name}[${getCurrentPublicKey.name}] -----> Sending params: ${JSON.stringify(alastriaId)}`)
-    entityModel.getCurrentPublicKey(alastriaId)
+    entityService.getCurrentPublicKey(alastriaId)
     .then(publickey => {
       if (publickey) {
         log.debug(`${controller_name}[${getCurrentPublicKey.name}] -----> Successfully obtained Public Key: ${publickey}`)
@@ -169,7 +169,7 @@ function getpresentationStatus(req, res){
     log.debug(`${controller_name}[${getpresentationStatus.name}] -----> Sending params: ${JSON.stringify(presentationHash)}`)
     let issuer = req.swagger.params.serviceProvider.value;
     let subject = req.swagger.params.subject.value;
-    entityModel.getpresentationStatus(presentationHash,issuer,subject)
+    entityService.getpresentationStatus(presentationHash,issuer,subject)
       .then(presentationStatus => { 
         if (presentationStatus != null){
           log.debug(`${controller_name}[${getpresentationStatus.name}] -----> Successfully obtained presentation status: ${presentationStatus}`);
@@ -199,7 +199,7 @@ function updateReceiverPresentationStatus(req, res){
     let presentationHash = req.swagger.params.presentationHash.value;
     log.debug(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> Sending params: ${JSON.stringify(presentationHash)}`)
     let newStatus = req.swagger.params.body.value;    
-    entityModel.updateReceiverPresentationStatus(presentationHash,newStatus)
+    entityService.updateReceiverPresentationStatus(presentationHash,newStatus)
       .then(() => { 
         log.debug(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> Successfully updated status presentation`);
         res.status(200).send();
@@ -222,7 +222,7 @@ function getCredentialStatus(req, res){
     let issuer = req.swagger.params.issuer.value;
     let subject = req.swagger.params.subject.value;
     log.debug(`${controller_name}[${getCredentialStatus.name}] -----> Sending params: ${JSON.stringify(credentialHash, issuer, subject)}`)
-    entityModel.getCredentialStatus(credentialHash, issuer, subject)
+    entityService.getCredentialStatus(credentialHash, issuer, subject)
       .then(credentialStatus => { 
         log.debug(`${controller_name}[${getCredentialStatus.name}] -----> Successfully obtained presentation status: ${JSON.stringify(credentialStatus)}`)
         if (credentialStatus.exists == true){
@@ -257,7 +257,7 @@ function recivePresentationData(req, res) {
     let signedTx = req.swagger.params.presentation.value.signedPresentation
     let subjectPubkey = req.swagger.params.presentation.value.subjectPublicKey
     log.debug(`${controller_name}[${recivePresentationData.name}] -----> Sending params: ${JSON.stringify(req.swagger.params.presentation.value)}`)
-    entityModel.getSubjectData(subjectPubkey, signedTx)
+    entityService.getSubjectData(subjectPubkey, signedTx)
     .then(subjectData => {
       log.debug(`${controller_name}[${recivePresentationData.name}] -----> Successfully obtained presentation data`);
       io.emit('getPresentationData', {status: 200,

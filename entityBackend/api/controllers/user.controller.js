@@ -47,7 +47,7 @@ function login(req, res) {
         res.status(200).send(msg)
       } else {
         io.emit('login', authenticated)
-        res.status(200).send(authenticated)
+        res.status(401).send(authenticated)
       }
     })
     .catch(error => {

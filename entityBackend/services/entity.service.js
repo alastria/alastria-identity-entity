@@ -7,9 +7,9 @@
 const { transactionFactory, UserIdentity, config, tokensFactory } = require('alastria-identity-lib')
 const Log = require('log4js')
 const keythereum = require('keythereum')
-const configHelper = require('../helpers/config.helper')
+const configHelper = require('../api/helpers/config.helper')
 const myConfig = configHelper.getConfig()
-const web3Helper = require('../helpers/web3.helper')
+const web3Helper = require('../api/helpers/web3.helper')
 const moduleName = '[Entity Model]'
 const web3 = web3Helper.getWeb3()
 const log = Log.getLogger()
@@ -17,25 +17,10 @@ log.level = myConfig.Log.level
 
 let issuerKeystore = myConfig.issuerKeystore
 let issuerIdentity, issuerPrivateKey
-let subjectKeystore = myConfig.subjectKeystore
-let subjectIdentity, subjectPrivateKey
 
 /////////////////////////////////////////////////////////
 ///////             PRIVATE FUNCTIONS             ///////
 /////////////////////////////////////////////////////////
-
-function getSubjectIdentity() {
-  try {
-    log.debug(`${moduleName}[${getSubjectIdentity.name}] -----> IN ...`)
-    subjectPrivateKey = keythereum.recover(myConfig.addressPassword, subjectKeystore)
-    subjectIdentity = new UserIdentity(web3, `0x${subjectKeystore.address}`, subjectPrivateKey)
-    log.debug(`${moduleName}[${getSubjectIdentity.name}] -----> Subject Getted`)
-    return subjectIdentity
-  } catch (error) {
-    log.error(`${moduleName}[${getSubjectIdentity.name}] -----> ${error}`)
-    return error
-  }
-}
 
 function getIssuerIdentity() {
   try {
@@ -54,16 +39,16 @@ function sendSigned(transactionSigned) {
   return new Promise((resolve, reject) => {
     log.debug(`${moduleName}[${sendSigned.name}] -----> IN ...`)
     web3.eth.sendSignedTransaction(transactionSigned)
-      .on('transactionHash', function (hash) {
-        log.debug(`${moduleName}[${sendSigned.name}] -----> HASH: ${hash} ...`)
-      })
-      .on('receipt', receipt => {
-        resolve(receipt)
-      })
-      .on('error', error => {
-        log.error(`${moduleName}[${sendSigned.name}] -----> ${error}`)
-        reject(error)
-      });
+    .on('transactionHash', function (hash) {
+      log.debug(`${moduleName}[${sendSigned.name}] -----> HASH: ${hash}`)
+    })
+    .on('receipt', receipt => {
+      resolve(receipt)
+    })
+    .on('error', error => {
+      log.error(`${moduleName}[${sendSigned.name}] -----> ${error}`)
+      reject(error)
+    });
   })
 }
 
@@ -71,9 +56,9 @@ function subjectGetKnownTransaction(subjectCredential) {
   return new Promise((resolve, reject) => {
     let subjectID = getSubjectIdentity()
     subjectID.getKnownTransaction(subjectCredential)
-      .then(receipt => {
-        resolve(receipt)
-      })
+    .then(receipt => {
+      resolve(receipt)
+    })
   })
 }
 
@@ -81,14 +66,14 @@ function issuerGetKnownTransaction(issuerCredential) {
   return new Promise((resolve, reject) => {
     let issuerID = getIssuerIdentity()
     issuerID.getKnownTransaction(issuerCredential)
-      .then(receipt => {
-        resolve(receipt)
-      })
+    .then(receipt => {
+      resolve(receipt)
+    })
   })
 }
 
-function preparedAlastriaId() {
-  let preparedId = transactionFactory.identityManager.prepareAlastriaID(web3, subjectKeystore.address)
+function preparedAlastriaId(subjectAddress) {
+  let preparedId = transactionFactory.identityManager.prepareAlastriaID(web3, subjectAddress)
   return preparedId
 }
 
@@ -114,41 +99,42 @@ module.exports = {
 function createAlastriaID(params) {
   return new Promise((resolve, reject) => {
     log.debug(`${moduleName}[${createAlastriaID.name}] -----> IN ...`)
+    let subjectAddress = params.address
     let signedCreateTransaction = params.signedTX
-    let preparedId = preparedAlastriaId()
+    let preparedId = preparedAlastriaId(subjectAddress)
     issuerGetKnownTransaction(preparedId)
-      .then(signedPreparedTransaction => {
-        sendSigned(signedPreparedTransaction)
-          .then(prepareSendSigned => {
-            sendSigned(signedCreateTransaction)
-              .then(createSendSigned => {
-                web3.eth.call({
-                  to: config.alastriaIdentityManager,
-                  data: web3.eth.abi.encodeFunctionCall(config.contractsAbi['AlastriaIdentityManager']['identityKeys'], [issuerKeystore.address])
-                })
-                  .then(AlastriaIdentity => {
-                    let alastriaDID = tokensFactory.tokens.createDID('quor', AlastriaIdentity.slice(26));
-                    let objectIdentity = {
-                      proxyAddress: `0x${AlastriaIdentity.slice(26)}`,
-                      did: alastriaDID
-                    }
-                    resolve(objectIdentity)
-                  })
-                  .catch(error => {
-                    log.error(`${moduleName}[${createAlastriaID.name}] -----> ${error}`)
-                    reject(error)
-                  })
-              })
-              .catch(error => {
-                log.error(`${moduleName}[${createAlastriaID.name}] -----> ${error}`)
-                reject(error)
-              })
+    .then(signedPreparedTransaction => {
+      sendSigned(signedPreparedTransaction)
+      .then(prepareSendSigned => {
+        sendSigned(signedCreateTransaction)
+        .then(createSendSigned => {
+          web3.eth.call({
+            to: config.alastriaIdentityManager,
+            data: web3.eth.abi.encodeFunctionCall(config.contractsAbi['AlastriaIdentityManager']['identityKeys'], [issuerKeystore.address])
+          })
+          .then(AlastriaIdentity => {
+            let alastriaDID = tokensFactory.tokens.createDID('quor', AlastriaIdentity.slice(26));
+            let objectIdentity = {
+              proxyAddress: `0x${AlastriaIdentity.slice(26)}`,
+              did: alastriaDID
+            }
+            resolve(objectIdentity)
           })
           .catch(error => {
             log.error(`${moduleName}[${createAlastriaID.name}] -----> ${error}`)
             reject(error)
           })
+        })
+        .catch(error => {
+          log.error(`${moduleName}[${createAlastriaID.name}] -----> ${error}`)
+          reject(error)
+        })
       })
+      .catch(error => {
+        log.error(`${moduleName}[${createAlastriaID.name}] -----> ${error}`)
+        reject(error)
+      })
+    })
   })
 }
 

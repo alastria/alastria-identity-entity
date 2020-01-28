@@ -150,17 +150,25 @@ function updateUser(id, params) {
     log.debug(`${moduleName}[${updateUser.name}] -----> IN...`)
     mongoHelper.connect(myConfig.mongo)
     .then(connected => {
+      let update = {}
+      if(params.password) {
+        update = {
+          "password": params.password,
+        }
+      } else {
+        update = {
+          "username": params.username,
+          "name": params.name,
+          "surname": params.surname,
+          "email": params.email,
+          "address": params.address
+        }
+      }
       let db = connected.db(mongoDatabase)
       db.collection(mongoCollection).updateOne(
         {"_id": new ObjectId(id)},
         {
-          "$set": {"username": params.username,
-                   "name": params.name,
-                   "surname": params.surname,
-                   "email": params.email,
-                   "address": params.address,
-                   "password": params.password
-                  }
+          "$set": update
       })
       .then(updated => {
         log.debug(`${moduleName}[${updateUser.name}] -----> Updated Records: ${updated.result.nModified}`)
