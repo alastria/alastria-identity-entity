@@ -12,6 +12,7 @@ export class SimpleModalComponent implements OnInit {
   @Input() size: string; // xl, lg or sm
   @Input() id = 'simpleModal';
   @Input() qrData: any;
+  @Input() qrSize = 200;
 
   constructor() { }
 

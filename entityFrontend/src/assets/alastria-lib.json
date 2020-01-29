@@ -1,0 +1,26 @@
+{
+    "header": {
+        "alg": "ES256K",
+        "typ": "JWT",
+        "kid": "did:ala:quor:redT:1f869267cb52e8d1b2b1997d013f13eeebf303b1"
+    },
+    "payload": {
+        "jti": "https://www.metrovacesa.com/alastria/presentationrequest/7864",
+        "iss": "did:alastria:quorum:testnet1:QmeeasCZ9jLbX...ueBJ7d7csxhb",
+        "iat": 1525465044,
+        "exp": 1530735444,
+        "nbf": 1525465044,
+        "pr": {
+            "@context": [
+                "https://www.w3.org/2018/credentials/v1",
+                "JWT"
+            ],
+            "type": ["VerifiablePresentationRequest"],
+            "procHash": "H398sjHd...kldjUYn475n",
+            "procUrl": "https://www.metrovacesa.com/alastria/businessprocess/4583",
+            "data": [
+            ]
+        }
+    },
+    "privateKey": "<Buffer c0 d2 be ff 3d d3 ab 1d ef da 03 af 9d ed d8 52 4b 43 c4 e1 a7 3a f3 bd 55 f0 8a 65 71 35 e4 11>"
+}

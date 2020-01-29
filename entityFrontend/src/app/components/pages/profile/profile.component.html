@@ -59,6 +59,7 @@
   </app-modal-result>
   <app-simple-modal *ngIf="isAlastriaVerified"
     (handleOk)="handleOkFillYourProfile()" 
+    [qrSize]="256"
     type="qr"
     [qrData]="qrDataFillProfile">
   </app-simple-modal>
