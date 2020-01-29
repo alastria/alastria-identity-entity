@@ -4,15 +4,16 @@ import { ActivatedRoute } from '@angular/router';
 
 // SERVICES
 import { HomeService } from 'src/app/services/home/home.service';
-import { Service } from 'src/app/models/services/services.model';
 import { SocketService } from 'src/app/services/socket/socket.service';
-import { Event } from 'src/app/models/enums/enums.model';
+import { AlastriaLibService } from 'src/app/services/alastria-lib/alastria-lib.service';
 
 // COMPONENTS
 import { ServiceFormComponent } from '../../common/service-form/service-form.component';
 
 // MODALS
 import { ResultModal } from './../../../models/result-modal/result-modal';
+import { Event } from 'src/app/models/enums/enums.model';
+import { Service } from 'src/app/models/services/services.model';
 
 declare var $: any;
 
@@ -28,7 +29,7 @@ export class ServiceDetailComponent implements OnInit {
     type: 'error',
     title: '',
     description: ''
-  }
+  };
   service: Service;
   detailImageUrl: string;
   detailImageAlt: string;
@@ -40,7 +41,6 @@ export class ServiceDetailComponent implements OnInit {
 
   ngOnInit() {
     this.getServiceById();
-    this.initIoConnection();
   }
 
   handleSubmit() {
@@ -61,12 +61,14 @@ export class ServiceDetailComponent implements OnInit {
   /**
    * Function for init connection with websocket and subscribe in differents events
    */
-  private initIoConnection(): void {
+  initIoConnection(): void {
     this.socketService.initSocket();
 
     this.subscription.add(this.socketService.onGetPresentationData()
       .subscribe((detailUser: any) => {
         this.serviceFormComponent.setValuesForm(detailUser);
+        $('#simpleModal').modal('hide');
+        this.socketService.sendDisconnect();
       })
     );
 

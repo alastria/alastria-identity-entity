@@ -34,7 +34,7 @@ import { AuthGuardService } from './services/auth/auth-guard.service';
     ProfileModule,
     LinkUserModule
   ],
-  exports:[
+  exports: [
     AngularFontAwesomeModule,
   ],
   providers: [AuthGuardService],

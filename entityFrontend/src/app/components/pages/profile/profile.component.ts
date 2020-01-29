@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { environment } from './../../../../environments/environment';
 import { Identity } from './../../../models/identity/identity.model';
@@ -11,6 +12,7 @@ import { UserFormComponent } from 'src/app/components/common/user-form/user-form
 import { UserService } from 'src/app/services/user/user.service';
 import { SocketService } from 'src/app/services/socket/socket.service';
 import { EntityService } from 'src/app/services/entity/entity.service';
+import { AlastriaLibService } from 'src/app/services/alastria-lib/alastria-lib.service';
 
 // MODELS
 import { User } from 'src/app/models/user/user.model';
@@ -116,6 +118,8 @@ export class ProfileComponent implements OnInit {
   constructor(private userService: UserService,
               private socketService: SocketService,
               private entityService: EntityService,
+              private alastriaLibService: AlastriaLibService,
+              private http: HttpClient,
               private changeDetector: ChangeDetectorRef) { }
 
   ngOnInit() {
@@ -255,10 +259,37 @@ export class ProfileComponent implements OnInit {
     await $('#modalFillProfile').modal('hide');
     this.qrDataFillProfile = JSON.stringify(profileFields);
     this.initIoConnection();
+    this.createPresentationRequest(profileFields);
     $('#simpleModal').modal('show');
   }
 
-  private checkAlastriaIdIsVerified() {
+  private async createPresentationRequest(fields: Array<string>) {
+    try {
+      const url = '../../../assets/alastria-lib.json';
+      const alastriaLibJson: any = await this.http.get(url).toPromise();
+
+      if (fields && fields.length) {
+        fields.map((field: string) => {
+          alastriaLibJson.payload.pr.data.push({
+            '@context': 'JWT',
+            levelOfAssurance: 'High',
+            required: true,
+            field_name: field
+          });
+        });
+      }
+
+      const presentationRequest = this.alastriaLibService.createPresentationRequest(alastriaLibJson.header, alastriaLibJson.payload);
+      // TODO GET PRIVATE KEY
+      const presentationRequestSigned = this.alastriaLibService.signPresentationRequest(presentationRequest, alastriaLibJson.privateKey);
+      this.qrDataFillProfile = JSON.stringify(presentationRequestSigned);
+
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+ private checkAlastriaIdIsVerified() {
     this.isAlastriaVerified = this.userService.getIsAlastriaIdVerified();
   }
 

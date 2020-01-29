@@ -1,3 +1,5 @@
+import { EntityService } from './../../../services/entity/entity.service';
+import { HttpClient } from '@angular/common/http';
 import { ResultModal } from './../../../models/result-modal/result-modal';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
@@ -6,6 +8,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 // SERVICES
 import { UserService } from 'src/app/services/user/user.service';
 import { SocketService } from 'src/app/services/socket/socket.service';
+import { AlastriaLibService } from 'src/app/services/alastria-lib/alastria-lib.service';
 
 // MODELS
 import { User } from 'src/app/models/user/user.model';
@@ -30,6 +33,8 @@ export class LinkUserComponent implements OnInit {
     description: ''
   };
   user: User;
+  qrData: any = '';
+  qrSize = 256;
   errorPasswordNewUser: string;
   errorPasswordLogin: string;
   inputsNewUserForm: Array<any> = [
@@ -100,10 +105,19 @@ export class LinkUserComponent implements OnInit {
       required: true
     },
   ];
+  styleButtonAlastriaId = {
+    color: '#00CAD6',
+    backgroundIcon: 'white',
+    colorIcon: 'black'
+  };
+
 
   constructor( private router: Router,
                private userService: UserService,
-               private socketService: SocketService) { }
+               private socketService: SocketService,
+               private alastriaLibService: AlastriaLibService,
+               private entityService: EntityService,
+               private http: HttpClient) { }
 
   ngOnInit() {
     this.user = {
@@ -114,6 +128,7 @@ export class LinkUserComponent implements OnInit {
       password: ''
     };
     this.initIoConnection();
+    this.createPresentationRequest();
   }
 
   async handleRegister(userRegister) {
@@ -151,12 +166,44 @@ export class LinkUserComponent implements OnInit {
     }
   }
 
+  showModalQr() {
+    $('#simpleModal').modal('show');
+  }
+
   sendNewUser() {
     this.socketService.sendGetPresentationData();
   }
 
   handleResultOK() {
     $('#modal-result').modal('hide');
+  }
+
+  private async createPresentationRequest() {
+    try {
+      const url = '../../../assets/alastria-lib.json';
+      const alastriaLibJson: any = await this.http.get(url).toPromise();
+      alastriaLibJson.payload.pr.data = [
+        {
+            '@context': 'JWT',
+            levelOfAssurance: 'High',
+            required: true,
+            field_name: 'name'
+        },
+        {
+          '@context': 'JWT',
+          levelOfAssurance: 'High',
+          required: true,
+          field_name: 'email'
+        },
+      ];
+
+      const presentationRequest = this.alastriaLibService.createPresentationRequest(alastriaLibJson.header, alastriaLibJson.payload);
+      // TODO GET PRIVATE KEY
+      const presentationRequestSigned = this.alastriaLibService.signPresentationRequest(presentationRequest, alastriaLibJson.privateKey);
+      this.qrData = presentationRequestSigned;
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   private async login(userRegister: any) {
@@ -179,6 +226,8 @@ export class LinkUserComponent implements OnInit {
       .subscribe((newUser: User) => {
         this.user = newUser;
         this.userFormComponent.setValuesForm(newUser);
+        this.socketService.sendDisconnect();
+        $('#simpleModal').modal('hide');
       })
     );
 

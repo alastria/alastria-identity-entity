@@ -11,7 +11,7 @@
         <div id="qr" *ngIf="type === 'qr'">
           <app-generate-qr id="qr"
             [qrData]="qrData"
-            [size]="200">
+            [size]="qrSize">
           </app-generate-qr>
         </div>
         <div id="htmlContent" *ngIf="type !== 'qr'" [innerHTML]="htmlContent">
