@@ -17,7 +17,7 @@ export class EntityService {
 
   constructor(private http: HttpClient) { }
 
-  /** 
+  /**
    * Function for create identity calling at the server
    * @param identity - data of identity for create a new identity
    * @returns {*}

@@ -42,6 +42,7 @@ export class ProfileComponent implements OnInit {
   qrAlastriaId: string;
   qrCredentials: any;
   optionsMenu = ['Edit profile', 'Reset password', 'Alastria ID'];
+  optionSelected = '';
   resultModal: ResultModal = {
     type: 'success',
     title: '',
@@ -58,10 +59,24 @@ export class ProfileComponent implements OnInit {
   qrDataFillProfile: any = '[]';
   inputsUserForm: Array<any> = [
     {
-      label: 'Full name',
+      label: 'Name',
       type: 'text',
-      name: 'fullname',
-      value: 'fullname',
+      name: 'name',
+      value: 'name',
+      icon: 'user'
+    },
+    {
+      label: 'Surname',
+      type: 'text',
+      name: 'surname',
+      value: 'surname',
+      icon: 'user'
+    },
+    {
+      label: 'Username',
+      type: 'text',
+      name: 'username',
+      value: 'username',
       icon: 'user'
     },
     {
@@ -78,6 +93,24 @@ export class ProfileComponent implements OnInit {
       value: 'address',
       icon: 'map-marker'
     },
+  ];
+  inputsResetPassword: Array<any> = [
+    {
+      label: 'Password',
+      type: 'password',
+      name: 'password',
+      value: 'password',
+      icon: 'key',
+      required: true
+    },
+    {
+      label: 'Repeat password',
+      type: 'password',
+      name: 'repeatPassword',
+      value: 'repeatPassword',
+      icon: 'key',
+      required: true
+    }
   ];
 
   constructor(private userService: UserService,
@@ -100,9 +133,7 @@ export class ProfileComponent implements OnInit {
     switch (option) {
       case this.optionsMenu[0]:
         this.userFormComponent.toggleFormState();
-        break;
-      case this.optionsMenu[1]:
-        this.resetPassword();
+        this.optionSelected = (this.optionSelected === option) ? '' : option;
         break;
       case 'Fill your AlastriaID profile':
         this.fillYourProfile();
@@ -111,6 +142,7 @@ export class ProfileComponent implements OnInit {
         $('#modalCreateAlastriaId').modal('show');
         break;
       default:
+        this.optionSelected = (this.optionSelected === option) ? '' : option;
         break;
     }
   }
@@ -183,7 +215,7 @@ export class ProfileComponent implements OnInit {
   /**
    * handle when click in 'save' of edit profile then set user from
    * userService
-   * @param user - new data of user for change
+   * @param user - new data of user for change or resetPassword
    */
   async handleEditProfile(user: User): Promise<any> {
     const userResult = await this.userService.updateUser(user);
@@ -191,6 +223,23 @@ export class ProfileComponent implements OnInit {
     this.userService.setUserLoggedIn(userResult);
     this.user = this.userService.getUserLoggedIn();
     this.userFormComponent.toggleFormState();
+    this.optionSelected = '';
+  }
+
+  /**
+   * handle when click in 'save' of edit profile then set user from
+   * userService
+   * @param user - new data of user for change or resetPassword
+   */
+  async handleResetPassword(user: any): Promise<any> {
+    const userNewPassword = {
+      id: user.id,
+      password: user.password
+    };
+    userNewPassword.id = this.user.id;
+    const userResult = await this.userService.updatePassword(userNewPassword);
+    userResult.authToken = this.user.authToken;
+    this.optionSelected = '';
   }
 
   handleOkFillYourProfile() {
@@ -219,10 +268,6 @@ export class ProfileComponent implements OnInit {
       this.optionsMenu.splice(this.optionsMenu.length - 1, 1);
       this.optionsMenu.push(titleOption);
     }
-  }
-
-  private resetPassword(): void {
-    console.log('RESET PASSWORD');
   }
 
   private fillYourProfile(): void {

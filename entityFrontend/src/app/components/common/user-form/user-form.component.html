@@ -18,7 +18,7 @@
       </div>
     </div>
   </div>
-  <div *ngIf="userForm?.controls['repeatPassword']?.errors.mismatch" class="alert alert-danger">
+  <div *ngIf="userForm?.controls['repeatPassword']?.errors?.mismatch" class="alert alert-danger">
     Passwords don't match.
   </div>
   <div class="row" [ngClass]="{'justify-content-center': buttonName.toLowerCase() != 'save' && !isDisabled}" *ngIf="buttonName && !isDisabled">

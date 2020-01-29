@@ -54,6 +54,14 @@ export class UserService {
       });
   }
 
+  updatePassword(user: any): any {
+    return this.http.put(`${this.apiUrl}/${this.path}/user?id=${user.id}`, user).toPromise()
+      .then((res) => res)
+      .catch((error: any) => {
+        throw error;
+      });
+  }
+
   /**
    * Get data of user
    * @returns user
