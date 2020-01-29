@@ -74,8 +74,7 @@ declare var $: any;
       this.userService.setUserLoggedIn(userLogin);
       this.router.navigate(['/', 'home']);
     } catch (error) {
-      console.log('Error ', error);
-      if (error && error.status === 403) {
+      if (error && error.status === 401) {
         this.errorLogin = 'User or password incorrect';
       } else {
         this.errorLogin = (error && error.message) ? error.message : 'Internal server error';
@@ -120,8 +119,7 @@ declare var $: any;
       $('#simpleModal').modal('hide');
       this.router.navigate(['/', 'vinculate']); // TODO: Consultar al servidor si el usuario esta vinculado o no
     } catch (error) {
-      console.log('Error ', error);
-      if (error && error.status === 403) {
+      if (error && error.status === 401) {
         this.errorLogin = 'User or password incorrect';
       } else {
         this.errorLogin = (error && error.message) ? error.message : 'Internal server error';

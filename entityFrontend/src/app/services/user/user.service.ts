@@ -28,7 +28,7 @@ export class UserService {
       } else {
         const error = {
           message: 'incorrect username or password',
-          status: 403
+          status: 401
         };
 
         throw error;
