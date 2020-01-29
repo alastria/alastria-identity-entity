@@ -7,6 +7,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 })
 export class MenuComponent implements OnInit {
   @Input() options: Array<string>;
+  @Input() optionSelected = '';
   @Output() handleSelectOption = new EventEmitter<string>();
 
   constructor() { }
@@ -15,7 +16,9 @@ export class MenuComponent implements OnInit {
   }
 
   selectOption(option: string) {
-    this.handleSelectOption.emit(option);
+    if (this.optionSelected === '' || this.optionSelected === option) {
+      this.handleSelectOption.emit(option);
+    }
   }
 
 }

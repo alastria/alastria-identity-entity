@@ -109,7 +109,7 @@ export class UserFormComponent implements OnInit {
   /*
   * Generate userForm with inputsForm
   */
-  private generateForm(): void {
+  generateForm(): void {
     const parametersForm: object = {};
     this.inputsForm.map((input: InputUserForm ) => {
         parametersForm[input.name] = [{ value: this.user[(input.name.toLowerCase() === 'fullname') ? this.fullName : input.value],
