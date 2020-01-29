@@ -164,8 +164,7 @@ export class ProfileComponent implements OnInit {
     this.initIoConnection();
   }
 
-  handleSetUpAlastriaId() {
-    $('#modalCreateAlastriaId').modal('hide');
+  async handleSetUpAlastriaId() {
     this.isCreateAlastriaId = true;
     this.parametersForCreateAlastriaId = {
       title: `Set up your Alastria ID for ${environment.entityName}`,
@@ -173,7 +172,8 @@ export class ProfileComponent implements OnInit {
       type: 'S'
     };
     this.changeDetector.detectChanges();
-    this.createAlastriaIdComponent.createOrSetUpAlastriaId();
+    await this.createAlastriaIdComponent.createOrSetUpAlastriaId();
+    $('#modalCreateAlastriaId').modal('hide');
     this.initIoConnection();
   }
 

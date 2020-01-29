@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { tokensFactory } from 'alastria-identity-lib';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -9,8 +10,10 @@ export class AlastriaLibService {
   constructor() { }
 
   createPresentationRequest(header: any, payload: any) {
+    const procUrl = `${environment.apiUrl}/${payload.pr.procUrl}`;
+
     return tokensFactory.tokens.createPresentationRequest(
-      header.kid, payload.iss, payload.pr['@context'], payload.pr.procUrl, payload.pr.procHash, payload.pr.data, payload.nbf, payload.jti
+      header.kid, payload.iss, payload.pr['@context'], procUrl, payload.pr.procHash, payload.pr.data, payload.nbf, payload.jti
     );
   }
 
