@@ -97,7 +97,7 @@
       imgUrl="../../../assets/images/alastria-icon.svg"
       (handleLoginSocial)="handleLoginSocial($event)">
     </app-button-login>
-    <app-simple-modal qrData="test-login" (handleOk)="handleOk()" type="qr"></app-simple-modal>
+    <app-simple-modal [qrData]="qrData" (handleOk)="handleOk()" type="qr"></app-simple-modal>
     <app-modal-result
       [type]="resultModal.type"
       [title]="resultModal.title"

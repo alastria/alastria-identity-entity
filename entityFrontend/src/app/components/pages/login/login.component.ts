@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { ResultModal } from './../../../models/result-modal/result-modal';
 import { SocketService } from './../../../services/socket/socket.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
@@ -22,6 +23,7 @@ declare var $: any;
   private subscription: Subscription = new Subscription();
   formLogin: FormGroup;
   errorLogin: string;
+  qrData: string;
   resultModal: ResultModal = {
     type: 'error',
     title: '',
@@ -47,7 +49,8 @@ declare var $: any;
   constructor(private router: Router,
               private fb: FormBuilder,
               private userService: UserService,
-              private socketService: SocketService) { }
+              private socketService: SocketService,
+              private http: HttpClient) { }
 
   ngOnInit() {
     sessionStorage.clear();
@@ -56,6 +59,7 @@ declare var $: any;
       name: ['', Validators.required],
       password: ['', Validators.required],
     });
+    this.createQrLogin();
   }
 
   /**
@@ -125,6 +129,12 @@ declare var $: any;
         this.errorLogin = (error && error.message) ? error.message : 'Internal server error';
       }
     }
+  }
+
+  private async createQrLogin() {
+    const qrLogin = await this.http.get('../../../../assets/loginQr.json');
+    this.qrData = JSON.stringify(qrLogin);
+    console.log(this.qrData);
   }
 
   /**
