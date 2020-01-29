@@ -5,7 +5,7 @@
 /////////////////////////////////////////////////////////
 
 const Log = require('log4js')
-const entityService = require('../../services/entity.service')
+const entityService = require('../services/entity.service')
 const configHelper = require('../helpers/config.helper')
 const myConfig = configHelper.getConfig()
 const wsHelper = require('../helpers/ws.helper')
@@ -291,7 +291,7 @@ function createAlastriaToken(req, res) {
     log.debug(`${controller_name}[${createAlastriaToken.name}] -----> IN ...`)
     let params = req.swagger.params.body.value
     log.debug(`${controller_name}[${createAlastriaToken.name}] -----> Sending params: ${JSON.stringify(params)}`)
-    let signedAT = entityModel.createAlastriaToken(params)
+    let signedAT = entityService.createAlastriaToken(params)
     log.debug(`${controller_name}[${createAlastriaToken.name}] -----> Successfully created Alastria Token`)
     res.status(200).send({"signedAT": signedAT})
   } catch (error) {
