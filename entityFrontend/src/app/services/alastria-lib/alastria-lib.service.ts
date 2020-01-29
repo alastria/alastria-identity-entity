@@ -14,7 +14,12 @@ export class AlastriaLibService {
     );
   }
 
-  signPresentationRequest(presentationRequest: any, key: any) {
-    return tokensFactory.tokens.signJWT(presentationRequest, key);
+  signJWT(jwt: any, privateKey: any) {
+    return tokensFactory.tokens.signJWT(jwt, privateKey);
+  }
+
+  createAlastriaToken(config: any) {
+    return tokensFactory.tokens.createAlastriaToken(config.did, config.providerUrl, config.callbackUrl,
+      config.alastriaNetId, config.tokenExpTime, config.tokenActivationDate, config.jsonTokenId);
   }
 }

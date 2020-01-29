@@ -1,5 +1,7 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { AlastriaLibService } from 'src/app/services/alastria-lib/alastria-lib.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-create-alastria-id',
@@ -35,7 +37,8 @@ export class CreateAlastriaIdComponent implements OnInit {
   urlAppStore = 'https://apps.apple.com/es/'; // 'http://itunes.apple.com/<país>/app/<nombre-aplicación>/id<ID-aplicación>?mt=8'
   qrAlastriaId: string;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient,
+              private alastriaLibService: AlastriaLibService) { }
 
   ngOnInit() {
   }
@@ -72,12 +75,25 @@ export class CreateAlastriaIdComponent implements OnInit {
    * generate qr with config for create alastria id
    * @returns - config
    */
-  private async  generateQr(): Promise<string> {
+  private async generateQr(): Promise<string> {
     let qr: string;
     if (this.type === 'C') {
-      const configUrl = '../../../assets/configTest.json';
-      const config = await this.http.get(configUrl).toPromise();
-      qr = JSON.stringify(config);
+      const currentDate = Math.floor(Date.now() / 1000);
+      const expDate = currentDate + 600;
+      const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
+      const alastriaLibJson: any = await this.http.get(alastriaLibJsonUrl).toPromise();
+      const config = {
+        did: alastriaLibJson.header.kid,
+        providerUrl: alastriaLibJson.openAccess,
+        callbackUrl: `${environment.apiUrl}/entity/alastria/identity`,
+        alastriaNetId: 'redT',
+        tokenExpTime: expDate,
+        tokenActivationDate: currentDate,
+        jsonTokenId: Math.random().toString(36).substring(2)
+      };
+      const alastriaToken = this.alastriaLibService.createAlastriaToken(config);
+      const signedToken = this.alastriaLibService.signJWT(alastriaToken, alastriaLibJson.privateKey);
+      qr = signedToken;
     } else {
       qr = 'Set up alastria ID'; // POR DEFINIR
     }
