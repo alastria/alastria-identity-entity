@@ -43,7 +43,9 @@ function createAlastriaID(req, res) {
     .then(alastriaID => {
       if (alastriaID) {
         log.debug(`${controller_name}[${createAlastriaID.name}] -----> Successfully created new AlastriaId`)
-        io.emit('createAlastriaId', 'Identidad de Alastria creada correctamente.')
+        io.emit('createAlastriaId', {status: 200,
+                                     message: 'Identidad de Alastria creada correctamente.',
+                                     data: alastriaId})
         res.status(200).send(alastriaID)
       }
       else {
@@ -136,8 +138,8 @@ function getCurrentPublicKey(req, res) {
     log.debug(`${controller_name}[${getCurrentPublicKey.name}] -----> Sending params: ${JSON.stringify(alastriaId)}`)
     entityService.getCurrentPublicKey(alastriaId)
     .then(publickey => {
-      if (publickey) {
-        log.debug(`${controller_name}[${getCurrentPublicKey.name}] -----> Successfully obtained Public Key: ${publickey}`)
+      if (publickey[0].length > 0) {
+        log.debug(`${controller_name}[${getCurrentPublicKey.name}] -----> Successfully obtained Public Key`)
         let result = {
           publicKey: publickey[0]
         }

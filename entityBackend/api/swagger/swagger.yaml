@@ -799,6 +799,10 @@ definitions:
         type: string
       vinculated:
         type: boolean
+      did:
+        type: string
+      proxyAddress:
+        type: string
   PresentationData:
     properties:
       data:

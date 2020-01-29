@@ -56,16 +56,16 @@ function sendSigned(transactionSigned) {
   return new Promise((resolve, reject) => {
     log.debug(`${serviceName}[${sendSigned.name}] -----> IN ...`)
     web3.eth.sendSignedTransaction(transactionSigned)
-      .on('transactionHash', function (hash) {
-        log.debug(`${serviceName}[${sendSigned.name}] -----> HASH: ${hash} ...`)
-      })
-      .on('receipt', receipt => {
-        resolve(receipt)
-      })
-      .on('error', error => {
-        log.error(`${serviceName}[${sendSigned.name}] -----> ${error}`)
-        reject(error)
-      });
+    .on('transactionHash', function (hash) {
+      log.debug(`${serviceName}[${sendSigned.name}] -----> HASH: ${hash} ...`)
+    })
+    .on('receipt', receipt => {
+      resolve(receipt)
+    })
+    .on('error', error => {
+      log.error(`${serviceName}[${sendSigned.name}] -----> ${error}`)
+      reject(error)
+    });
   })
 }
 
@@ -73,9 +73,12 @@ function subjectGetKnownTransaction(subjectCredential) {
   return new Promise((resolve, reject) => {
     let subjectID = getSubjectIdentity()
     subjectID.getKnownTransaction(subjectCredential)
-      .then(receipt => {
-        resolve(receipt)
-      })
+    .then(receipt => {
+      resolve(receipt)
+    })
+    .catch(error => {
+      reject(error)
+    })
   })
 }
 
@@ -83,15 +86,23 @@ function issuerGetKnownTransaction(issuerCredential) {
   return new Promise((resolve, reject) => {
     let issuerID = getIssuerIdentity()
     issuerID.getKnownTransaction(issuerCredential)
-      .then(receipt => {
-        resolve(receipt)
-      })
+    .then(receipt => {
+      resolve(receipt)
+    })
+    .catch(error => {
+      reject(error)
+    })
   })
 }
 
 function preparedAlastriaId() {
-  let preparedId = transactionFactory.identityManager.prepareAlastriaID(web3, subjectKeystore.address)
-  return preparedId
+  try {
+    let preparedId = transactionFactory.identityManager.prepareAlastriaID(web3, subjectKeystore.address)
+    return preparedId
+  } 
+  catch(error) {
+    return error
+  }
 }
 
 /////////////////////////////////////////////////////////
@@ -106,6 +117,7 @@ module.exports = {
   updateReceiverPresentationStatus,
   addSubjectPresentation,
   getCredentialStatus,
+  getSubjectData,
   createAlastriaToken
 }
 
@@ -230,8 +242,8 @@ function getCurrentPublicKey(subject) {
     web3.eth.call(currentPubKey)
     .then(result => {
       log.debug(`${serviceName}[${getCurrentPublicKey.name}] -----> Success`)
-      let publicKey = web3.utils.hexToUtf8(result)
-      resolve(publicKey.substr(1))
+      let pubKey = web3.eth.abi.decodeParameters(['string'], result) 
+      resolve(pubKey)
     })
     .catch(error => {
       log.error(`${serviceName}[${getCurrentPublicKey.name}] -----> ${error}`)
@@ -315,6 +327,27 @@ function getCredentialStatus(credentialHash, issuer, subject) {
   });
 }
 
+function getSubjectData(pubkey, presentationSigned) { 
+  return new Promise((resolve, reject) => { 
+    log.debug(`${moduleName}[${getSubjectData.name}] -----> IN ...`) 
+    let verified = tokensFactory.tokens.verifyJWT(presentationSigned, `04${pubkey.substr(2)}`) 
+    if (verified == true) { 
+      log.debug(`${moduleName}[${getSubjectData.name}] -----> Subject presentation verified`) 
+      let presentationData = tokensFactory.tokens.decodeJWT(presentationSigned) 
+      if (presentationData.payload) { 
+        log.debug(`${moduleName}[${getSubjectData.name}] -----> JWT decoded successfuly`) 
+        resolve(presentationData) 
+      } else { 
+        log.error(`${moduleName}[${getSubjectData.name}] -----> Error decoding JWT`) 
+        reject(presentationData) 
+      } 
+    } else { 
+      log.error(`${moduleName}[${getSubjectData.name}] -----> Error verifying JWT`) 
+      reject(verified) 
+    } 
+  }) 
+}
+
 function createAlastriaToken(at) {
   try {
     log.debug(`${serviceName}[${createAlastriaToken.name}] -----> IN ...`)
@@ -327,18 +360,6 @@ function createAlastriaToken(at) {
     return signedAT
   } catch (error) {
     log.error(`${serviceName}[${createAlastriaToken.name}] -----> Culdnt get the issuers private key`)
+    return error
   }
 }
-
-function crteateAlastriaToken(at) {
-  return new Promise((resolve, reject) => {
-    log.debug(`${serviceName}[${createAlastriaToken.name}] -----> IN ...`)
-    let issuerPrivateKey
-    issuerPrivateKey = keythereum.recover(myConfig.addressPassword, myConfig.issuerKeystore)
-    let alastriaToken = tokensFactory.tokens.createAlastriaToken(at.didIsssuer, at.providerURL, at.callbackURL, 
-      at.alastriaNetId, at.tokenExpTime, at.tokenActivationDate, at.jsonTokenId)
-    let signedAT = tokensFactory.tokens.signJWT(alastriaToken, issuerPrivateKey)
-    log.debug(`${serviceName}[${createAlastriaToken.name}] -----> Success`)
-  })
-}
-

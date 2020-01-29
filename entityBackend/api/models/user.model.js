@@ -26,7 +26,8 @@ module.exports = {
   createUser,
   updateUser,
   getUser,
-  checkAuth
+  checkAuth,
+  vinculateUser
 }
 
 /////////////////////////////////////////////////////////
@@ -157,6 +158,13 @@ function updateUser(id, params) {
         update = {
           "password": params.password,
         }
+      } else if(params.objectIdentity) {
+        update = {
+          "did": params.objectIdentity.did,
+          "proxyAddress": params.objectIdentity.proxyAddress,
+          "vinculated": true
+        }
+
       } else {
         update = {
           "username": params.username,
@@ -236,6 +244,40 @@ function checkAuth(token) {
     })
     .catch(error => {
       log.error(`${moduleName}[${checkAuth.name}] -----> Error: ${error}`)
+      reject(error)
+    })
+  })
+}
+
+function vinculateUser(objectidentity) {
+  return new Promise((resolve, reject) => {
+    log.debug(`${moduleName}[${vinculateUser.name}] -----> IN...`)
+    mongoHelper.connect(myConfig.mongo)
+    .then(connected => {
+      let db = connected.db(mongoDatabase)
+      db.collection(mongoCollection).findOne({"_id": new ObjectId(id)})
+      .then(user => {
+        log.debug(`${moduleName}[${getUser.name}] -----> Data obtained`)
+        let userData = {
+          id: user._id,
+          username: user.username,
+          name: user.name,
+          surname: user.surname,
+          email: user.email,
+          address: user.address,
+          vinculated: (user.vinculated == null) ? false : user.vinculated
+        }
+        connected.close()
+        resolve(userData)
+      })
+      .catch(error => {
+        log.error(`${moduleName}[${getUser.name}] -----> Error: ${error}`)
+        connected.close()
+        reject(error)
+      })
+    })
+    .catch(error => {
+      log.error(`${moduleName}[${getUser.name}] -----> Error: ${error}`)
       reject(error)
     })
   })
