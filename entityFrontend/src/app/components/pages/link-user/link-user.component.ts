@@ -199,7 +199,7 @@ export class LinkUserComponent implements OnInit {
 
       const presentationRequest = this.alastriaLibService.createPresentationRequest(alastriaLibJson.header, alastriaLibJson.payload);
       // TODO GET PRIVATE KEY
-      const presentationRequestSigned = this.alastriaLibService.signPresentationRequest(presentationRequest, alastriaLibJson.privateKey);
+      const presentationRequestSigned = this.alastriaLibService.signJWT(presentationRequest, alastriaLibJson.privateKey);
       this.qrData = presentationRequestSigned;
     } catch (error) {
       console.error(error);

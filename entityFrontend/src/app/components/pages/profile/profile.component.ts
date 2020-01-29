@@ -151,8 +151,7 @@ export class ProfileComponent implements OnInit {
     }
   }
 
-  handleCreateAlastriaId() {
-    $('#modalCreateAlastriaId').modal('hide');
+  async handleCreateAlastriaId() {
     this.isCreateAlastriaId = true;
     this.parametersForCreateAlastriaId = {
       title: 'Create your AlastriaID',
@@ -160,12 +159,12 @@ export class ProfileComponent implements OnInit {
       type: 'C'
     };
     this.changeDetector.detectChanges();
-    this.createAlastriaIdComponent.createOrSetUpAlastriaId();
+    await this.createAlastriaIdComponent.createOrSetUpAlastriaId();
+    $('#modalCreateAlastriaId').modal('hide');
     this.initIoConnection();
   }
 
-  handleSetUpAlastriaId() {
-    $('#modalCreateAlastriaId').modal('hide');
+  async handleSetUpAlastriaId() {
     this.isCreateAlastriaId = true;
     this.parametersForCreateAlastriaId = {
       title: `Set up your Alastria ID for ${environment.entityName}`,
@@ -173,7 +172,8 @@ export class ProfileComponent implements OnInit {
       type: 'S'
     };
     this.changeDetector.detectChanges();
-    this.createAlastriaIdComponent.createOrSetUpAlastriaId();
+    await this.createAlastriaIdComponent.createOrSetUpAlastriaId();
+    $('#modalCreateAlastriaId').modal('hide');
     this.initIoConnection();
   }
 
@@ -281,7 +281,7 @@ export class ProfileComponent implements OnInit {
 
       const presentationRequest = this.alastriaLibService.createPresentationRequest(alastriaLibJson.header, alastriaLibJson.payload);
       // TODO GET PRIVATE KEY
-      const presentationRequestSigned = this.alastriaLibService.signPresentationRequest(presentationRequest, alastriaLibJson.privateKey);
+      const presentationRequestSigned = this.alastriaLibService.signJWT(presentationRequest, alastriaLibJson.privateKey);
       this.qrDataFillProfile = JSON.stringify(presentationRequestSigned);
 
     } catch (error) {
