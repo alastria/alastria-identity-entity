@@ -326,8 +326,8 @@ export class ProfileComponent implements OnInit {
         const userUpdate = this.createUserUpdateForVinculated(response);
         this.userService.updateUser(userUpdate)
           .then((result: any) => {
-            this.userService.setIsAlastriaIdVerified(result.update.vinculated);
-            this.userService.setUserLoggedIn(result.update);
+            this.userService.setIsAlastriaIdVerified(result.user.vinculated);
+            this.userService.setUserLoggedIn(result.user);
             this.resultModal = {
               type: 'success',
               title: 'Congratulations!',
@@ -347,8 +347,8 @@ export class ProfileComponent implements OnInit {
         const userUpdate = this.createUserUpdateForVinculated(response);
         this.userService.updateUser(userUpdate)
           .then((result: any) => {
-              this.userService.setIsAlastriaIdVerified(result.update.vinculated);
-              this.userService.setUserLoggedIn(result.update);
+              this.userService.setIsAlastriaIdVerified(result.user.vinculated);
+              this.userService.setUserLoggedIn(result.user);
               this.resultModal = {
                 type: 'success',
                 title: 'Congratulations!',
