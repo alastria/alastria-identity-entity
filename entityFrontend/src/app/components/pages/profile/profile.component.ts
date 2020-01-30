@@ -312,30 +312,19 @@ export class ProfileComponent implements OnInit {
     this.socketService.initSocket();
 
     this.subscription.add(this.socketService.onCreateIdentity()
-      .subscribe((message: any) => {
+      .subscribe((response: any) => {
         this.socketService.sendDisconnect();
-        const identity: Identity = {
-          signedTX: message,
-          address: ''
-        };
 
-        this.entityService.createIdentity(identity)
-          .then((result: any) => {
-            if (result && result.proxyAddress && result.did) {
-              this.userService.setIsAlastriaIdVerified(true);
-              const userChange = this.userService.getUserLoggedIn();
-              userChange.proxyAddress = result.proxyAddress;
-              userChange.did = result.did;
-              this.userService.setUserLoggedIn(userChange);
+        this.userService.updateUser(response)
+          .then((user: User) => {
+              this.userService.setIsAlastriaIdVerified(user.vinculated);
+              this.userService.setUserLoggedIn(user);
               this.resultModal = {
                 type: 'success',
                 title: 'Congratulations!',
                 description: 'Your Alastria ID has been created. Start to fill you new AlastriaID'
               };
               $('#modal-result').modal('show');
-            } else {
-              this.userService.setIsAlastriaIdVerified(true);
-            }
           })
         .catch((error: any) => {
           console.error(error);
@@ -344,14 +333,19 @@ export class ProfileComponent implements OnInit {
     );
 
     this.subscription.add(this.socketService.onSetUpAlastriaId()
-      .subscribe(() => {
+      .subscribe((response) => {
         this.socketService.sendDisconnect();
-        this.resultModal = {
-          type: 'success',
-          title: 'Congratulations!',
-          description: `Your AlastriaID has been linked to your ${environment.entityName} profile. Now you can login next times with your AlastriaID`
-        };
-        $('#modal-result').modal('show');
+        this.userService.updateUser(response)
+          .then((user: User) => {
+              this.userService.setIsAlastriaIdVerified(user.vinculated);
+              this.userService.setUserLoggedIn(user);
+              this.resultModal = {
+                type: 'success',
+                title: 'Congratulations!',
+                description: `Your AlastriaID has been linked to your ${environment.entityName} profile. Now you can login next times with your AlastriaID`
+              };
+              $('#modal-result').modal('show');
+          });
         this.userService.setIsAlastriaIdVerified(true);
       })
     );

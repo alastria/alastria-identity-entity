@@ -10,4 +10,5 @@ export class User {
     proxyAddress?: string;
     did?: string;
     authToken?: string;
+    vinculated?: boolean;
 }
