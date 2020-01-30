@@ -323,15 +323,15 @@ export class ProfileComponent implements OnInit {
         this.socketService.sendDisconnect();
         const userUpdate = this.createUserUpdateForVinculated(response);
         this.userService.updateUser(userUpdate)
-          .then((user: User) => {
-              this.userService.setIsAlastriaIdVerified(user.vinculated);
-              this.userService.setUserLoggedIn(user);
-              this.resultModal = {
-                type: 'success',
-                title: 'Congratulations!',
-                description: 'Your Alastria ID has been created. Start to fill you new AlastriaID'
-              };
-              $('#modal-result').modal('show');
+          .then((result: any) => {
+            this.userService.setIsAlastriaIdVerified(result.update.vinculated);
+            this.userService.setUserLoggedIn(result.update);
+            this.resultModal = {
+              type: 'success',
+              title: 'Congratulations!',
+              description: 'Your Alastria ID has been created. Start to fill you new AlastriaID'
+            };
+            $('#modal-result').modal('show');
           })
         .catch((error: any) => {
           console.error(error);
@@ -344,9 +344,9 @@ export class ProfileComponent implements OnInit {
         this.socketService.sendDisconnect();
         const userUpdate = this.createUserUpdateForVinculated(response);
         this.userService.updateUser(userUpdate)
-          .then((user: User) => {
-              this.userService.setIsAlastriaIdVerified(user.vinculated);
-              this.userService.setUserLoggedIn(user);
+          .then((result: any) => {
+              this.userService.setIsAlastriaIdVerified(result.update.vinculated);
+              this.userService.setUserLoggedIn(result.update);
               this.resultModal = {
                 type: 'success',
                 title: 'Congratulations!',
