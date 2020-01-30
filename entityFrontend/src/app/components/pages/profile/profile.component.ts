@@ -306,7 +306,9 @@ export class ProfileComponent implements OnInit {
   }
 
   private createUserUpdateForVinculated(responseWs: any) {
-    const userUpdate = responseWs.data;
+    const userUpdate: any = {
+      objectIdentity: responseWs.data,
+    };
     userUpdate.id = this.user.id;
 
     return userUpdate;
