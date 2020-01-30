@@ -322,7 +322,7 @@ export class ProfileComponent implements OnInit {
       .subscribe((response: any) => {
         this.socketService.sendDisconnect();
         const userUpdate = this.createUserUpdateForVinculated(response);
-        this.userService.updateUser(response)
+        this.userService.updateUser(userUpdate)
           .then((user: User) => {
               this.userService.setIsAlastriaIdVerified(user.vinculated);
               this.userService.setUserLoggedIn(user);
@@ -343,7 +343,7 @@ export class ProfileComponent implements OnInit {
       .subscribe((response) => {
         this.socketService.sendDisconnect();
         const userUpdate = this.createUserUpdateForVinculated(response);
-        this.userService.updateUser(response)
+        this.userService.updateUser(userUpdate)
           .then((user: User) => {
               this.userService.setIsAlastriaIdVerified(user.vinculated);
               this.userService.setUserLoggedIn(user);
