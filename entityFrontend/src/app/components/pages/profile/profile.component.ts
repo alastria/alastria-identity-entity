@@ -305,6 +305,13 @@ export class ProfileComponent implements OnInit {
     $('#modalFillProfile').modal('show');
   }
 
+  private createUserUpdateForVinculated(responseWs: any) {
+    const userUpdate = responseWs.data;
+    userUpdate.id = this.user.id;
+
+    return userUpdate;
+  }
+
   /**
    * Function for init connection with websocket and subscribe in differents events
    */
@@ -314,7 +321,7 @@ export class ProfileComponent implements OnInit {
     this.subscription.add(this.socketService.onCreateIdentity()
       .subscribe((response: any) => {
         this.socketService.sendDisconnect();
-
+        const userUpdate = this.createUserUpdateForVinculated(response);
         this.userService.updateUser(response)
           .then((user: User) => {
               this.userService.setIsAlastriaIdVerified(user.vinculated);
@@ -335,6 +342,7 @@ export class ProfileComponent implements OnInit {
     this.subscription.add(this.socketService.onSetUpAlastriaId()
       .subscribe((response) => {
         this.socketService.sendDisconnect();
+        const userUpdate = this.createUserUpdateForVinculated(response);
         this.userService.updateUser(response)
           .then((user: User) => {
               this.userService.setIsAlastriaIdVerified(user.vinculated);
