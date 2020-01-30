@@ -182,8 +182,15 @@ function updateUser(id, params) {
       })
       .then(updated => {
         log.debug(`${moduleName}[${updateUser.name}] -----> Updated Records: ${updated.result.nModified}`)
-        connected.close()
-        resolve(updated.result.nModified)
+        getUser(id)
+        .then(gettedUser => {
+          let result = {
+            updated: updated.result.nModified,
+            user: gettedUser
+          }
+          connected.close()
+          resolve(result)
+        })
       })
       .catch(error => {
         log.error(`${moduleName}[${updateUser.name}] -----> Error: ${error}`)
@@ -214,6 +221,8 @@ function getUser(id) {
           surname: user.surname,
           email: user.email,
           address: user.address,
+          did: user.did,
+          proxyAddress: user.proxyAddress,
           vinculated: (user.vinculated == null) ? false : user.vinculated
         }
         connected.close()

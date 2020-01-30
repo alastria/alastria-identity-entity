@@ -110,18 +110,20 @@ function updateUser(req, res) {
     log.debug(`${controller_name}[${updateUser.name}] -----> Sending params: ${JSON.stringify(params)}`)
     userModel.updateUser(id, params)
     .then(updated => {
-      if(updated == 0){
-        log.error(`${controller_name}[${updateUser.name}] -----> No records updated`)
+      let modifieds = updated.updated
+      if(modifieds == 0){
+        log.debug(`${controller_name}[${updateUser.name}] -----> No records updated`)
         let msg = {
           message: `No se ha actualizado ningun registro`
         }
         res.status(200).send(msg)
       } else {
         log.debug(`${controller_name}[${updateUser.name}] -----> Records updated`)
-        let msg = {
-          message: `Exito al actulaizar el usuario`
+        let response = {
+          message: `Exito al actulaizar el usuario`,
+          user: updated.user
         }
-        res.status(200).send(msg)
+        res.status(200).send(response)
       }
     })
   }

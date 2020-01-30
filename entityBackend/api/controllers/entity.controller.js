@@ -43,9 +43,9 @@ function createAlastriaID(req, res) {
     .then(alastriaID => {
       if (alastriaID) {
         log.debug(`${controller_name}[${createAlastriaID.name}] -----> Successfully created new AlastriaId`)
-        io.emit('createAlastriaId', {status: 200,
+        io.emit('createIdentity', {status: 200,
                                      message: 'Identidad de Alastria creada correctamente.',
-                                     data: alastriaId})
+                                     data: alastriaID})
         res.status(200).send(alastriaID)
       }
       else {
