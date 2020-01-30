@@ -5,7 +5,7 @@ info:
 # during dev, should point to your local machine
 host: localhost:10010
 # basePath prefixes all resource paths 
-basePath: /alastria/entity
+basePath: /entity
 # 
 schemes:
   # tip: remove http to make production-grade
@@ -20,7 +20,221 @@ produces:
   - application/json
   - text/plain
 paths:
-  /identity:
+  # START only for user and login
+  /login:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: user.controller
+    get:
+      description: check if user has account into the platform
+      operationId: login
+      parameters:
+        - name: user
+          in: query
+          type: string
+          description: username or email of the user
+          required: true
+        - name: password
+          in: query
+          type: string
+          description: password of the user
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/userTokenAccess"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "401":
+          description: User not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "503":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /user:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: user.controller
+    post:
+      description: Create a new User in the database
+      # used as the method name of the controller
+      operationId: addUser
+      parameters:
+        - name: body
+          in: body
+          description: Necessary data to create a new user in database
+          required: false
+          schema: 
+            $ref: "#/definitions/userData"
+      responses:
+        "200":
+          description: User creation success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/userCreatedSuccess"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "503":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    put:
+      description: Update use data in the database
+      # used as the method name of the controller
+      operationId: updateUser
+      parameters:
+        - name: id
+          in: query
+          description: Id of the user to update
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: Necessary data to update an user in database
+          required: false
+          schema: 
+            $ref: "#/definitions/userData"
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/userData"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: User not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "503":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    get:
+      description: Get data saved in the database
+      operationId: getUser
+      parameters:
+        - name: userID
+          in: query
+          type: string
+          description: Id of the user
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/userInfo"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "503":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /presentation:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: entity.controller
+    post:
+      description: Get data from a presentation
+      # used as the method name of the controller
+      operationId: recivePresentationData
+      parameters:
+        - name: presentation
+          in: body
+          description: Necessary data to create a new Alastria ID
+          required: false
+          schema: 
+            $ref: "#/definitions/Presentation"
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/PresentationData"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "503":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /user/checkAuth:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: user.controller
+    get:
+      description: check if user is authenticated
+      operationId: checkUserAuth
+      parameters:
+        - name: authToken
+          in: query
+          type: string
+          description: tokoen to check
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/userAuthenticated"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "503":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  # END Only for user and login
+  /alastria/identity:
     # binds a127 app logic to a route
     x-swagger-router-controller: entity.controller
     post:
@@ -57,7 +271,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /identity/serviceProviders:
+  /alastria/identity/serviceProviders:
     # binds a127 app logic to a route
     x-swagger-router-controller: entity.controller
     get:
@@ -86,7 +300,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /identity/issuers:
+  /alastria/identity/issuers:
     # binds a127 app logic to a route
     x-swagger-router-controller: entity.controller
     get:
@@ -115,7 +329,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /identity/{alastriaDID}:
+  /alastria/identity/{alastriaDID}:
     # binds a127 app logic to a route
     x-swagger-router-controller: entity.controller
     get:
@@ -150,7 +364,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /identity/{alastriaDID}/list:
+  /alastria/identity/{alastriaDID}/list:
     # binds a127 app logic to a route
     x-swagger-router-controller: entity.controller
     get:
@@ -185,7 +399,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /credential:
+  /alastria/credential:
     # binds a127 app logic to a route
     x-swagger-router-controller: entity.controller
     get:
@@ -250,7 +464,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /credential/{identityDID}:
+  /alastria/credential/{identityDID}:
     get:
       x-swagger-router-controller: entity.controller
       description: Get all the credentials available for the Subject (IdentityDID) with the status {available, valid, expired}
@@ -284,7 +498,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /credential/status/{credentialHash}:
+  /alastria/credential/status/{credentialHash}:
     get:
       x-swagger-router-controller: entity.controller
       description: get current Issuer or Subject status for the given credential
@@ -369,7 +583,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /presentation:
+  /alastria/presentation:
     # binds a127 app logic to a route
     x-swagger-router-controller: entity.controller
     post:
@@ -407,7 +621,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /presentation/{identityDID}:
+  /alastria/presentation/{identityDID}:
     get:
       x-swagger-router-controller: entity.controller
       description: Get all the presentations available for the user with the status {Valid, Received, AskDeletion, DeletionConfirmation}
@@ -441,7 +655,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /presentation/status/{presentationHash}:
+  /alastria/presentation/status/{presentationHash}:
     get:
       x-swagger-router-controller: entity.controller
       description: get current Subject or Service Provider (Receiver) status for the given presentation
@@ -557,6 +771,56 @@ paths:
     x-swagger-pipe: swagger_raw
 # complex objects have schema definitions
 definitions:
+  userAuthenticated:
+    properties:
+      status:
+        type: boolean
+  userTokenAccess:
+    properties:
+      authtoken:
+        type: object
+  userInfo:
+    properties:
+      data:
+        type: object
+  userData:
+    properties:
+      username:
+        type: string
+      name:
+        type: string
+      surname:
+        type: string
+      email:
+        type: string
+      address:
+        type: string
+      password:
+        type: string
+      vinculated:
+        type: boolean
+      did:
+        type: string
+      proxyAddress:
+        type: string
+  PresentationData:
+    properties:
+      data:
+        type: object
+  Presentation:
+    properties:
+      subjectPublicKey:
+        type: string
+      signedPresentation:
+        type: string
+  credential:
+    properties:
+      header:
+        type: "object"
+      payload:
+        type: "object"
+      signature:
+        type: "object"
   alastriaIdentityResponse:
     properties:
       alastriaDID:
@@ -609,13 +873,18 @@ definitions:
     properties:
       message:
         type: string
+  userCreatedSuccess:
+    required:
+      - message
+    properties:
+      message:
+        type: string
   identityData:
     type: "object"
-    required: [signedTX]
+    required: [signedAIC]
     properties:
-      "signedTX":
+      "signedAIC":
         type: string
-        example: "0x47f4c19df21b0f98718e1ed91c7d5c5f5511a64093b0a3dd943fb54a74eb16d2....0xe90eeaa7931c54966c2badf7bed04b5bb46c6dc4970bd32c05cc614c27f93d0e"
   issuerCredentialdata:
     type: "object"
     required: [issuerCredentialHash, issuer]

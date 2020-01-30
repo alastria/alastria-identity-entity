@@ -1,5 +1,8 @@
 <ul>
   <li *ngFor="let option of options">
-    <a (click)="selectOption(option)">{{ option }}</a>
+    <a (click)="selectOption(option)"
+        [ngClass]="{'disabled': option !== optionSelected && optionSelected !== ''}">
+      {{ option }}
+    </a>
   </li>
 </ul>

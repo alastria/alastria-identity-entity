@@ -68,8 +68,8 @@ declare var $: any;
   async onSubmit(): Promise<any> {
     try {
       this.errorLogin = '';
-      const user: User = {
-        name: this.formLogin.get('name').value,
+      const user = {
+        username: this.formLogin.get('name').value,
         password: this.formLogin.get('password').value
       };
 
@@ -111,15 +111,9 @@ declare var $: any;
   /**
    * Function handle when click ok in modal simple
    */
-  async onLogin(): Promise<any> {
+  async onLogin(user: User): Promise<any> {
     try {
-      const user: User = {
-        name: 'Samuel',
-        password: 'test'
-      };
-      const userLogin = await this.userService.login(user);
-
-      this.userService.setUserLoggedIn(userLogin);
+      this.userService.setUserLoggedIn(user);
       $('#simpleModal').modal('hide');
       this.router.navigate(['/', 'vinculate']); // TODO: Consultar al servidor si el usuario esta vinculado o no
     } catch (error) {
@@ -144,8 +138,13 @@ declare var $: any;
     this.socketService.initSocket();
 
     this.subscription.add(this.socketService.onLogin()
-      .subscribe(() => {
-        this.onLogin();
+      .subscribe((result) => {
+        let userStorage: User;
+        if (result.authToken) {
+          userStorage = result.userdata;
+          userStorage.authToken = result.authToken;
+        }
+        this.onLogin(userStorage);
         this.socketService.sendDisconnect();
       })
     );

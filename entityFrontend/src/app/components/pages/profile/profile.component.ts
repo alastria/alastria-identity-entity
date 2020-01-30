@@ -44,6 +44,7 @@ export class ProfileComponent implements OnInit {
   qrAlastriaId: string;
   qrCredentials: any;
   optionsMenu = ['Edit profile', 'Reset password', 'Alastria ID'];
+  optionSelected = '';
   resultModal: ResultModal = {
     type: 'success',
     title: '',
@@ -60,10 +61,24 @@ export class ProfileComponent implements OnInit {
   qrDataFillProfile: any = '[]';
   inputsUserForm: Array<any> = [
     {
-      label: 'Full name',
+      label: 'Name',
       type: 'text',
-      name: 'fullName',
-      value: 'fullName',
+      name: 'name',
+      value: 'name',
+      icon: 'user'
+    },
+    {
+      label: 'Surname',
+      type: 'text',
+      name: 'surname',
+      value: 'surname',
+      icon: 'user'
+    },
+    {
+      label: 'Username',
+      type: 'text',
+      name: 'username',
+      value: 'username',
       icon: 'user'
     },
     {
@@ -80,6 +95,24 @@ export class ProfileComponent implements OnInit {
       value: 'address',
       icon: 'map-marker'
     },
+  ];
+  inputsResetPassword: Array<any> = [
+    {
+      label: 'Password',
+      type: 'password',
+      name: 'password',
+      value: 'password',
+      icon: 'key',
+      required: true
+    },
+    {
+      label: 'Repeat password',
+      type: 'password',
+      name: 'repeatPassword',
+      value: 'repeatPassword',
+      icon: 'key',
+      required: true
+    }
   ];
 
   constructor(private userService: UserService,
@@ -103,10 +136,8 @@ export class ProfileComponent implements OnInit {
   handleSelectOption(option: string): void {
     switch (option) {
       case this.optionsMenu[0]:
-        this.editProfile();
-        break;
-      case this.optionsMenu[1]:
-        this.resetPassword();
+        this.userFormComponent.toggleFormState();
+        this.optionSelected = (this.optionSelected === option) ? '' : option;
         break;
       case 'Fill your AlastriaID profile':
         this.fillYourProfile();
@@ -115,12 +146,12 @@ export class ProfileComponent implements OnInit {
         $('#modalCreateAlastriaId').modal('show');
         break;
       default:
+        this.optionSelected = (this.optionSelected === option) ? '' : option;
         break;
     }
   }
 
-  handleCreateAlastriaId() {
-    $('#modalCreateAlastriaId').modal('hide');
+  async handleCreateAlastriaId() {
     this.isCreateAlastriaId = true;
     this.parametersForCreateAlastriaId = {
       title: 'Create your AlastriaID',
@@ -128,12 +159,12 @@ export class ProfileComponent implements OnInit {
       type: 'C'
     };
     this.changeDetector.detectChanges();
-    this.createAlastriaIdComponent.createOrSetUpAlastriaId();
+    await this.createAlastriaIdComponent.createOrSetUpAlastriaId();
+    $('#modalCreateAlastriaId').modal('hide');
     this.initIoConnection();
   }
 
-  handleSetUpAlastriaId() {
-    $('#modalCreateAlastriaId').modal('hide');
+  async handleSetUpAlastriaId() {
     this.isCreateAlastriaId = true;
     this.parametersForCreateAlastriaId = {
       title: `Set up your Alastria ID for ${environment.entityName}`,
@@ -141,7 +172,8 @@ export class ProfileComponent implements OnInit {
       type: 'S'
     };
     this.changeDetector.detectChanges();
-    this.createAlastriaIdComponent.createOrSetUpAlastriaId();
+    await this.createAlastriaIdComponent.createOrSetUpAlastriaId();
+    $('#modalCreateAlastriaId').modal('hide');
     this.initIoConnection();
   }
 
@@ -186,13 +218,32 @@ export class ProfileComponent implements OnInit {
 
   /**
    * handle when click in 'save' of edit profile then set user from
-   * userService and call editProfile()
-   * @param user - new data of user for change
+   * userService
+   * @param user - new data of user for change or resetPassword
    */
-  handleEditProfile(user: User): void {
-    this.userService.setUserLoggedIn(user);
+  async handleEditProfile(user: User): Promise<any> {
+    const userResult = await this.userService.updateUser(user);
+    userResult.authToken = this.user.authToken;
+    this.userService.setUserLoggedIn(userResult);
     this.user = this.userService.getUserLoggedIn();
-    this.editProfile();
+    this.userFormComponent.toggleFormState();
+    this.optionSelected = '';
+  }
+
+  /**
+   * handle when click in 'save' of edit profile then set user from
+   * userService
+   * @param user - new data of user for change or resetPassword
+   */
+  async handleResetPassword(user: any): Promise<any> {
+    const userNewPassword = {
+      id: user.id,
+      password: user.password
+    };
+    userNewPassword.id = this.user.id;
+    const userResult = await this.userService.updatePassword(userNewPassword);
+    userResult.authToken = this.user.authToken;
+    this.optionSelected = '';
   }
 
   handleOkFillYourProfile() {
@@ -230,7 +281,7 @@ export class ProfileComponent implements OnInit {
 
       const presentationRequest = this.alastriaLibService.createPresentationRequest(alastriaLibJson.header, alastriaLibJson.payload);
       // TODO GET PRIVATE KEY
-      const presentationRequestSigned = this.alastriaLibService.signPresentationRequest(presentationRequest, alastriaLibJson.privateKey);
+      const presentationRequestSigned = this.alastriaLibService.signJWT(presentationRequest, alastriaLibJson.privateKey);
       this.qrDataFillProfile = JSON.stringify(presentationRequestSigned);
 
     } catch (error) {
@@ -250,16 +301,17 @@ export class ProfileComponent implements OnInit {
     }
   }
 
-  private editProfile(): void {
-    this.userFormComponent.toggleFormState();
-  }
-
-  private resetPassword(): void {
-    console.log('RESET PASSWORD');
-  }
-
   private fillYourProfile(): void {
     $('#modalFillProfile').modal('show');
+  }
+
+  private createUserUpdateForVinculated(responseWs: any) {
+    const userUpdate: any = {
+      objectIdentity: responseWs.data,
+    };
+    userUpdate.id = this.user.id;
+
+    return userUpdate;
   }
 
   /**
@@ -269,30 +321,19 @@ export class ProfileComponent implements OnInit {
     this.socketService.initSocket();
 
     this.subscription.add(this.socketService.onCreateIdentity()
-      .subscribe((message: any) => {
+      .subscribe((response: any) => {
         this.socketService.sendDisconnect();
-        const identity: Identity = {
-          signedTX: message,
-          address: ''
-        };
-
-        this.entityService.createIdentity(identity)
+        const userUpdate = this.createUserUpdateForVinculated(response);
+        this.userService.updateUser(userUpdate)
           .then((result: any) => {
-            if (result && result.proxyAddress && result.did) {
-              this.userService.setIsAlastriaIdVerified(true);
-              const userChange = this.userService.getUserLoggedIn();
-              userChange.proxyAddress = result.proxyAddress;
-              userChange.did = result.did;
-              this.userService.setUserLoggedIn(userChange);
-              this.resultModal = {
-                type: 'success',
-                title: 'Congratulations!',
-                description: 'Your Alastria ID has been created. Start to fill you new AlastriaID'
-              };
-              $('#modal-result').modal('show');
-            } else {
-              this.userService.setIsAlastriaIdVerified(true);
-            }
+            this.userService.setIsAlastriaIdVerified(result.user.vinculated);
+            this.userService.setUserLoggedIn(result.user);
+            this.resultModal = {
+              type: 'success',
+              title: 'Congratulations!',
+              description: 'Your Alastria ID has been created. Start to fill you new AlastriaID'
+            };
+            $('#modal-result').modal('show');
           })
         .catch((error: any) => {
           console.error(error);
@@ -301,14 +342,20 @@ export class ProfileComponent implements OnInit {
     );
 
     this.subscription.add(this.socketService.onSetUpAlastriaId()
-      .subscribe(() => {
+      .subscribe((response) => {
         this.socketService.sendDisconnect();
-        this.resultModal = {
-          type: 'success',
-          title: 'Congratulations!',
-          description: `Your AlastriaID has been linked to your ${environment.entityName} profile. Now you can login next times with your AlastriaID`
-        };
-        $('#modal-result').modal('show');
+        const userUpdate = this.createUserUpdateForVinculated(response);
+        this.userService.updateUser(userUpdate)
+          .then((result: any) => {
+              this.userService.setIsAlastriaIdVerified(result.user.vinculated);
+              this.userService.setUserLoggedIn(result.user);
+              this.resultModal = {
+                type: 'success',
+                title: 'Congratulations!',
+                description: `Your AlastriaID has been linked to your ${environment.entityName} profile. Now you can login next times with your AlastriaID`
+              };
+              $('#modal-result').modal('show');
+          });
         this.userService.setIsAlastriaIdVerified(true);
       })
     );

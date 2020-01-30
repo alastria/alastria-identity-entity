@@ -13,11 +13,11 @@ import { environment } from '../../../environments/environment';
 export class EntityService {
 
   apiUrl = environment.apiUrl;
-  path = 'alastria/entity';
+  path = 'entity/alastria';
 
   constructor(private http: HttpClient) { }
 
-  /** 
+  /**
    * Function for create identity calling at the server
    * @param identity - data of identity for create a new identity
    * @returns {*}

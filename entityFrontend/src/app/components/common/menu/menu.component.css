@@ -9,3 +9,8 @@ a {
     background-color: transparent;
     cursor: pointer;
 }
+
+.disabled, .disabled:focus, .disabled:active, .disabled:hover {
+    cursor: default;
+    color: gray;
+}

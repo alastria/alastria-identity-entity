@@ -24,6 +24,14 @@
         buttonName="Save"
         (handleEditProfile)="handleEditProfile($event)">
       </app-user-form>
+      <app-user-form 
+        *ngIf="optionsMenu && optionSelected === optionsMenu[1]"
+        [user]="user" 
+        [inputsForm]="inputsResetPassword"
+        [isDisabled]=false
+        buttonName="Save"
+        (handleEditProfile)="handleResetPassword($event)">
+      </app-user-form>
     </div>
     <div class="col-md-6">
       <hr id="divide-line">
@@ -35,7 +43,7 @@
           </div>
           <div class="row">
             <div class="col-12">
-              <app-menu [options]="optionsMenu" (handleSelectOption)="handleSelectOption($event)"></app-menu>
+              <app-menu [options]="optionsMenu" (handleSelectOption)="handleSelectOption($event)" [optionSelected]="optionSelected"></app-menu>
             </div>
           </div>
       </div>

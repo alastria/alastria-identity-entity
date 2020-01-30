@@ -44,6 +44,14 @@ export class LinkUserComponent implements OnInit {
       name: 'fullname',
       value: 'fullname',
       icon: 'user',
+      required: false
+    },
+    {
+      label: 'Username',
+      type: 'text',
+      name: 'username',
+      value: 'username',
+      icon: 'user',
       required: true
     },
     {
@@ -113,6 +121,7 @@ export class LinkUserComponent implements OnInit {
 
   ngOnInit() {
     this.user = {
+      id: '',
       name: '',
       email: '',
       surname: '',
@@ -128,6 +137,7 @@ export class LinkUserComponent implements OnInit {
 
     // TODO: llamada al servidor para vincular el usuario
     try {
+      const userRegisterResult = await this.userService.createUser(userRegister);
       await this.login(userRegister);
     } catch (error) {
       if (error && error.status === 403) {
@@ -189,7 +199,7 @@ export class LinkUserComponent implements OnInit {
 
       const presentationRequest = this.alastriaLibService.createPresentationRequest(alastriaLibJson.header, alastriaLibJson.payload);
       // TODO GET PRIVATE KEY
-      const presentationRequestSigned = this.alastriaLibService.signPresentationRequest(presentationRequest, alastriaLibJson.privateKey);
+      const presentationRequestSigned = this.alastriaLibService.signJWT(presentationRequest, alastriaLibJson.privateKey);
       this.qrData = presentationRequestSigned;
     } catch (error) {
       console.error(error);

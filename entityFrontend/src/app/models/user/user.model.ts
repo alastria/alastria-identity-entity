@@ -1,11 +1,14 @@
 export class User {
+    id: string;
     name: string;
-    password: string;
+    password?: string;
     repeatPassword?: string;
     surname?: string;
+    username?: string;
     email?: string;
     address?: string;
-    isAuthenticated?: boolean;
     proxyAddress?: string;
     did?: string;
+    authToken?: string;
+    vinculated?: boolean;
 }

@@ -4,11 +4,15 @@ import { HttpClient } from '@angular/common/http';
 // MODELS
 import { User } from 'src/app/models/user/user.model';
 
+import { environment } from '../../../environments/environment';
+
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
   isAlastriaIdVerified: boolean;
+  apiUrl = environment.apiUrl;
+  path = 'entity';
 
   constructor(private http: HttpClient) { }
 
@@ -16,42 +20,46 @@ export class UserService {
    * @param user - data of user for login in the aplication
    * @returns message correct or incorrect login
    */
-  async login(user: User): Promise<any> {
+
+  async login(user: any): Promise<any> {
+    const username = (user.email) ? user.email : user.username;
     try {
-      const authUrl = '../../../assets/auth.json';
-      let isLogin = false;
-      const authCredentials: any = await this.http.get(authUrl).toPromise();
+      const result: any = await this.http.get(`${this.apiUrl}/${this.path}/login?user=${username}&password=${user.password}`).toPromise();
+      if (result.authToken) {
+        const userStorage: User = result.userdata;
+        userStorage.authToken = result.authToken;
 
-      if ((user.name === authCredentials.name || user.name === authCredentials.email || user.email === authCredentials.email)
-          && user.password === authCredentials.password) {
-        isLogin = true;
-      } else {
-        const error = {
-          message: 'incorrect username or password',
-          status: 401
-        };
-
-        throw error;
+        return userStorage;
       }
-
-      authCredentials.isAuthenticated = isLogin;
-      delete authCredentials.password;
-
-      return authCredentials;
     } catch (error) {
-
+      console.log('error ', error);
       throw error;
     }
   }
 
-  /**
-   * Check if user is authenticated
-   * @returns - true or false id the user is authenticated
-   */
-  isAuthenticated(): boolean {
-    const currentUser = this.getUserLoggedIn();
 
-    return (currentUser && currentUser.isAuthenticated) ? currentUser.isAuthenticated : false;
+  createUser(user: User): any {
+    return this.http.post(`${this.apiUrl}/${this.path}/user`, user).toPromise()
+      .then((res) => res)
+      .catch((error: any) => {
+        throw error;
+      });
+  }
+
+  updateUser(user: User): any {
+    return this.http.put(`${this.apiUrl}/${this.path}/user?id=${user.id}`, user).toPromise()
+      .then((res) => res)
+      .catch((error: any) => {
+        throw error;
+      });
+  }
+
+  updatePassword(user: any): any {
+    return this.http.put(`${this.apiUrl}/${this.path}/user?id=${user.id}`, user).toPromise()
+      .then((res) => res)
+      .catch((error: any) => {
+        throw error;
+      });
   }
 
   /**

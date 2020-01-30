@@ -1,5 +1,9 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { AlastriaLibService } from 'src/app/services/alastria-lib/alastria-lib.service';
+import { environment } from 'src/environments/environment';
+
+const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
 
 @Component({
   selector: 'app-create-alastria-id',
@@ -35,7 +39,8 @@ export class CreateAlastriaIdComponent implements OnInit {
   urlAppStore = 'https://apps.apple.com/es/'; // 'http://itunes.apple.com/<país>/app/<nombre-aplicación>/id<ID-aplicación>?mt=8'
   qrAlastriaId: string;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient,
+              private alastriaLibService: AlastriaLibService) { }
 
   ngOnInit() {
   }
@@ -72,15 +77,50 @@ export class CreateAlastriaIdComponent implements OnInit {
    * generate qr with config for create alastria id
    * @returns - config
    */
-  private async  generateQr(): Promise<string> {
+  private async generateQr(): Promise<string> {
     let qr: string;
+
     if (this.type === 'C') {
-      const configUrl = '../../../assets/configTest.json';
-      const config = await this.http.get(configUrl).toPromise();
-      qr = JSON.stringify(config);
+      qr = await this.createAlastriaToken();
     } else {
-      qr = 'Set up alastria ID'; // POR DEFINIR
+      qr = await this.createPresentationRequest();
     }
+
     return qr;
+  }
+
+  private async createAlastriaToken(): Promise<string> {
+    const currentDate = Math.floor(Date.now() / 1000);
+    const expDate = currentDate + 600;
+    const alastriaLibJson: any = await this.http.get(alastriaLibJsonUrl).toPromise();
+    const config = {
+      did: alastriaLibJson.header.kid,
+      providerUrl: alastriaLibJson.openAccess,
+      callbackUrl: `${environment.apiUrl}/entity/alastria/identity`,
+      alastriaNetId: 'redT',
+      tokenExpTime: expDate,
+      tokenActivationDate: currentDate,
+      jsonTokenId: Math.random().toString(36).substring(2)
+    };
+    const alastriaToken = this.alastriaLibService.createAlastriaToken(config);
+
+    return this.alastriaLibService.signJWT(alastriaToken, alastriaLibJson.privateKey);
+  }
+
+  private async createPresentationRequest(): Promise<string> {
+    const alastriaLibJson: any = await this.http.get(alastriaLibJsonUrl).toPromise();
+    alastriaLibJson.payload.pr.data = [
+      {
+          '@context': 'JWT',
+          levelOfAssurance: 'High',
+          required: true,
+          field_name: 'did'
+      },
+    ];
+
+    const presentationRequest = this.alastriaLibService.createPresentationRequest(alastriaLibJson.header, alastriaLibJson.payload);
+    const presentationRequestSigned = this.alastriaLibService.signJWT(presentationRequest, alastriaLibJson.privateKey);
+
+    return JSON.stringify(presentationRequestSigned);
   }
 }
