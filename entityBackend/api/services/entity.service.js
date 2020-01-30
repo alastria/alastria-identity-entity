@@ -118,7 +118,7 @@ module.exports = {
   addSubjectPresentation,
   getCredentialStatus,
   getSubjectData,
-  createAlastriaToken
+  verifyAlastriaSesion
 }
 
 /////////////////////////////////////////////////////////
@@ -329,37 +329,41 @@ function getCredentialStatus(credentialHash, issuer, subject) {
 
 function getSubjectData(pubkey, presentationSigned) { 
   return new Promise((resolve, reject) => { 
-    log.debug(`${moduleName}[${getSubjectData.name}] -----> IN ...`) 
+    log.debug(`${serviceName}[${getSubjectData.name}] -----> IN ...`) 
     let verified = tokensFactory.tokens.verifyJWT(presentationSigned, `04${pubkey.substr(2)}`) 
     if (verified == true) { 
-      log.debug(`${moduleName}[${getSubjectData.name}] -----> Subject presentation verified`) 
+      log.debug(`${serviceName}[${getSubjectData.name}] -----> Subject presentation verified`) 
       let presentationData = tokensFactory.tokens.decodeJWT(presentationSigned) 
       if (presentationData.payload) { 
-        log.debug(`${moduleName}[${getSubjectData.name}] -----> JWT decoded successfuly`) 
+        log.debug(`${serviceName}[${getSubjectData.name}] -----> JWT decoded successfuly`) 
         resolve(presentationData) 
       } else { 
-        log.error(`${moduleName}[${getSubjectData.name}] -----> Error decoding JWT`) 
+        log.error(`${serviceName}[${getSubjectData.name}] -----> Error decoding JWT`) 
         reject(presentationData) 
       } 
     } else { 
-      log.error(`${moduleName}[${getSubjectData.name}] -----> Error verifying JWT`) 
+      log.error(`${serviceName}[${getSubjectData.name}] -----> Error verifying JWT`) 
       reject(verified) 
     } 
   }) 
 }
 
-function createAlastriaToken(at) {
-  try {
-    log.debug(`${serviceName}[${createAlastriaToken.name}] -----> IN ...`)
-    let issuerPrivateKey
-    issuerPrivateKey = keythereum.recover(myConfig.addressPassword, myConfig.issuerKeystore)
-    let alastriaToken = tokensFactory.tokens.createAlastriaToken(at.didIsssuer, at.providerURL, at.callbackURL, 
-      at.alastriaNetId, at.tokenExpTime, at.tokenActivationDate, at.jsonTokenId)
-    let signedAT = tokensFactory.tokens.signJWT(alastriaToken, issuerPrivateKey)
-    log.debug(`${serviceName}[${createAlastriaToken.name}] -----> Success`)
-    return signedAT
-  } catch (error) {
-    log.error(`${serviceName}[${createAlastriaToken.name}] -----> Culdnt get the issuers private key`)
-    return error
-  }
-}
+function verifyAlastriaSesion(alastriaSesion) {
+  return new Promise((resolve, reject) => {
+    log.debug(`${serviceName}[${verifyAlastriaSesion.name}] -----> IN...`)
+    let decode = tokensFactory.tokens.decodeJWT(alastriaSesion.signedAIC)
+    let didSubject = decode.payload.iss.split(':')[4]
+    log.debug(`${serviceName}[${verifyAlastriaSesion.name}] -----> Obtained correctly the Subject DID`)
+    getCurrentPublicKey(didSubject)
+    .then(subjectPublicKey => {
+      let publicKey = subjectPublicKey[0]
+      log.debug(`${serviceName}[${verifyAlastriaSesion.name}] -----> Obtained correctly the Subject PublicKey`)
+      let verifiedAlastraSesion = tokensFactory.tokens.verifyJWT(alastriaSesion.signedAIC, `04${publicKey}`)
+      if(verifiedAlastraSesion == true) {
+        // TODO buscar por did el usuario
+      }
+    })
+
+  })
+ }
+
