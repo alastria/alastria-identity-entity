@@ -24,9 +24,9 @@ export class UserService {
   async login(user: any): Promise<any> {
     const username = (user.email) ? user.email : user.username;
     try {
-      const result: any = await this.http.get(`${this.apiUrl}/${this.path}/login?user=${username}&password=${user.password}`).toPromise();
+      const result: any = await this.http.get(`${this.apiUrl}/${this.path}/login?username=${username}&password=${user.password}`).toPromise();
       if (result.authToken) {
-        const userStorage: User = result.userdata;
+        const userStorage: User = result.userData;
         userStorage.authToken = result.authToken;
 
         return userStorage;
