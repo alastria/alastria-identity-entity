@@ -27,7 +27,7 @@ module.exports = {
   addSubjectPresentation,
   getCredentialStatus,
   recivePresentationData,
-  createAlastriaToken
+  verifyAlastriaSesion
 }
 
 /////////////////////////////////////////////////////////
@@ -43,9 +43,9 @@ function createAlastriaID(req, res) {
     .then(alastriaID => {
       if (alastriaID) {
         log.debug(`${controller_name}[${createAlastriaID.name}] -----> Successfully created new AlastriaId`)
-        io.emit('createAlastriaId', {status: 200,
+        io.emit('createIdentity', {status: 200,
                                      message: 'Identidad de Alastria creada correctamente.',
-                                     data: alastriaId})
+                                     data: alastriaID})
         res.status(200).send(alastriaID)
       }
       else {
@@ -288,20 +288,23 @@ function recivePresentationData(req, res) {
       res.status(503).send(msg)
   }
 }
-function createAlastriaToken(req, res) {
+
+function verifyAlastriaSesion(req, res) {
   try {
-    log.debug(`${controller_name}[${createAlastriaToken.name}] -----> IN ...`)
-    let params = req.swagger.params.body.value
-    log.debug(`${controller_name}[${createAlastriaToken.name}] -----> Sending params: ${JSON.stringify(params)}`)
-    let signedAT = entityService.createAlastriaToken(params)
-    log.debug(`${controller_name}[${createAlastriaToken.name}] -----> Successfully created Alastria Token`)
-    res.status(200).send({"signedAT": signedAT})
-  } catch (error) {
-    log.error(`${controller_name}[${createAlastriaToken.name}] -----> ${error}`)
+    log.debug(`${controller_name}[${verifyAlastriaSesion.name}] -----> IN ...`)
+    let alastriaSesion = req.swagger.params.alastriaSesion.value
+    log.debug(`${controller_name}[${verifyAlastriaSesion.name}] -----> Sending params: ${JSON.stringify(alastriaSesion)}`)
+    entityService.verifyAlastriaSesion(alastriaSesion)
+    .then(verified => {
+      console.log(verified)
+      res.status(200).send('ok')
+    })
+  }
+  catch(error) {
+    log.error(`${controller_name}[${verifyAlastriaSesion.name}] -----> Error: ${error}`)
     let msg = {
-      message: `Unauthorized: ${error}`
+      message: `${error}`
     }
-    res.status(401).send(msg)
+    res.status(503).send(msg)
   }
 }
-

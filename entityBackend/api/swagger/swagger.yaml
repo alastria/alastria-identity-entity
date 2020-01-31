@@ -200,6 +200,43 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /alastriaToken:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: entity.controller
+    post:
+      description: Verify Alastria Sesion from Wallet
+      # used as the method name of the controller
+      operationId: verifyAlastriaSesion
+      parameters:
+        - name: alastriaSesion
+          in: body
+          description: Necessary data to create a new Alastria ID
+          required: false
+          schema: 
+            $ref: "#/definitions/identityData"
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/userTokenAccess"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "503":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /user/checkAuth:
     # binds a127 app logic to a route
     x-swagger-router-controller: user.controller

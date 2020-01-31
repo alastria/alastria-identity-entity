@@ -26,8 +26,7 @@ module.exports = {
   createUser,
   updateUser,
   getUser,
-  checkAuth,
-  vinculateUser
+  checkAuth
 }
 
 /////////////////////////////////////////////////////////
@@ -164,7 +163,6 @@ function updateUser(id, params) {
           "proxyAddress": params.objectIdentity.proxyAddress,
           "vinculated": true
         }
-
       } else {
         update = {
           "username": params.username,
@@ -182,8 +180,15 @@ function updateUser(id, params) {
       })
       .then(updated => {
         log.debug(`${moduleName}[${updateUser.name}] -----> Updated Records: ${updated.result.nModified}`)
-        connected.close()
-        resolve(updated.result.nModified)
+        getUser(id)
+        .then(gettedUser => {
+          let result = {
+            updated: updated.result.nModified,
+            user: gettedUser
+          }
+          connected.close()
+          resolve(result)
+        })
       })
       .catch(error => {
         log.error(`${moduleName}[${updateUser.name}] -----> Error: ${error}`)
@@ -214,6 +219,8 @@ function getUser(id) {
           surname: user.surname,
           email: user.email,
           address: user.address,
+          did: user.did,
+          proxyAddress: user.proxyAddress,
           vinculated: (user.vinculated == null) ? false : user.vinculated
         }
         connected.close()
@@ -244,40 +251,6 @@ function checkAuth(token) {
     })
     .catch(error => {
       log.error(`${moduleName}[${checkAuth.name}] -----> Error: ${error}`)
-      reject(error)
-    })
-  })
-}
-
-function vinculateUser(objectidentity) {
-  return new Promise((resolve, reject) => {
-    log.debug(`${moduleName}[${vinculateUser.name}] -----> IN...`)
-    mongoHelper.connect(myConfig.mongo)
-    .then(connected => {
-      let db = connected.db(mongoDatabase)
-      db.collection(mongoCollection).findOne({"_id": new ObjectId(id)})
-      .then(user => {
-        log.debug(`${moduleName}[${getUser.name}] -----> Data obtained`)
-        let userData = {
-          id: user._id,
-          username: user.username,
-          name: user.name,
-          surname: user.surname,
-          email: user.email,
-          address: user.address,
-          vinculated: (user.vinculated == null) ? false : user.vinculated
-        }
-        connected.close()
-        resolve(userData)
-      })
-      .catch(error => {
-        log.error(`${moduleName}[${getUser.name}] -----> Error: ${error}`)
-        connected.close()
-        reject(error)
-      })
-    })
-    .catch(error => {
-      log.error(`${moduleName}[${getUser.name}] -----> Error: ${error}`)
       reject(error)
     })
   })
