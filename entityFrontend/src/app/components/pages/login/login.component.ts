@@ -122,11 +122,7 @@ const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
     try {
       this.userService.setUserLoggedIn(user);
       $('#simpleModal').modal('hide');
-      if (user.id) {
-        this.router.navigate(['/', 'home']);
-      } else {
-        this.router.navigate(['/', 'vinculate']);
-      }
+      this.router.navigate(['/', 'home']);
     } catch (error) {
       if (error && error.status === 401) {
         this.errorLogin = 'User or password incorrect';
@@ -167,18 +163,14 @@ const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
     this.subscription.add(this.socketService.onLogin()
       .subscribe((result) => {
         let userStorage: User;
-        if (result.userData) {
+        if (result.userData && result.authToken) {
           userStorage = result.userData;
-          if (result.authToken) {
-            userStorage.authToken = result.authToken;
-          }
+          userStorage.authToken = result.authToken;
+          this.onLogin(userStorage);
         } else {
-          if (result.authToken) {
-            userStorage.authToken = result.authToken;
-          }
+          this.router.navigate(['/', 'vinculate']);
         }
 
-        this.onLogin(userStorage);
         this.socketService.sendDisconnect();
       })
     );
