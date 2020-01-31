@@ -162,12 +162,14 @@ const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
 
     this.subscription.add(this.socketService.onLogin()
       .subscribe((result) => {
+        console.log('result ', result);
         let userStorage: User;
         if (result.userData && result.authToken) {
           userStorage = result.userData;
           userStorage.authToken = result.authToken;
           this.onLogin(userStorage);
         } else {
+          $('#simpleModal').modal('hide');
           this.router.navigate(['/', 'vinculate']);
         }
 
