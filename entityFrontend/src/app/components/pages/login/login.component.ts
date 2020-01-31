@@ -5,13 +5,18 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { environment } from 'src/environments/environment';
 
 // SERVICES
 import { UserService } from 'src/app/services/user/user.service';
+import { AlastriaLibService } from 'src/app/services/alastria-lib/alastria-lib.service';
+
+// MODELS
 import { User } from 'src/app/models/user/user.model';
 import { Event } from 'src/app/models/enums/enums.model';
 
 declare var $: any;
+const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
 
 @Component({
   selector: 'app-login',
@@ -50,6 +55,7 @@ declare var $: any;
               private fb: FormBuilder,
               private userService: UserService,
               private socketService: SocketService,
+              private alastriaLibService: AlastriaLibService,
               private http: HttpClient) { }
 
   ngOnInit() {
@@ -110,12 +116,17 @@ declare var $: any;
 
   /**
    * Function handle when click ok in modal simple
+   * if user contain id then go to home page, but if user only contain authToken then go to vinculate
    */
   async onLogin(user: User): Promise<any> {
     try {
       this.userService.setUserLoggedIn(user);
       $('#simpleModal').modal('hide');
-      this.router.navigate(['/', 'vinculate']); // TODO: Consultar al servidor si el usuario esta vinculado o no
+      if (user.id) {
+        this.router.navigate(['/', 'home']);
+      } else {
+        this.router.navigate(['/', 'vinculate']);
+      }
     } catch (error) {
       if (error && error.status === 401) {
         this.errorLogin = 'User or password incorrect';
@@ -126,9 +137,26 @@ declare var $: any;
   }
 
   private async createQrLogin() {
-    const qrLogin = await this.http.get('../../../../assets/loginQr.json');
-    this.qrData = JSON.stringify(qrLogin);
+    this.qrData = await this.createAlastriaToken();
     console.log(this.qrData);
+  }
+
+  private async createAlastriaToken(): Promise<string> {
+    const currentDate = Math.floor(Date.now() / 1000);
+    const expDate = currentDate + 600;
+    const alastriaLibJson: any = await this.http.get(alastriaLibJsonUrl).toPromise();
+    const config = {
+      did: alastriaLibJson.header.kid,
+      providerUrl: alastriaLibJson.openAccess,
+      callbackUrl: `${environment.apiUrl}/entity/alastriaToken`,
+      alastriaNetId: 'redT',
+      tokenExpTime: expDate,
+      tokenActivationDate: currentDate,
+      jsonTokenId: Math.random().toString(36).substring(2)
+    };
+    const alastriaToken = this.alastriaLibService.createAlastriaToken(config);
+
+    return this.alastriaLibService.signJWT(alastriaToken, alastriaLibJson.privateKey);
   }
 
   /**
@@ -140,10 +168,17 @@ declare var $: any;
     this.subscription.add(this.socketService.onLogin()
       .subscribe((result) => {
         let userStorage: User;
-        if (result.authToken) {
-          userStorage = result.userdata;
-          userStorage.authToken = result.authToken;
+        if (result.userData) {
+          userStorage = result.userData;
+          if (result.authToken) {
+            userStorage.authToken = result.authToken;
+          }
+        } else {
+          if (result.authToken) {
+            userStorage.authToken = result.authToken;
+          }
         }
+
         this.onLogin(userStorage);
         this.socketService.sendDisconnect();
       })

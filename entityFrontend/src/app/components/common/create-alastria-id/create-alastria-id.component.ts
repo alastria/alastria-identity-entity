@@ -1,7 +1,9 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { AlastriaLibService } from 'src/app/services/alastria-lib/alastria-lib.service';
 import { environment } from 'src/environments/environment';
+
+// SERVICES
+import { AlastriaLibService } from 'src/app/services/alastria-lib/alastria-lib.service';
 
 const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
 
