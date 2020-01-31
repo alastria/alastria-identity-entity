@@ -138,7 +138,6 @@ const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
 
   private async createQrLogin() {
     this.qrData = await this.createAlastriaToken();
-    console.log(this.qrData);
   }
 
   private async createAlastriaToken(): Promise<string> {
