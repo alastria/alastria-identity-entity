@@ -66,8 +66,8 @@ function isAuth(data) {
 function login(params){
   return new Promise((resolve, reject) => {
     log.debug(`${moduleName}[${login.name}] -----> IN...`);
-    let username = params.user.value
-    let pwd = params.password.value
+    let username = params.username
+    let pwd = params.password
     mongoHelper.connect(myConfig.mongo)
     .then(connected => {
       let db = connected.db(mongoDatabase)
@@ -83,7 +83,7 @@ function login(params){
         let token = jwt.sign({data: jsonObjet}, pwd, { expiresIn: 60 * 60})
         log.debug(`${moduleName}[${login.name}] -----> JWT created`);
         let userObject = {
-          userdata: {
+          userData: {
             id: found._id,
             username: found.username,
             name: found.name,
@@ -206,25 +206,28 @@ function updateUser(id, params) {
 function getUser(id) {
   return new Promise((resolve, reject) => {
     log.debug(`${moduleName}[${getUser.name}] -----> IN...`)
+    let find = (id.startsWith('did') == true) ? {"did":id} : {"_id": new ObjectId(id)}
     mongoHelper.connect(myConfig.mongo)
     .then(connected => {
       let db = connected.db(mongoDatabase)
-      db.collection(mongoCollection).findOne({"_id": new ObjectId(id)})
+      db.collection(mongoCollection).findOne(find)
       .then(user => {
-        log.debug(`${moduleName}[${getUser.name}] -----> Data obtained`)
-        let userData = {
-          id: user._id,
-          username: user.username,
-          name: user.name,
-          surname: user.surname,
-          email: user.email,
-          address: user.address,
-          did: user.did,
-          proxyAddress: user.proxyAddress,
-          vinculated: (user.vinculated == null) ? false : user.vinculated
+        if (user == null){
+          log.debug(`${moduleName}[${getUser.name}] -----> User not found in the DataBase`)
+          resolve(user)
+        } else {
+          log.debug(`${moduleName}[${getUser.name}] -----> Data obtained`)
+          login(user)
+          .then(loged => {
+            log.debug(`${moduleName}[${getUser.name}] -----> User loged`)
+            resolve(loged)
+          })
+          .catch(error => {
+            log.error(`${moduleName}[${getUser.name}] -----> Error: ${error}`)
+            connected.close()
+            reject(error)
+          })
         }
-        connected.close()
-        resolve(userData)
       })
       .catch(error => {
         log.error(`${moduleName}[${getUser.name}] -----> Error: ${error}`)

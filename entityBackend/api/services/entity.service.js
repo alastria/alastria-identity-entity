@@ -10,8 +10,9 @@ const keythereum = require('keythereum')
 const configHelper = require('../helpers/config.helper')
 const myConfig = configHelper.getConfig()
 const web3Helper = require('../helpers/web3.helper')
-const serviceName = '[Entity Service]'
 const web3 = web3Helper.getWeb3()
+const userModel = require('../models/user.model')
+const serviceName = '[Entity Service]'
 const log = Log.getLogger()
 log.level = myConfig.Log.level
 
@@ -360,10 +361,21 @@ function verifyAlastriaSesion(alastriaSesion) {
       log.debug(`${serviceName}[${verifyAlastriaSesion.name}] -----> Obtained correctly the Subject PublicKey`)
       let verifiedAlastraSesion = tokensFactory.tokens.verifyJWT(alastriaSesion.signedAIC, `04${publicKey}`)
       if(verifiedAlastraSesion == true) {
-        // TODO buscar por did el usuario
+        userModel.getUser(decode.payload.iss)
+        .then(user => {
+          let loged = (user == null) ? verifiedAlastraSesion : user
+          resolve(loged)
+        })
+        .catch(error => {
+          log.error(`${serviceName}[${verifyAlastriaSesion.name}] -----> ${error}`)
+          reject(error)
+        })
       }
     })
-
+    .catch(error => {
+      log.error(`${serviceName}[${verifyAlastriaSesion.name}] -----> ${error}`)
+      reject(error)
+    })
   })
  }
 

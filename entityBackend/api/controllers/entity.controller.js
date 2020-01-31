@@ -203,16 +203,16 @@ function updateReceiverPresentationStatus(req, res){
     log.debug(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> Sending params: ${JSON.stringify(presentationHash)}`)
     let newStatus = req.swagger.params.body.value;    
     entityService.updateReceiverPresentationStatus(presentationHash,newStatus)
-      .then(() => { 
-        log.debug(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> Successfully updated status presentation`);
-        res.status(200).send();
-      })
-      .catch(error => {
-        let msg = {
-          message: `Insternal Server Error: ${error}`
-        }
-        res.status(503).send(msg)
-      })         
+    .then(() => { 
+      log.debug(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> Successfully updated status presentation`);
+      res.status(200).send();
+    })
+    .catch(error => {
+      let msg = {
+        message: `Insternal Server Error: ${error}`
+      }
+      res.status(503).send(msg)
+    })         
   } catch (error) {
     log.error(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> ${error}`)
   }
@@ -234,6 +234,7 @@ function getCredentialStatus(req, res){
                                       message: 'Guardada correctamente las credenciales.'})
           res.status(200).send(credentialStatus);
         } else {
+          log.error(`${controller_name}[${getCredentialStatus.name}] -----> ${error}`)
           let msg = {
             message: 'Error getting presentation status'
           }
@@ -243,7 +244,13 @@ function getCredentialStatus(req, res){
         }        
       })
       .catch(error => {
-        
+        log.debug(`${controller_name}[${getCredentialStatus.name}] -----> ${error}`)
+        let msg = {
+          message: 'Error getting presentation status'
+        }
+        io.emit('error', {status: 404,
+                          message: 'No se ha guardado correctamente la credencial. Vuelva a intentarlo.'})
+        res.status(404).send(msg)
       })         
   } catch (error) {
     log.error(`${controller_name}[${getCredentialStatus.name}] -----> ${error}`)
@@ -274,7 +281,7 @@ function recivePresentationData(req, res) {
       }
       log.error(`${controller_name}[${recivePresentationData.name}] -----> Error: ${msg.message}`);
       io.emit('error', {status: 400,
-                        message: message})
+                        message: msg.message})
       res.status(400).send(msg)
     })
   }
@@ -296,8 +303,18 @@ function verifyAlastriaSesion(req, res) {
     log.debug(`${controller_name}[${verifyAlastriaSesion.name}] -----> Sending params: ${JSON.stringify(alastriaSesion)}`)
     entityService.verifyAlastriaSesion(alastriaSesion)
     .then(verified => {
-      console.log(verified)
-      res.status(200).send('ok')
+      log.debug(`${controller_name}[${verifyAlastriaSesion.name}] -----> Alastria Sesion verified successfuly`)
+      io.emit('login', verified)
+      res.status(200).send(verified)
+    })
+    .catch(error => {
+      log.error(`${controller_name}[${verifyAlastriaSesion.name}] -----> Error: ${error}`)
+    let msg = {
+      message: `${error}`
+    }
+    io.emit('error', {status: 401,
+                      message: msg.message})
+    res.status(401).send(msg)
     })
   }
   catch(error) {
