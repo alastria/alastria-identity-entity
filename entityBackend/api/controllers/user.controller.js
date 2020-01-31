@@ -34,7 +34,7 @@ function login(req, res) {
   try {
     log.debug(`${controller_name}[${login.name}] -----> IN ...`)
     let loginData =  {
-      user: req.swagger.params.user.value,
+      username: req.swagger.params.username.value,
       password: req.swagger.params.password.value
     }
     log.debug(`${controller_name}[${login.name}] -----> Sending params: ${JSON.stringify(loginData)}`)

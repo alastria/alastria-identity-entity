@@ -28,7 +28,7 @@ paths:
       description: check if user has account into the platform
       operationId: login
       parameters:
-        - name: user
+        - name: username
           in: query
           type: string
           description: username or email of the user

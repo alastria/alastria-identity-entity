@@ -131,7 +131,6 @@ function createAlastriaID(params) {
     log.debug(`${serviceName}[${createAlastriaID.name}] -----> IN ...`)
     let decodedAIC = tokensFactory.tokens.decodeJWT(params.signedAIC)
     let signedCreateTransaction = decodedAIC.payload.createAlastriaTX
-    console.log("signedCreateTransaction", signedCreateTransaction)
     let preparedId = preparedAlastriaId()
     issuerGetKnownTransaction(preparedId)
     .then(signedPreparedTransaction => {
