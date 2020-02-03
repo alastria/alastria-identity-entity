@@ -119,7 +119,7 @@ module.exports = {
   addSubjectPresentation,
   getCredentialStatus,
   getSubjectData,
-  verifyAlastriaSesion
+  verifyAlastriaSession
 }
 
 /////////////////////////////////////////////////////////
@@ -348,16 +348,16 @@ function getSubjectData(pubkey, presentationSigned) {
   }) 
 }
 
-function verifyAlastriaSesion(alastriaSesion) {
+function verifyAlastriaSession(alastriaSession) {
   return new Promise((resolve, reject) => {
-    log.debug(`${serviceName}[${verifyAlastriaSesion.name}] -----> IN...`)
-    let decode = tokensFactory.tokens.decodeJWT(alastriaSesion.signedAIC)
+    log.debug(`${serviceName}[${verifyAlastriaSession.name}] -----> IN...`)
+    let decode = tokensFactory.tokens.decodeJWT(alastriaSession.signedAIC)
     let didSubject = decode.payload.iss.split(':')[4]
-    log.debug(`${serviceName}[${verifyAlastriaSesion.name}] -----> Obtained correctly the Subject DID`)
+    log.debug(`${serviceName}[${verifyAlastriaSession.name}] -----> Obtained correctly the Subject DID`)
     getCurrentPublicKey(didSubject)
     .then(subjectPublicKey => {
       let publicKey = subjectPublicKey[0]
-      log.debug(`${serviceName}[${verifyAlastriaSesion.name}] -----> Obtained correctly the Subject PublicKey`)
+      log.debug(`${serviceName}[${verifyAlastriaSession.name}] -----> Obtained correctly the Subject PublicKey`)
       let verifiedAlastraSesion = tokensFactory.tokens.verifyJWT(alastriaSesion.signedAIC, `04${publicKey}`)
       if(verifiedAlastraSesion == true) {
         userModel.getUser(decode.payload.iss)
@@ -366,13 +366,13 @@ function verifyAlastriaSesion(alastriaSesion) {
           resolve(loged)
         })
         .catch(error => {
-          log.error(`${serviceName}[${verifyAlastriaSesion.name}] -----> ${error}`)
+          log.error(`${serviceName}[${verifyAlastriaSession.name}] -----> ${error}`)
           reject(error)
         })
       }
     })
     .catch(error => {
-      log.error(`${serviceName}[${verifyAlastriaSesion.name}] -----> ${error}`)
+      log.error(`${serviceName}[${verifyAlastriaSession.name}] -----> ${error}`)
       reject(error)
     })
   })

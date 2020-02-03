@@ -204,14 +204,14 @@ paths:
     # binds a127 app logic to a route
     x-swagger-router-controller: entity.controller
     post:
-      description: Verify Alastria Sesion from Wallet
+      description: Verify Alastria Session from Wallet
       # used as the method name of the controller
-      operationId: verifyAlastriaSesion
+      operationId: verifyAlastriaSession
       parameters:
-        - name: alastriaSesion
+        - name: alastriaSession
           in: body
-          description: Necessary data to create a new Alastria ID
-          required: false
+          description: JWT signed by Wallet to create an Alastria Session
+          required: true
           schema: 
             $ref: "#/definitions/identityData"
       responses:

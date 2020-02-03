@@ -27,7 +27,7 @@ module.exports = {
   addSubjectPresentation,
   getCredentialStatus,
   recivePresentationData,
-  verifyAlastriaSesion
+  verifyAlastriaSession
 }
 
 /////////////////////////////////////////////////////////
@@ -296,19 +296,19 @@ function recivePresentationData(req, res) {
   }
 }
 
-function verifyAlastriaSesion(req, res) {
+function verifyAlastriaSession(req, res) {
   try {
-    log.debug(`${controller_name}[${verifyAlastriaSesion.name}] -----> IN ...`)
-    let alastriaSesion = req.swagger.params.alastriaSesion.value
-    log.debug(`${controller_name}[${verifyAlastriaSesion.name}] -----> Sending params: ${JSON.stringify(alastriaSesion)}`)
-    entityService.verifyAlastriaSesion(alastriaSesion)
+    log.debug(`${controller_name}[${verifyAlastriaSession.name}] -----> IN ...`)
+    let alastriaSession = req.swagger.params.alastriaSession.value
+    log.debug(`${controller_name}[${verifyAlastriaSession.name}] -----> Sending params: ${JSON.stringify(alastriaSesion)}`)
+    entityService.verifyAlastriaSession(alastriaSesion)
     .then(verified => {
-      log.debug(`${controller_name}[${verifyAlastriaSesion.name}] -----> Alastria Sesion verified successfuly`)
+      log.debug(`${controller_name}[${verifyAlastriaSession.name}] -----> Alastria Sesion verified successfuly`)
       io.emit('login', verified)
       res.status(200).send(verified)
     })
     .catch(error => {
-      log.error(`${controller_name}[${verifyAlastriaSesion.name}] -----> Error: ${error}`)
+      log.error(`${controller_name}[${verifyAlastriaSession.name}] -----> Error: ${error}`)
     let msg = {
       message: `${error}`
     }
@@ -318,7 +318,7 @@ function verifyAlastriaSesion(req, res) {
     })
   }
   catch(error) {
-    log.error(`${controller_name}[${verifyAlastriaSesion.name}] -----> Error: ${error}`)
+    log.error(`${controller_name}[${verifyAlastriaSession.name}] -----> Error: ${error}`)
     let msg = {
       message: `${error}`
     }
