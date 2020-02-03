@@ -366,7 +366,7 @@ function verifyAlastriaSession(alastriaSession) {
             did: decode.payload.iss,
             proxyAddress: didSubject
           }
-          let loged = (user == null) ? data : user
+          let loged = (user == null) || (user.did == null) ? data : user
           resolve(loged)
         })
         .catch(error => {
