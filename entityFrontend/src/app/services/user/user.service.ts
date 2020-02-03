@@ -93,6 +93,22 @@ export class UserService {
   setIsAlastriaIdVerified(isAlastriaIdVerified: boolean): void {
     this.isAlastriaIdVerified = isAlastriaIdVerified;
   }
+
+  /**
+   * Get userVinculate
+   * @returns string
+   */
+  getUserVinculate(): any {
+    return JSON.parse(sessionStorage.getItem('userVinculate'));
+  }
+
+  /**
+   * set userVinculate in session storage
+   * @param userVinculate - userVinculate for vinculate user
+   */
+  setUserVinculate(userVinculate: string): void {
+    sessionStorage.setItem('userVinculate', JSON.stringify(userVinculate));
+  }
 }
 
 

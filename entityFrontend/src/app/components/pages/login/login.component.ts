@@ -170,6 +170,7 @@ const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
           this.onLogin(userStorage);
         } else {
           $('#simpleModal').modal('hide');
+          this.userService.setUserVinculate(result);
           this.router.navigate(['/', 'vinculate']);
         }
 
