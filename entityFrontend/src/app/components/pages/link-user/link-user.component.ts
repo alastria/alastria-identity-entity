@@ -136,9 +136,11 @@ export class LinkUserComponent implements OnInit {
       this.errorPasswordNewUser = '';
       delete userRegister.repeatPassword;
       const userVinculate = this.userService.getUserVinculate();
-      userRegister.did = userVinculate.did;
-      userRegister.proxyAddress = userVinculate.proxyAddress;
-      userRegister.vinculated = true;
+      if (userVinculate) {
+        userRegister.did = userVinculate.did;
+        userRegister.proxyAddress = userVinculate.proxyAddress;
+        userRegister.vinculated = true;
+      }
     // TODO: llamada al servidor para vincular el usuario
       await this.userService.createUser(userRegister);
       await this.login(userRegister, true);
@@ -212,12 +214,16 @@ export class LinkUserComponent implements OnInit {
   private async login(userRegister: any, isRegister: boolean) {
     try {
       const userLogin = await this.userService.login(userRegister);
-      if (!isRegister) {
+      if (isRegister) {
+        this.userService.setUserLoggedIn(userLogin);
+      } else {
         const userVinculate = this.userService.getUserVinculate();
-        userVinculate.id = userLogin.id;
-        const userUpdate = await this.userService.updateUser(userVinculate);
-        userUpdate.userData.authToken = userUpdate.authToken;
-        this.userService.setUserLoggedIn(userUpdate.userData);
+        if (userVinculate) {
+          userVinculate.id = userLogin.id;
+          const userUpdate = await this.userService.updateUser(userVinculate);
+          this.userService.setUserLoggedIn(userUpdate);
+        }
+        this.userService.setUserLoggedIn(userLogin);
       }
       sessionStorage.removeItem('userVinculate');
       this.router.navigate(['/', 'home']);
