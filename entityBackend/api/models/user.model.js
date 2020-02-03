@@ -190,7 +190,6 @@ function updateUser(id, params) {
             updated: updated.result.nModified,
             user: gettedUser
           }
-          console.log(gettedUser)
           connected.close()
           resolve(result)
         })

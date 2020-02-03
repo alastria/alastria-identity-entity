@@ -304,7 +304,7 @@ function verifyAlastriaSession(req, res) {
     entityService.verifyAlastriaSession(alastriaSession)
     .then(verified => {
       log.debug(`${controller_name}[${verifyAlastriaSession.name}] -----> Alastria Sesion verified successfuly`)
-      io.emit('login', verified)
+      io.emit('session', verified)
       res.status(200).send(verified)
     })
     .catch(error => {
