@@ -320,7 +320,7 @@ export class ProfileComponent implements OnInit {
           .then((result: any) => {
             const user = result.user.userData;
             user.authToken = result.user.authToken;
-            this.userService.setUserLoggedIn(result.user);
+            this.userService.setUserLoggedIn(user);
             this.resultModal = {
               type: 'success',
               title: 'Congratulations!',
@@ -336,7 +336,7 @@ export class ProfileComponent implements OnInit {
       })
     );
 
-    this.subscription.add(this.socketService.onLogin()
+    this.subscription.add(this.socketService.onSession()
       .subscribe((response) => {
         this.socketService.sendDisconnect();
         const userUpdate = this.createUserUpdateForVinculated(response);

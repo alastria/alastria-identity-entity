@@ -160,7 +160,7 @@ const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
   private initIoConnection(): void {
     this.socketService.initSocket();
 
-    this.subscription.add(this.socketService.onLogin()
+    this.subscription.add(this.socketService.onSession()
       .subscribe((result) => {
         console.log('result ', result);
         let userStorage: User;
