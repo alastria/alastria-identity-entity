@@ -90,7 +90,9 @@ function login(params){
             surname: found.surname,
             email: found.email,
             address: found.address,
-            vinculated: (found.vinculated == null) ? false : found.vinculated
+            vinculated: (found.vinculated == null) ? false : found.vinculated,
+            did: found.did,
+            proxyAddress: found.proxyAddress
           },
           authToken: token
         }
@@ -188,6 +190,7 @@ function updateUser(id, params) {
             updated: updated.result.nModified,
             user: gettedUser
           }
+          console.log(gettedUser)
           connected.close()
           resolve(result)
         })
