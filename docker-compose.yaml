@@ -11,7 +11,7 @@ services:
       - NODE_ENDPOINT=alastria
     links:
     #   - ganache:ganache  // if you are using local endpoint uncomment this two lines
-      - mongo:mongo
+      - mongo-express:mongo-express
     ports:
       - "10010:10010"
     volumes:
