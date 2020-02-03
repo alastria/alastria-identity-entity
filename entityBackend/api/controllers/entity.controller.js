@@ -300,8 +300,8 @@ function verifyAlastriaSession(req, res) {
   try {
     log.debug(`${controller_name}[${verifyAlastriaSession.name}] -----> IN ...`)
     let alastriaSession = req.swagger.params.alastriaSession.value
-    log.debug(`${controller_name}[${verifyAlastriaSession.name}] -----> Sending params: ${JSON.stringify(alastriaSesion)}`)
-    entityService.verifyAlastriaSession(alastriaSesion)
+    log.debug(`${controller_name}[${verifyAlastriaSession.name}] -----> Sending params: ${JSON.stringify(alastriaSession)}`)
+    entityService.verifyAlastriaSession(alastriaSession)
     .then(verified => {
       log.debug(`${controller_name}[${verifyAlastriaSession.name}] -----> Alastria Sesion verified successfuly`)
       io.emit('login', verified)

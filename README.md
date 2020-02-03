@@ -16,11 +16,17 @@ Backend that interacts with the [Alastria Identity Lib](https://github.com/alast
 
 Frontend of the Entity.
 
+### Mongo Database
+
+Data Base of the entity.
+
 ## How to run the Entity
 
 ### Requirements
 
 You need to install [`npm`](https://www.npmjs.com/get-npm), [`docker`](https://docs.docker.com/v17.09/engine/installation/) and [`docker-compose`](https://docs.docker.com/compose/install/).
+
+### Starting the the database
 
 ### Install entityFrontend
 

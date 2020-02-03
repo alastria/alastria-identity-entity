@@ -358,11 +358,14 @@ function verifyAlastriaSession(alastriaSession) {
     .then(subjectPublicKey => {
       let publicKey = subjectPublicKey[0]
       log.debug(`${serviceName}[${verifyAlastriaSession.name}] -----> Obtained correctly the Subject PublicKey`)
-      let verifiedAlastraSesion = tokensFactory.tokens.verifyJWT(alastriaSesion.signedAIC, `04${publicKey}`)
-      if(verifiedAlastraSesion == true) {
+      let verifiedAlastraSession = tokensFactory.tokens.verifyJWT(alastriaSession.signedAIC, `04${publicKey}`)
+      if(verifiedAlastraSession == true) {
         userModel.getUser(decode.payload.iss)
         .then(user => {
-          let loged = (user == null) ? verifiedAlastraSesion : user
+          let data = {
+            did: decode.payload.iss
+          }
+          let loged = (user == null) ? data : user
           resolve(loged)
         })
         .catch(error => {
