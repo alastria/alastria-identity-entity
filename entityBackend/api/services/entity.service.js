@@ -363,7 +363,8 @@ function verifyAlastriaSession(alastriaSession) {
         userModel.getUser(decode.payload.iss)
         .then(user => {
           let data = {
-            did: decode.payload.iss
+            did: decode.payload.iss,
+            proxyAddress: didSubject
           }
           let loged = (user == null) ? data : user
           resolve(loged)

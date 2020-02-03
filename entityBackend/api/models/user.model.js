@@ -122,6 +122,8 @@ function createUser(params) {
         email: params.email,
         address: params.address,
         password: params.password,
+        did: params.did,
+        proxyAddress: params.proxyAddress,
         vinculated: (params.vinculated == null) ? false : params.vinculated
       }
       let db = connected.db(mongoDatabase)
