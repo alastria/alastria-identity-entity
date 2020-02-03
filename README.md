@@ -20,13 +20,23 @@ Frontend of the Entity.
 
 Data Base of the entity.
 
+### Mongo-Express
+
+A tool to monitorize the mongo database.
+
+#### Notes
+
+If you want to develope, fir of all you need to have the database started, to do this you have to run this command in the directory of alastria-identity-entity.
+
+```sh
+docker-compose up -d mongo-express
+```
+
 ## How to run the Entity
 
 ### Requirements
 
 You need to install [`npm`](https://www.npmjs.com/get-npm), [`docker`](https://docs.docker.com/v17.09/engine/installation/) and [`docker-compose`](https://docs.docker.com/compose/install/).
-
-### Starting the the database
 
 ### Install entityFrontend
 
