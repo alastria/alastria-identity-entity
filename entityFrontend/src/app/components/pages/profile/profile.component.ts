@@ -298,9 +298,8 @@ export class ProfileComponent implements OnInit {
   }
 
   private createUserUpdateForVinculated(responseWs: any) {
-    console.log(responseWs);
     const userUpdate: any = {
-      objectIdentity: responseWs.data,
+      objectIdentity: responseWs,
     };
     userUpdate.id = this.user.id;
 
@@ -315,11 +314,12 @@ export class ProfileComponent implements OnInit {
 
     this.subscription.add(this.socketService.onCreateIdentity()
       .subscribe((response: any) => {
-        console.log(response);
         this.socketService.sendDisconnect();
         const userUpdate = this.createUserUpdateForVinculated(response);
         this.userService.updateUser(userUpdate)
           .then((result: any) => {
+            const user = result.user.userData;
+            user.authToken = result.user.authToken;
             this.userService.setUserLoggedIn(result.user);
             this.resultModal = {
               type: 'success',
@@ -327,6 +327,7 @@ export class ProfileComponent implements OnInit {
               description: 'Your Alastria ID has been created. Start to fill you new AlastriaID'
             };
             this.user = this.userService.getUserLoggedIn();
+            this.isCreateAlastriaId = false;
             $('#modal-result').modal('show');
           })
         .catch((error: any) => {
@@ -341,12 +342,16 @@ export class ProfileComponent implements OnInit {
         const userUpdate = this.createUserUpdateForVinculated(response);
         this.userService.updateUser(userUpdate)
           .then((result: any) => {
-              this.userService.setUserLoggedIn(result.user);
+              const user = result.user.userData;
+              user.authToken = result.user.authToken;
+              this.userService.setUserLoggedIn(user);
               this.resultModal = {
                 type: 'success',
                 title: 'Congratulations!',
                 description: `Your AlastriaID has been linked to your ${environment.entityName} profile. Now you can login next times with your AlastriaID`
               };
+              this.user = this.userService.getUserLoggedIn();
+              this.isCreateAlastriaId = false;
               $('#modal-result').modal('show');
           });
       })
