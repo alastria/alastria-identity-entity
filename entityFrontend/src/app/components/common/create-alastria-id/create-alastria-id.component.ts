@@ -80,15 +80,13 @@ export class CreateAlastriaIdComponent implements OnInit {
    * @returns - config
    */
   private async generateQr(): Promise<string> {
-    let qr: string;
-
-    if (this.type === 'C') {
+    try {
+      let qr: string;
       qr = await this.createAlastriaToken();
-    } else {
-      qr = await this.createPresentationRequest();
+      return qr;
+    } catch (error) {
+      console.error(error);
     }
-
-    return qr;
   }
 
   private async createAlastriaToken(): Promise<string> {
@@ -107,22 +105,5 @@ export class CreateAlastriaIdComponent implements OnInit {
     const alastriaToken = this.alastriaLibService.createAlastriaToken(config);
 
     return this.alastriaLibService.signJWT(alastriaToken, alastriaLibJson.privateKey);
-  }
-
-  private async createPresentationRequest(): Promise<string> {
-    const alastriaLibJson: any = await this.http.get(alastriaLibJsonUrl).toPromise();
-    alastriaLibJson.payload.pr.data = [
-      {
-          '@context': 'JWT',
-          levelOfAssurance: 'High',
-          required: true,
-          field_name: 'did'
-      },
-    ];
-
-    const presentationRequest = this.alastriaLibService.createPresentationRequest(alastriaLibJson.header, alastriaLibJson.payload);
-    const presentationRequestSigned = this.alastriaLibService.signJWT(presentationRequest, alastriaLibJson.privateKey);
-
-    return JSON.stringify(presentationRequestSigned);
   }
 }
