@@ -112,6 +112,8 @@ function addSubjectPresentation(req, res) {
     entityService.addSubjectPresentation(params)
     .then(addSubjectPres => {
       log.debug(`${controller_name}[${addSubjectPresentation.name}] -----> Successfully added subject presentation: ${JSON.stringify(addSubjectPres)}`)
+      io.emit('getPresentationData', {status: 200,
+                                  message: 'Guardada correctamente las credenciales.'})
       res.status(200).send(addSubjectPres)
     })
     .catch(error => {
@@ -119,6 +121,8 @@ function addSubjectPresentation(req, res) {
       let msg = {
         message: 'Error: Transaction has been reverted by the EVM'
       }
+      io.emit('error', {status: 400,
+                        message: `${error}`})
       res.status(400).send(msg)
     })
   }
@@ -127,6 +131,8 @@ function addSubjectPresentation(req, res) {
     let msg = {
       message: 'Insternal Server Erorr'
     }
+    io.emit('error', {status: 503,
+                      message: `${error}`})
     res.status(503).send(msg)
    }
 }
@@ -279,7 +285,7 @@ function recivePresentationData(req, res) {
       let msg = {
         message: `${error}`
       }
-      log.error(`${controller_name}[${recivePresentationData.name}] -----> Error: ${msg.message}`);
+      log.error(`${controller_name}[${recivePresentationData.name}] -----> Error: ${message}`);
       io.emit('error', {status: 400,
                         message: msg.message})
       res.status(400).send(msg)

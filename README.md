@@ -57,8 +57,8 @@ npm run build
 Before running the Entity, you can change the blockchain node IP in the file [docker-compose.yaml](/docker-compose.yaml). At the moment, you can choose one of this (**only one**):
 
 ```yaml
-- NODE_ENDPOINT=localEndpoint
-#- NODE_ENDPOINT=alastria
+- NODE_ENDPOINT=alastria
+#- NODE_ENDPOINT=localEndpoint
 ```
 
 In the example above, a ganache will run locally, so you will need to deploy the _smart contracts_ manually.
