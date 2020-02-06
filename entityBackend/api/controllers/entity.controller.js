@@ -22,7 +22,7 @@ module.exports = {
   createAlastriaID,
   addIssuerCredential,
   getCurrentPublicKey,
-  getpresentationStatus,
+  getPresentationStatus,
   updateReceiverPresentationStatus,
   addSubjectPresentation,
   getCredentialStatus,
@@ -171,20 +171,21 @@ function getCurrentPublicKey(req, res) {
    }
 }
 
-function getpresentationStatus(req, res){
+function getPresentationStatus(req, res){
   try {
-    log.debug(`${controller_name}[${getpresentationStatus.name}] -----> IN ...`);
+    log.debug(`${controller_name}[${getPresentationStatus.name}] -----> IN ...`);
     let presentationHash = req.swagger.params.presentationHash.value;
-    log.debug(`${controller_name}[${getpresentationStatus.name}] -----> Sending params: ${JSON.stringify(presentationHash)}`)
+    log.debug(`${controller_name}[${getPresentationStatus.name}] -----> Sending params: ${JSON.stringify(presentationHash)}`)
     let issuer = req.swagger.params.serviceProvider.value;
     let subject = req.swagger.params.subject.value;
-    entityService.getpresentationStatus(presentationHash,issuer,subject)
+    entityService.getPresentationStatus(presentationHash,issuer,subject)
       .then(presentationStatus => { 
         if (presentationStatus != null){
-          log.debug(`${controller_name}[${getpresentationStatus.name}] -----> Successfully obtained presentation status: ${presentationStatus}`);
+          log.debug(`${controller_name}[${getPresentationStatus.name}] -----> Successfully obtained presentation status: ${presentationStatus}`);
           res.status(200).send(presentationStatus);
         }
         else {
+          log.error(`${controller_name}[${getPresentationStatus.name}] -----> Error: Error getting presentation status`);
           let msg = {
             message: 'Error getting presentation status'
           }
@@ -192,13 +193,18 @@ function getpresentationStatus(req, res){
         }        
       })
       .catch(error => {
+        log.error(`${controller_name}[${getPresentationStatus.name}] -----> ${error}`);
         let msg = {
-          message: `Insternal Server Error: ${error}`
+          message: `${error}`
         }
-        res.status(503).send(msg)
+        res.status(400).send(msg)
       })         
   } catch (error) {
-    log.error(`${controller_name}[${getpresentationStatus.name}] -----> ${error}`)
+    log.error(`${controller_name}[${getPresentationStatus.name}] -----> ${error}`)
+    let msg = {
+      message: `Insternal Server Error: ${error}`
+    }
+    res.status(503).send(msg)
   }
 }
 
@@ -214,13 +220,18 @@ function updateReceiverPresentationStatus(req, res){
       res.status(200).send();
     })
     .catch(error => {
+      log.error(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> ${error}`);
       let msg = {
-        message: `Insternal Server Error: ${error}`
+        message: `${error}`
       }
-      res.status(503).send(msg)
+      res.status(404).send(msg)
     })         
   } catch (error) {
     log.error(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> ${error}`)
+    let msg = {
+      message: `${error}`
+    }
+    res.status(503).send(msg)
   }
 }
 

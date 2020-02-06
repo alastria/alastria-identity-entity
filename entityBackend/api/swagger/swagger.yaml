@@ -696,7 +696,7 @@ paths:
     get:
       x-swagger-router-controller: entity.controller
       description: get current Subject or Service Provider (Receiver) status for the given presentation
-      operationId: getpresentationStatus
+      operationId: getPresentationStatus
       parameters:
         - name: presentationHash
           in: path
