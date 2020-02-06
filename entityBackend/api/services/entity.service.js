@@ -7,8 +7,6 @@
 const { transactionFactory, UserIdentity, config, tokensFactory } = require('alastria-identity-lib')
 const Log = require('log4js')
 const keythereum = require('keythereum')
-const EC = require('elliptic').ec
-const keccak256 = require('js-sha3').keccak256
 const configHelper = require('../helpers/config.helper')
 const myConfig = configHelper.getConfig()
 const web3Helper = require('../helpers/web3.helper')
@@ -20,12 +18,27 @@ log.level = myConfig.Log.level
 
 let issuerKeystore = myConfig.issuerKeystore
 let issuerIdentity, issuerPrivateKey
+let subjectKeystore = myConfig.subjectKeystore
+let subjectIdentity, subjectPrivateKey
 
 
 
 /////////////////////////////////////////////////////////
 ///////             PRIVATE FUNCTIONS             ///////
 /////////////////////////////////////////////////////////
+
+function getSubjectIdentity() {
+  try {
+    log.debug(`${serviceName}[${getSubjectIdentity.name}] -----> IN ...`)
+    subjectPrivateKey = keythereum.recover(myConfig.addressPassword, subjectKeystore)
+    subjectIdentity = new UserIdentity(web3, `0x${subjectKeystore.address}`, subjectPrivateKey)
+    log.debug(`${serviceName}[${getSubjectIdentity.name}] -----> Subject Getted`)
+    return subjectIdentity
+  } catch (error) {
+    log.error(`${serviceName}[${getSubjectIdentity.name}] -----> ${error}`)
+    return error
+  }
+}
 
 function getIssuerIdentity() {
   try {
@@ -83,28 +96,9 @@ function issuerGetKnownTransaction(issuerCredential) {
   })
 }
 
-function getAddressFromPubKey(publicKey) {
+function preparedAlastriaId() {
   try {
-    log.debug(`${serviceName}[${getAddressFromPubKey.name}] -----> IN ...`)
-    const ec = new EC('secp256k1')
-    // Decode Public Key
-    const key = ec.keyFromPublic(`04${publicKey.substr(2)}`, 'hex')
-    // Convert to uncompressed format
-    const pubKey = key.getPublic().encode('hex').slice(2)
-    // Apply keccak
-    const address = keccak256(Buffer.from(pubKey, 'hex')).slice(64 - 40)
-    log.debug(`${serviceName}[${getAddressFromPubKey.name}] -----> Getted address`)
-    return address
-  }
-  catch(error) {
-    log.error(`${serviceName}[${getAddressFromPubKey.name}] -----> ${error}`)
-    return error
-  }
-}
-
-function preparedAlastriaId(subjectAddress) {
-  try {
-    let preparedId = transactionFactory.identityManager.prepareAlastriaID(web3, subjectAddress)
+    let preparedId = transactionFactory.identityManager.prepareAlastriaID(web3, subjectKeystore.address)
     return preparedId
   } 
   catch(error) {
@@ -120,7 +114,7 @@ module.exports = {
   createAlastriaID,
   addIssuerCredential,
   getCurrentPublicKey,
-  getPresentationStatus,
+  getpresentationStatus,
   updateReceiverPresentationStatus,
   addSubjectPresentation,
   getCredentialStatus,
@@ -136,9 +130,8 @@ function createAlastriaID(params) {
   return new Promise((resolve, reject) => {
     log.debug(`${serviceName}[${createAlastriaID.name}] -----> IN ...`)
     let decodedAIC = tokensFactory.tokens.decodeJWT(params.signedAIC)
-    let subjectAddress = getAddressFromPubKey(decodedAIC.payload.publicKey)
     let signedCreateTransaction = decodedAIC.payload.createAlastriaTX
-    let preparedId = preparedAlastriaId(subjectAddress)
+    let preparedId = preparedAlastriaId()
     issuerGetKnownTransaction(preparedId)
     .then(signedPreparedTransaction => {
       sendSigned(signedPreparedTransaction)
@@ -198,8 +191,7 @@ function addIssuerCredential(params) {
           }
           log.debug(`${serviceName}[${addIssuerCredential.name}] -----> Success`)
           resolve(credentialStatus)
-        })
-        .catch(error => {
+        }).catch(error => {
           log.error(`${serviceName}[${addIssuerCredential.name}] -----> ${error}`)
           reject(error)
         })
@@ -208,10 +200,6 @@ function addIssuerCredential(params) {
         log.error(`${serviceName}[${addIssuerCredential.name}] -----> ${error}`)
         reject(error)
       })
-    })
-    .catch(error => {
-      log.error(`${serviceName}[${addIssuerCredential.name}] -----> ${error}`)
-      reject(error)
     })
   })
 }
@@ -234,8 +222,7 @@ function addSubjectPresentation(params) {
           }
           log.debug(`${serviceName}[${addSubjectPresentation.name}] -----> Success`)
           resolve(credentialStatus)
-        })
-        .catch(error => {
+        }).catch(error => {
           log.error(`${serviceName}[${addSubjectPresentation.name}] -----> ${error}`)
           reject(error)
         })
@@ -244,10 +231,6 @@ function addSubjectPresentation(params) {
         log.error(`${serviceName}[${addSubjectPresentation.name}] -----> ${error}`)
         reject(error)
       })
-    })
-    .catch(error => {
-      log.error(`${serviceName}[${addSubjectPresentation.name}] -----> ${error}`)
-      reject(error)
     })
   })
 }
@@ -269,9 +252,9 @@ function getCurrentPublicKey(subject) {
   })
 }
 
-function getPresentationStatus(presentationHash, issuer, subject) {
+function getpresentationStatus(presentationHash, issuer, subject) {
   return new Promise((resolve, reject) => {
-    log.debug(`${serviceName}[${getPresentationStatus.name}] -----> IN ...`)
+    log.debug(`${serviceName}[${getpresentationStatus.name}] -----> IN ...`)
     let presentationStatus = null;
     if (issuer != null) {
       presentationStatus = transactionFactory.presentationRegistry.getReceiverPresentationStatus(web3, issuer, presentationHash);
@@ -286,11 +269,11 @@ function getPresentationStatus(presentationHash, issuer, subject) {
           exist: resultStatus[0],
           status: resultStatus[1]
         }
-        log.debug(`${serviceName}[${getPresentationStatus.name}] -----> Success`)
+        log.debug(`${serviceName}[${getpresentationStatus.name}] -----> Success`)
         resolve(resultStatusJson);
       })
       .catch(error => {
-        log.error(`${serviceName}[${getPresentationStatus.name}] -----> ${error}`)
+        log.error(`${serviceName}[${getpresentationStatus.name}] -----> ${error}`)
         reject(error)
       })
     }
@@ -312,10 +295,6 @@ function updateReceiverPresentationStatus(presentationHash, newStatus) {
         log.error(`${serviceName}[${updateReceiverPresentationStatus.name}] -----> ${error}`)
         reject(error)
       })
-    })
-    .catch(error => {
-      log.error(`${serviceName}[${updateReceiverPresentationStatus.name}] -----> ${error}`)
-      reject(error)
     })
   })
 }
@@ -345,7 +324,7 @@ function getCredentialStatus(credentialHash, issuer, subject) {
         reject(error)
       })
     }
-  })
+  });
 }
 
 function getSubjectData(pubkey, presentationSigned) { 

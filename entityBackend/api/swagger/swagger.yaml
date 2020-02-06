@@ -850,14 +850,14 @@ definitions:
         type: string
       signedPresentation:
         type: string
-  # credential:
-  #   properties:
-  #     header:
-  #       type: "object"
-  #     payload:
-  #       type: "object"
-  #     signature:
-  #       type: "object"
+  credential:
+    properties:
+      header:
+        type: "object"
+      payload:
+        type: "object"
+      signature:
+        type: "object"
   alastriaIdentityResponse:
     properties:
       alastriaDID:
@@ -868,14 +868,14 @@ definitions:
         type: string
         #schema:
           #$ref: "#/definitions/credentialCatalog"
-  # credentialCatalog:
-  #   properties:
-  #     credentialName:
-  #       type: string
-  #     status:
-  #       type: string
-  #     credentialType:
-  #       type: string
+  credentialCatalog:
+    properties:
+      credentialName:
+        type: string
+      status:
+        type: string
+      credentialType:
+        type: string
   addCredentialResponse:
     properties:
       status:
