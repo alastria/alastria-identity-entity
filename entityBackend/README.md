@@ -14,7 +14,7 @@ git clone https://github.com/alastria/alastria-identity-entity.git
 
 ### swagger project start & swagger project edit
 
-For start the backend application insert this commands:
+To start the backend application insert this commands:
 
 ```sh
 swagger project start
