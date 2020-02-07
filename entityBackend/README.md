@@ -28,7 +28,7 @@ swagger project edit
 
 ### Installation and Deployment for develop 🔧
 
-The first step open a terminal inside the proyect and go to entity backend folder
+The first step is to open a terminal inside the project and go to entity backend folder
 
 ```sh
 cd entityBackend
