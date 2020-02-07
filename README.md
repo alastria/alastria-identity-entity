@@ -26,7 +26,7 @@ A tool to monitorize the mongo database.
 
 #### Notes
 
-If you want to develope, fir of all you need to have the database started, to do this you have to run this command in the directory of alastria-identity-entity.
+If you want to develop, first of all you need to have the database started, to do this you have to run this command in the directory of alastria-identity-entity.
 
 ```sh
 docker-compose up -d mongo-express
