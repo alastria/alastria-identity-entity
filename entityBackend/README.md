@@ -48,7 +48,7 @@ swagger project start
 
 ### Installation and Deployment with Docker 🔧
 
-The unique step you have to do is go to the root folder and execute this command. This command will run a container of [MongoDB](https://docs.mongodb.com/manual/tutorial/) and an other container of [mongo-express](https://github.com/mongo-express/mongo-express#readme) (web page to manage the mongo database)
+The unique step you have to do is go to the root folder and execute this command. It will run a container for [MongoDB](https://docs.mongodb.com/manual/tutorial/) and  other container for [mongo-express](https://github.com/mongo-express/mongo-express#readme) (web page to manage the mongo database).
 
 ```sh
 docker-compose up -d entitybackend
