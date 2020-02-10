@@ -57,19 +57,6 @@ function sendSigned(transactionSigned) {
   })
 }
 
-function subjectGetKnownTransaction(subjectCredential) {
-  return new Promise((resolve, reject) => {
-    let subjectID = getSubjectIdentity()
-    subjectID.getKnownTransaction(subjectCredential)
-    .then(receipt => {
-      resolve(receipt)
-    })
-    .catch(error => {
-      reject(error)
-    })
-  })
-}
-
 function issuerGetKnownTransaction(issuerCredential) {
   return new Promise((resolve, reject) => {
     let issuerID = getIssuerIdentity()
@@ -122,7 +109,6 @@ module.exports = {
   getCurrentPublicKey,
   getPresentationStatus,
   updateReceiverPresentationStatus,
-  addSubjectPresentation,
   getCredentialStatus,
   getSubjectData,
   verifyAlastriaSession
@@ -179,12 +165,14 @@ function createAlastriaID(params) {
   })
 }
 
+
+// hay que revisar esta funcion ya que antes estabamos usando el getKnownTransaction del subject y eso nos lo manda el propio wallet.
 function addIssuerCredential(params) {
   return new Promise((resolve, reject) => {
     log.debug(`${serviceName}[${addIssuerCredential.name}] -----> IN ...`)
     log.debug(`${serviceName}[${addIssuerCredential.name}] -----> Calling addIssuer credential With params: ${JSON.stringify(params)}`)
     let issuerCredential = transactionFactory.credentialRegistry.addIssuerCredential(web3, params.issuerCredentialHash)
-    subjectGetKnownTransaction(issuerCredential)
+    issuerGetKnownTransaction(issuerCredential)
     .then(issuerCredentialSigned => {
       sendSigned(issuerCredentialSigned)
       .then(receipt => {
@@ -211,42 +199,6 @@ function addIssuerCredential(params) {
     })
     .catch(error => {
       log.error(`${serviceName}[${addIssuerCredential.name}] -----> ${error}`)
-      reject(error)
-    })
-  })
-}
-
-function addSubjectPresentation(params) {
-  return new Promise((resolve, reject) => {
-    log.debug(`${serviceName}[${addSubjectPresentation.name}] -----> IN ...`)
-    let subjectPres = transactionFactory.presentationRegistry.addSubjectPresentation(web3, params.subjectPresentationHash, params.uri)
-    subjectGetKnownTransaction(subjectPres)
-    .then(subjectPresSigned => {
-      sendSigned(subjectPresSigned)
-      .then(receipt => {
-        let subjectPresTx = transactionFactory.presentationRegistry.getSubjectPresentationStatus(web3, params.subject, params.subjectPresentationHash)
-        web3.eth.call(subjectPresTx)
-        .then(subjectPresStatus => {
-          let result = web3.eth.abi.decodeParameters(["bool", "uint8"], subjectPresStatus)
-          let credentialStatus = {
-            "exists": result[0],
-            "status": result[1]
-          }
-          log.debug(`${serviceName}[${addSubjectPresentation.name}] -----> Success`)
-          resolve(credentialStatus)
-        })
-        .catch(error => {
-          log.error(`${serviceName}[${addSubjectPresentation.name}] -----> ${error}`)
-          reject(error)
-        })
-      })
-      .catch(error => {
-        log.error(`${serviceName}[${addSubjectPresentation.name}] -----> ${error}`)
-        reject(error)
-      })
-    })
-    .catch(error => {
-      log.error(`${serviceName}[${addSubjectPresentation.name}] -----> ${error}`)
       reject(error)
     })
   })
