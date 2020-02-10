@@ -7,8 +7,7 @@
 const { transactionFactory, UserIdentity, config, tokensFactory } = require('alastria-identity-lib')
 const Log = require('log4js')
 const keythereum = require('keythereum')
-const EC = require('elliptic').ec
-const keccak256 = require('js-sha3').keccak256
+const EthCrypto = require('eth-crypto')
 const configHelper = require('../helpers/config.helper')
 const myConfig = configHelper.getConfig()
 const web3Helper = require('../helpers/web3.helper')
@@ -73,13 +72,7 @@ function issuerGetKnownTransaction(issuerCredential) {
 function getAddressFromPubKey(publicKey) {
   try {
     log.debug(`${serviceName}[${getAddressFromPubKey.name}] -----> IN ...`)
-    const ec = new EC('secp256k1')
-    // Decode Public Key
-    const key = ec.keyFromPublic(`04${publicKey.substr(2)}`, 'hex')
-    // Convert to uncompressed format
-    const pubKey = key.getPublic().encode('hex').slice(2)
-    // Apply keccak
-    const address = keccak256(Buffer.from(pubKey, 'hex')).slice(64 - 40)
+    let address = EthCrypto.publicKey.toAddress(publicKey)
     log.debug(`${serviceName}[${getAddressFromPubKey.name}] -----> Getted address`)
     return address
   }
