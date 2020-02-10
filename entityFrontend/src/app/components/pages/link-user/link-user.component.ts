@@ -132,13 +132,19 @@ export class LinkUserComponent implements OnInit {
   }
 
   async handleRegister(userRegister) {
-    this.errorPasswordNewUser = '';
-    delete userRegister.repeatPassword;
-
-    // TODO: llamada al servidor para vincular el usuario
     try {
-      const userRegisterResult = await this.userService.createUser(userRegister);
-      await this.login(userRegister);
+      this.errorPasswordNewUser = '';
+      delete userRegister.repeatPassword;
+      const userVinculate = this.userService.getUserVinculate();
+      if (userVinculate) {
+        userRegister.did = userVinculate.did;
+        userRegister.proxyAddress = userVinculate.proxyAddress;
+        userRegister.vinculated = true;
+      }
+    // TODO: llamada al servidor para vincular el usuario
+      await this.userService.createUser(userRegister);
+      await this.login(userRegister, true);
+      sessionStorage.removeItem('userVinculate');
     } catch (error) {
       if (error && error.status === 403) {
         this.errorPasswordNewUser = 'Incorrect email or password';
@@ -153,10 +159,9 @@ export class LinkUserComponent implements OnInit {
     delete userRegister.repeatPassword;
     userRegister.email = (userRegister.emailLogin) ? userRegister.emailLogin : userRegister.email;
     userRegister.password = (userRegister.passwordLogin) ? userRegister.passwordLogin : userRegister.password;
-
     // TODO: llamada al servidor para vincular el usuario
     try {
-      await this.login(userRegister);
+      await this.login(userRegister, false);
     } catch (error) {
       if (error && error.status === 403) {
         this.errorPasswordLogin = 'Incorrect email or password';
@@ -206,10 +211,21 @@ export class LinkUserComponent implements OnInit {
     }
   }
 
-  private async login(userRegister: any) {
+  private async login(userRegister: any, isRegister: boolean) {
     try {
       const userLogin = await this.userService.login(userRegister);
-      this.userService.setUserLoggedIn(userLogin);
+      if (isRegister) {
+        this.userService.setUserLoggedIn(userLogin);
+      } else {
+        const userVinculate = this.userService.getUserVinculate();
+        if (userVinculate) {
+          userVinculate.id = userLogin.id;
+          const userUpdate = await this.userService.updateUser(userVinculate);
+          this.userService.setUserLoggedIn(userUpdate);
+        }
+        this.userService.setUserLoggedIn(userLogin);
+      }
+      sessionStorage.removeItem('userVinculate');
       this.router.navigate(['/', 'home']);
     } catch (error) {
       throw error;

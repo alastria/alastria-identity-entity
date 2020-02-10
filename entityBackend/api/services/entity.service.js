@@ -7,37 +7,25 @@
 const { transactionFactory, UserIdentity, config, tokensFactory } = require('alastria-identity-lib')
 const Log = require('log4js')
 const keythereum = require('keythereum')
+const EC = require('elliptic').ec
+const keccak256 = require('js-sha3').keccak256
 const configHelper = require('../helpers/config.helper')
 const myConfig = configHelper.getConfig()
 const web3Helper = require('../helpers/web3.helper')
-const serviceName = '[Entity Service]'
 const web3 = web3Helper.getWeb3()
+const userModel = require('../models/user.model')
+const serviceName = '[Entity Service]'
 const log = Log.getLogger()
 log.level = myConfig.Log.level
 
 let issuerKeystore = myConfig.issuerKeystore
 let issuerIdentity, issuerPrivateKey
-let subjectKeystore = myConfig.subjectKeystore
-let subjectIdentity, subjectPrivateKey
 
 
 
 /////////////////////////////////////////////////////////
 ///////             PRIVATE FUNCTIONS             ///////
 /////////////////////////////////////////////////////////
-
-function getSubjectIdentity() {
-  try {
-    log.debug(`${serviceName}[${getSubjectIdentity.name}] -----> IN ...`)
-    subjectPrivateKey = keythereum.recover(myConfig.addressPassword, subjectKeystore)
-    subjectIdentity = new UserIdentity(web3, `0x${subjectKeystore.address}`, subjectPrivateKey)
-    log.debug(`${serviceName}[${getSubjectIdentity.name}] -----> Subject Getted`)
-    return subjectIdentity
-  } catch (error) {
-    log.error(`${serviceName}[${getSubjectIdentity.name}] -----> ${error}`)
-    return error
-  }
-}
 
 function getIssuerIdentity() {
   try {
@@ -69,19 +57,6 @@ function sendSigned(transactionSigned) {
   })
 }
 
-function subjectGetKnownTransaction(subjectCredential) {
-  return new Promise((resolve, reject) => {
-    let subjectID = getSubjectIdentity()
-    subjectID.getKnownTransaction(subjectCredential)
-    .then(receipt => {
-      resolve(receipt)
-    })
-    .catch(error => {
-      reject(error)
-    })
-  })
-}
-
 function issuerGetKnownTransaction(issuerCredential) {
   return new Promise((resolve, reject) => {
     let issuerID = getIssuerIdentity()
@@ -95,9 +70,28 @@ function issuerGetKnownTransaction(issuerCredential) {
   })
 }
 
-function preparedAlastriaId() {
+function getAddressFromPubKey(publicKey) {
   try {
-    let preparedId = transactionFactory.identityManager.prepareAlastriaID(web3, subjectKeystore.address)
+    log.debug(`${serviceName}[${getAddressFromPubKey.name}] -----> IN ...`)
+    const ec = new EC('secp256k1')
+    // Decode Public Key
+    const key = ec.keyFromPublic(`04${publicKey.substr(2)}`, 'hex')
+    // Convert to uncompressed format
+    const pubKey = key.getPublic().encode('hex').slice(2)
+    // Apply keccak
+    const address = keccak256(Buffer.from(pubKey, 'hex')).slice(64 - 40)
+    log.debug(`${serviceName}[${getAddressFromPubKey.name}] -----> Getted address`)
+    return address
+  }
+  catch(error) {
+    log.error(`${serviceName}[${getAddressFromPubKey.name}] -----> ${error}`)
+    return error
+  }
+}
+
+function preparedAlastriaId(subjectAddress) {
+  try {
+    let preparedId = transactionFactory.identityManager.prepareAlastriaID(web3, subjectAddress)
     return preparedId
   } 
   catch(error) {
@@ -113,12 +107,11 @@ module.exports = {
   createAlastriaID,
   addIssuerCredential,
   getCurrentPublicKey,
-  getpresentationStatus,
+  getPresentationStatus,
   updateReceiverPresentationStatus,
-  addSubjectPresentation,
   getCredentialStatus,
   getSubjectData,
-  createAlastriaToken
+  verifyAlastriaSession
 }
 
 /////////////////////////////////////////////////////////
@@ -129,9 +122,9 @@ function createAlastriaID(params) {
   return new Promise((resolve, reject) => {
     log.debug(`${serviceName}[${createAlastriaID.name}] -----> IN ...`)
     let decodedAIC = tokensFactory.tokens.decodeJWT(params.signedAIC)
+    let subjectAddress = getAddressFromPubKey(decodedAIC.payload.publicKey)
     let signedCreateTransaction = decodedAIC.payload.createAlastriaTX
-    console.log("signedCreateTransaction", signedCreateTransaction)
-    let preparedId = preparedAlastriaId()
+    let preparedId = preparedAlastriaId(subjectAddress)
     issuerGetKnownTransaction(preparedId)
     .then(signedPreparedTransaction => {
       sendSigned(signedPreparedTransaction)
@@ -172,12 +165,14 @@ function createAlastriaID(params) {
   })
 }
 
+
+// hay que revisar esta funcion ya que antes estabamos usando el getKnownTransaction del subject y eso nos lo manda el propio wallet.
 function addIssuerCredential(params) {
   return new Promise((resolve, reject) => {
     log.debug(`${serviceName}[${addIssuerCredential.name}] -----> IN ...`)
     log.debug(`${serviceName}[${addIssuerCredential.name}] -----> Calling addIssuer credential With params: ${JSON.stringify(params)}`)
     let issuerCredential = transactionFactory.credentialRegistry.addIssuerCredential(web3, params.issuerCredentialHash)
-    subjectGetKnownTransaction(issuerCredential)
+    issuerGetKnownTransaction(issuerCredential)
     .then(issuerCredentialSigned => {
       sendSigned(issuerCredentialSigned)
       .then(receipt => {
@@ -191,7 +186,8 @@ function addIssuerCredential(params) {
           }
           log.debug(`${serviceName}[${addIssuerCredential.name}] -----> Success`)
           resolve(credentialStatus)
-        }).catch(error => {
+        })
+        .catch(error => {
           log.error(`${serviceName}[${addIssuerCredential.name}] -----> ${error}`)
           reject(error)
         })
@@ -201,36 +197,9 @@ function addIssuerCredential(params) {
         reject(error)
       })
     })
-  })
-}
-
-function addSubjectPresentation(params) {
-  return new Promise((resolve, reject) => {
-    log.debug(`${serviceName}[${addSubjectPresentation.name}] -----> IN ...`)
-    let subjectPres = transactionFactory.presentationRegistry.addSubjectPresentation(web3, params.subjectPresentationHash, params.uri)
-    subjectGetKnownTransaction(subjectPres)
-    .then(subjectPresSigned => {
-      sendSigned(subjectPresSigned)
-      .then(receipt => {
-        let subjectPresTx = transactionFactory.presentationRegistry.getSubjectPresentationStatus(web3, params.subject, params.subjectPresentationHash)
-        web3.eth.call(subjectPresTx)
-        .then(subjectPresStatus => {
-          let result = web3.eth.abi.decodeParameters(["bool", "uint8"], subjectPresStatus)
-          let credentialStatus = {
-            "exists": result[0],
-            "status": result[1]
-          }
-          log.debug(`${serviceName}[${addSubjectPresentation.name}] -----> Success`)
-          resolve(credentialStatus)
-        }).catch(error => {
-          log.error(`${serviceName}[${addSubjectPresentation.name}] -----> ${error}`)
-          reject(error)
-        })
-      })
-      .catch(error => {
-        log.error(`${serviceName}[${addSubjectPresentation.name}] -----> ${error}`)
-        reject(error)
-      })
+    .catch(error => {
+      log.error(`${serviceName}[${addIssuerCredential.name}] -----> ${error}`)
+      reject(error)
     })
   })
 }
@@ -252,9 +221,9 @@ function getCurrentPublicKey(subject) {
   })
 }
 
-function getpresentationStatus(presentationHash, issuer, subject) {
+function getPresentationStatus(presentationHash, issuer, subject) {
   return new Promise((resolve, reject) => {
-    log.debug(`${serviceName}[${getpresentationStatus.name}] -----> IN ...`)
+    log.debug(`${serviceName}[${getPresentationStatus.name}] -----> IN ...`)
     let presentationStatus = null;
     if (issuer != null) {
       presentationStatus = transactionFactory.presentationRegistry.getReceiverPresentationStatus(web3, issuer, presentationHash);
@@ -269,11 +238,11 @@ function getpresentationStatus(presentationHash, issuer, subject) {
           exist: resultStatus[0],
           status: resultStatus[1]
         }
-        log.debug(`${serviceName}[${getpresentationStatus.name}] -----> Success`)
+        log.debug(`${serviceName}[${getPresentationStatus.name}] -----> Success`)
         resolve(resultStatusJson);
       })
       .catch(error => {
-        log.error(`${serviceName}[${getpresentationStatus.name}] -----> ${error}`)
+        log.error(`${serviceName}[${getPresentationStatus.name}] -----> ${error}`)
         reject(error)
       })
     }
@@ -295,6 +264,10 @@ function updateReceiverPresentationStatus(presentationHash, newStatus) {
         log.error(`${serviceName}[${updateReceiverPresentationStatus.name}] -----> ${error}`)
         reject(error)
       })
+    })
+    .catch(error => {
+      log.error(`${serviceName}[${updateReceiverPresentationStatus.name}] -----> ${error}`)
+      reject(error)
     })
   })
 }
@@ -324,42 +297,61 @@ function getCredentialStatus(credentialHash, issuer, subject) {
         reject(error)
       })
     }
-  });
+  })
 }
 
 function getSubjectData(pubkey, presentationSigned) { 
   return new Promise((resolve, reject) => { 
-    log.debug(`${moduleName}[${getSubjectData.name}] -----> IN ...`) 
+    log.debug(`${serviceName}[${getSubjectData.name}] -----> IN ...`) 
     let verified = tokensFactory.tokens.verifyJWT(presentationSigned, `04${pubkey.substr(2)}`) 
     if (verified == true) { 
-      log.debug(`${moduleName}[${getSubjectData.name}] -----> Subject presentation verified`) 
+      log.debug(`${serviceName}[${getSubjectData.name}] -----> Subject presentation verified`) 
       let presentationData = tokensFactory.tokens.decodeJWT(presentationSigned) 
       if (presentationData.payload) { 
-        log.debug(`${moduleName}[${getSubjectData.name}] -----> JWT decoded successfuly`) 
+        log.debug(`${serviceName}[${getSubjectData.name}] -----> JWT decoded successfuly`) 
         resolve(presentationData) 
       } else { 
-        log.error(`${moduleName}[${getSubjectData.name}] -----> Error decoding JWT`) 
+        log.error(`${serviceName}[${getSubjectData.name}] -----> Error decoding JWT`) 
         reject(presentationData) 
       } 
     } else { 
-      log.error(`${moduleName}[${getSubjectData.name}] -----> Error verifying JWT`) 
+      log.error(`${serviceName}[${getSubjectData.name}] -----> Error verifying JWT`) 
       reject(verified) 
     } 
   }) 
 }
 
-function createAlastriaToken(at) {
-  try {
-    log.debug(`${serviceName}[${createAlastriaToken.name}] -----> IN ...`)
-    let issuerPrivateKey
-    issuerPrivateKey = keythereum.recover(myConfig.addressPassword, myConfig.issuerKeystore)
-    let alastriaToken = tokensFactory.tokens.createAlastriaToken(at.didIsssuer, at.providerURL, at.callbackURL, 
-      at.alastriaNetId, at.tokenExpTime, at.tokenActivationDate, at.jsonTokenId)
-    let signedAT = tokensFactory.tokens.signJWT(alastriaToken, issuerPrivateKey)
-    log.debug(`${serviceName}[${createAlastriaToken.name}] -----> Success`)
-    return signedAT
-  } catch (error) {
-    log.error(`${serviceName}[${createAlastriaToken.name}] -----> Culdnt get the issuers private key`)
-    return error
-  }
-}
+function verifyAlastriaSession(alastriaSession) {
+  return new Promise((resolve, reject) => {
+    log.debug(`${serviceName}[${verifyAlastriaSession.name}] -----> IN...`)
+    let decode = tokensFactory.tokens.decodeJWT(alastriaSession.signedAIC)
+    let didSubject = decode.payload.iss.split(':')[4]
+    log.debug(`${serviceName}[${verifyAlastriaSession.name}] -----> Obtained correctly the Subject DID`)
+    getCurrentPublicKey(didSubject)
+    .then(subjectPublicKey => {
+      let publicKey = subjectPublicKey[0]
+      log.debug(`${serviceName}[${verifyAlastriaSession.name}] -----> Obtained correctly the Subject PublicKey`)
+      let verifiedAlastraSession = tokensFactory.tokens.verifyJWT(alastriaSession.signedAIC, `04${publicKey}`)
+      if(verifiedAlastraSession == true) {
+        userModel.getUser(decode.payload.iss)
+        .then(user => {
+          let data = {
+            did: decode.payload.iss,
+            proxyAddress: didSubject
+          }
+          let loged = (user == null) || (user.did == null) ? data : user
+          resolve(loged)
+        })
+        .catch(error => {
+          log.error(`${serviceName}[${verifyAlastriaSession.name}] -----> ${error}`)
+          reject(error)
+        })
+      }
+    })
+    .catch(error => {
+      log.error(`${serviceName}[${verifyAlastriaSession.name}] -----> ${error}`)
+      reject(error)
+    })
+  })
+ }
+

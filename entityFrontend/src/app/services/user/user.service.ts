@@ -24,9 +24,9 @@ export class UserService {
   async login(user: any): Promise<any> {
     const username = (user.email) ? user.email : user.username;
     try {
-      const result: any = await this.http.get(`${this.apiUrl}/${this.path}/login?user=${username}&password=${user.password}`).toPromise();
+      const result: any = await this.http.get(`${this.apiUrl}/${this.path}/login?username=${username}&password=${user.password}`).toPromise();
       if (result.authToken) {
-        const userStorage: User = result.userdata;
+        const userStorage: User = result.userData;
         userStorage.authToken = result.authToken;
 
         return userStorage;
@@ -92,6 +92,22 @@ export class UserService {
    */
   setIsAlastriaIdVerified(isAlastriaIdVerified: boolean): void {
     this.isAlastriaIdVerified = isAlastriaIdVerified;
+  }
+
+  /**
+   * Get userVinculate
+   * @returns string
+   */
+  getUserVinculate(): any {
+    return JSON.parse(sessionStorage.getItem('userVinculate'));
+  }
+
+  /**
+   * set userVinculate in session storage
+   * @param userVinculate - userVinculate for vinculate user
+   */
+  setUserVinculate(userVinculate: string): void {
+    sessionStorage.setItem('userVinculate', JSON.stringify(userVinculate));
   }
 }
 

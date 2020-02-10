@@ -58,9 +58,9 @@ export class SocketService {
       });
   }
 
-  public onLogin(): Observable<any> {
+  public onSession(): Observable<any> {
     return new Observable<any>(observer => {
-        this.socket.on('login', (data: any) => observer.next(data));
+        this.socket.on('session', (data: any) => observer.next(data));
     });
   }
 

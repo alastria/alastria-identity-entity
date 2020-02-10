@@ -16,6 +16,22 @@ Backend that interacts with the [Alastria Identity Lib](https://github.com/alast
 
 Frontend of the Entity.
 
+### Mongo Database
+
+Data Base of the entity.
+
+### Mongo-Express
+
+A tool to monitorize the mongo database.
+
+#### Notes
+
+If you want to develop, first of all you need to have the database started, to do this you have to run this command in the directory of alastria-identity-entity.
+
+```sh
+docker-compose up -d mongo-express
+```
+
 ## How to run the Entity
 
 ### Requirements
@@ -41,8 +57,8 @@ npm run build
 Before running the Entity, you can change the blockchain node IP in the file [docker-compose.yaml](/docker-compose.yaml). At the moment, you can choose one of this (**only one**):
 
 ```yaml
-- NODE_ENDPOINT=localEndpoint
-#- NODE_ENDPOINT=alastria
+- NODE_ENDPOINT=alastria
+#- NODE_ENDPOINT=localEndpoint
 ```
 
 In the example above, a ganache will run locally, so you will need to deploy the _smart contracts_ manually.

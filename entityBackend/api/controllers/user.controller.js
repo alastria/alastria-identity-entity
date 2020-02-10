@@ -33,20 +33,21 @@ module.exports = {
 function login(req, res) {
   try {
     log.debug(`${controller_name}[${login.name}] -----> IN ...`)
-    let params = req.swagger.params
-    log.debug(`${controller_name}[${login.name}] -----> Sending params: ${JSON.stringify(params)}`)
-    userModel.login(params)
+    let loginData =  {
+      username: req.swagger.params.username.value,
+      password: req.swagger.params.password.value
+    }
+    log.debug(`${controller_name}[${login.name}] -----> Sending params: ${JSON.stringify(loginData)}`)
+    userModel.login(loginData)
     .then(authenticated => {
       if (authenticated == null) {
-        log.error(`${controller_name}[${login.name}] -----> Usuario no autorizado`)
+        log.error(`${controller_name}[${login.name}] -----> Unauthorized`)
         let msg = {
           message: `Usuario no autorizado`
         }
-        io.emit('error', {status: 401,
-                          message: msg.message})
         res.status(401).send(msg)
       } else {
-        io.emit('login', authenticated)
+        log.debug(`${controller_name}[${login.name}] -----> User loged correctly`)
         res.status(200).send(authenticated)
       }
     })

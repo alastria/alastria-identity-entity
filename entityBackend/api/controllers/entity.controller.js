@@ -22,12 +22,11 @@ module.exports = {
   createAlastriaID,
   addIssuerCredential,
   getCurrentPublicKey,
-  getpresentationStatus,
+  getPresentationStatus,
   updateReceiverPresentationStatus,
-  addSubjectPresentation,
   getCredentialStatus,
   recivePresentationData,
-  createAlastriaToken
+  verifyAlastriaSession
 }
 
 /////////////////////////////////////////////////////////
@@ -104,33 +103,6 @@ function addIssuerCredential(req, res) {
    }
 }
 
-function addSubjectPresentation(req, res) {
-  try {
-    log.debug(`${controller_name}[${addSubjectPresentation.name}] -----> IN ...`)
-    let params = req.swagger.params.body.value
-    log.debug(`${controller_name}[${addSubjectPresentation.name}] -----> Sending params: ${JSON.stringify(params)}`)
-    entityService.addSubjectPresentation(params)
-    .then(addSubjectPres => {
-      log.debug(`${controller_name}[${addSubjectPresentation.name}] -----> Successfully added subject presentation: ${JSON.stringify(addSubjectPres)}`)
-      res.status(200).send(addSubjectPres)
-    })
-    .catch(error => {
-      log.error(`${controller_name}[${addSubjectPresentation.name}] -----> ${error}`)
-      let msg = {
-        message: 'Error: Transaction has been reverted by the EVM'
-      }
-      res.status(400).send(msg)
-    })
-  }
-  catch(error) {
-    log.error(`${controller_name}[${addSubjectPresentation.name}] -----> ${error}`)
-    let msg = {
-      message: 'Insternal Server Erorr'
-    }
-    res.status(503).send(msg)
-   }
-}
-
 function getCurrentPublicKey(req, res) {
   try {
     log.debug(`${controller_name}[${getCurrentPublicKey.name}] -----> IN ...`)
@@ -165,20 +137,21 @@ function getCurrentPublicKey(req, res) {
    }
 }
 
-function getpresentationStatus(req, res){
+function getPresentationStatus(req, res){
   try {
-    log.debug(`${controller_name}[${getpresentationStatus.name}] -----> IN ...`);
+    log.debug(`${controller_name}[${getPresentationStatus.name}] -----> IN ...`);
     let presentationHash = req.swagger.params.presentationHash.value;
-    log.debug(`${controller_name}[${getpresentationStatus.name}] -----> Sending params: ${JSON.stringify(presentationHash)}`)
+    log.debug(`${controller_name}[${getPresentationStatus.name}] -----> Sending params: ${JSON.stringify(presentationHash)}`)
     let issuer = req.swagger.params.serviceProvider.value;
     let subject = req.swagger.params.subject.value;
-    entityService.getpresentationStatus(presentationHash,issuer,subject)
+    entityService.getPresentationStatus(presentationHash,issuer,subject)
       .then(presentationStatus => { 
         if (presentationStatus != null){
-          log.debug(`${controller_name}[${getpresentationStatus.name}] -----> Successfully obtained presentation status: ${presentationStatus}`);
+          log.debug(`${controller_name}[${getPresentationStatus.name}] -----> Successfully obtained presentation status: ${presentationStatus}`);
           res.status(200).send(presentationStatus);
         }
         else {
+          log.error(`${controller_name}[${getPresentationStatus.name}] -----> Error: Error getting presentation status`);
           let msg = {
             message: 'Error getting presentation status'
           }
@@ -186,13 +159,18 @@ function getpresentationStatus(req, res){
         }        
       })
       .catch(error => {
+        log.error(`${controller_name}[${getPresentationStatus.name}] -----> ${error}`);
         let msg = {
-          message: `Insternal Server Error: ${error}`
+          message: `${error}`
         }
-        res.status(503).send(msg)
+        res.status(400).send(msg)
       })         
   } catch (error) {
-    log.error(`${controller_name}[${getpresentationStatus.name}] -----> ${error}`)
+    log.error(`${controller_name}[${getPresentationStatus.name}] -----> ${error}`)
+    let msg = {
+      message: `Insternal Server Error: ${error}`
+    }
+    res.status(503).send(msg)
   }
 }
 
@@ -203,18 +181,23 @@ function updateReceiverPresentationStatus(req, res){
     log.debug(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> Sending params: ${JSON.stringify(presentationHash)}`)
     let newStatus = req.swagger.params.body.value;    
     entityService.updateReceiverPresentationStatus(presentationHash,newStatus)
-      .then(() => { 
-        log.debug(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> Successfully updated status presentation`);
-        res.status(200).send();
-      })
-      .catch(error => {
-        let msg = {
-          message: `Insternal Server Error: ${error}`
-        }
-        res.status(503).send(msg)
-      })         
+    .then(() => { 
+      log.debug(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> Successfully updated status presentation`);
+      res.status(200).send();
+    })
+    .catch(error => {
+      log.error(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> ${error}`);
+      let msg = {
+        message: `${error}`
+      }
+      res.status(404).send(msg)
+    })         
   } catch (error) {
     log.error(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> ${error}`)
+    let msg = {
+      message: `${error}`
+    }
+    res.status(503).send(msg)
   }
 }
 
@@ -234,6 +217,7 @@ function getCredentialStatus(req, res){
                                       message: 'Guardada correctamente las credenciales.'})
           res.status(200).send(credentialStatus);
         } else {
+          log.error(`${controller_name}[${getCredentialStatus.name}] -----> ${error}`)
           let msg = {
             message: 'Error getting presentation status'
           }
@@ -243,7 +227,13 @@ function getCredentialStatus(req, res){
         }        
       })
       .catch(error => {
-        
+        log.debug(`${controller_name}[${getCredentialStatus.name}] -----> ${error}`)
+        let msg = {
+          message: 'Error getting presentation status'
+        }
+        io.emit('error', {status: 404,
+                          message: 'No se ha guardado correctamente la credencial. Vuelva a intentarlo.'})
+        res.status(404).send(msg)
       })         
   } catch (error) {
     log.error(`${controller_name}[${getCredentialStatus.name}] -----> ${error}`)
@@ -272,9 +262,9 @@ function recivePresentationData(req, res) {
       let msg = {
         message: `${error}`
       }
-      log.error(`${controller_name}[${recivePresentationData.name}] -----> Error: ${msg.message}`);
+      log.error(`${controller_name}[${recivePresentationData.name}] -----> Error: ${message}`);
       io.emit('error', {status: 400,
-                        message: message})
+                        message: msg.message})
       res.status(400).send(msg)
     })
   }
@@ -288,20 +278,33 @@ function recivePresentationData(req, res) {
       res.status(503).send(msg)
   }
 }
-function createAlastriaToken(req, res) {
+
+function verifyAlastriaSession(req, res) {
   try {
-    log.debug(`${controller_name}[${createAlastriaToken.name}] -----> IN ...`)
-    let params = req.swagger.params.body.value
-    log.debug(`${controller_name}[${createAlastriaToken.name}] -----> Sending params: ${JSON.stringify(params)}`)
-    let signedAT = entityService.createAlastriaToken(params)
-    log.debug(`${controller_name}[${createAlastriaToken.name}] -----> Successfully created Alastria Token`)
-    res.status(200).send({"signedAT": signedAT})
-  } catch (error) {
-    log.error(`${controller_name}[${createAlastriaToken.name}] -----> ${error}`)
+    log.debug(`${controller_name}[${verifyAlastriaSession.name}] -----> IN ...`)
+    let alastriaSession = req.swagger.params.alastriaSession.value
+    log.debug(`${controller_name}[${verifyAlastriaSession.name}] -----> Sending params: ${JSON.stringify(alastriaSession)}`)
+    entityService.verifyAlastriaSession(alastriaSession)
+    .then(verified => {
+      log.debug(`${controller_name}[${verifyAlastriaSession.name}] -----> Alastria Sesion verified successfuly`)
+      io.emit('session', verified)
+      res.status(200).send(verified)
+    })
+    .catch(error => {
+      log.error(`${controller_name}[${verifyAlastriaSession.name}] -----> Error: ${error}`)
     let msg = {
-      message: `Unauthorized: ${error}`
+      message: `${error}`
     }
+    io.emit('error', {status: 401,
+                      message: msg.message})
     res.status(401).send(msg)
+    })
+  }
+  catch(error) {
+    log.error(`${controller_name}[${verifyAlastriaSession.name}] -----> Error: ${error}`)
+    let msg = {
+      message: `${error}`
+    }
+    res.status(503).send(msg)
   }
 }
-

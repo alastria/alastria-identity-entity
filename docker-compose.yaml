@@ -2,7 +2,7 @@ version: "2.0"
 
 services:
 
-  entityBackend:
+  entitybackend:
     restart: on-failure:5
     build: entityBackend
     image: entityback
@@ -11,14 +11,15 @@ services:
       - NODE_ENDPOINT=alastria
     links:
     #   - ganache:ganache  // if you are using local endpoint uncomment this two lines
-      - mongo:mongo
+      - mongo-express:mongo-express
     ports:
       - "10010:10010"
+      - "10011:8080"
     volumes:
       - ./entityBackend/api:/app/api
     command: npm run start
 
-  entityFrontend:
+  entityfrontend:
     restart: on-failure:5
     build: entityFrontend
     image: entityfront
@@ -33,14 +34,22 @@ services:
         max-size: "1m"
         max-file: "3"
 
-  ganache:
-    restart: on-failure:5
-    image: trufflesuite/ganache-cli
-    ports:
-      - "8545:8545"
+  # ganache:
+  #   restart: on-failure:5
+  #   image: trufflesuite/ganache-cli
+  #   ports:
+  #     - "8545:8545"
   
   mongo:
     restart: on-failure:5
     image: mongo
     ports:
       - 27017:27017
+
+  mongo-express:
+    image: mongo-express
+    restart: on-failure:5
+    links:
+      - mongo
+    ports:
+      - 8081:8081

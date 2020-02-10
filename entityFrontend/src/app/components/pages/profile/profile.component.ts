@@ -56,7 +56,6 @@ export class ProfileComponent implements OnInit {
     colorIcon: 'black'
   };
   parametersForCreateAlastriaId: any;
-  isAlastriaVerified: boolean;
   isCreateAlastriaId: boolean;
   qrDataFillProfile: any = '[]';
   inputsUserForm: Array<any> = [
@@ -125,7 +124,6 @@ export class ProfileComponent implements OnInit {
   ngOnInit() {
     this.user = this.userService.getUserLoggedIn();
     this.initIoConnection();
-    this.checkAlastriaIdIsVerified();
     this.addOptionInMenu();
   }
 
@@ -211,8 +209,6 @@ export class ProfileComponent implements OnInit {
   handleResultModalOk(): void {
     $('#modal-result').modal('hide');
     this.qrAlastriaId = null;
-    this.isCreateAlastriaId = false;
-    this.checkAlastriaIdIsVerified();
     this.addOptionInMenu();
   }
 
@@ -289,13 +285,9 @@ export class ProfileComponent implements OnInit {
     }
   }
 
- private checkAlastriaIdIsVerified() {
-    this.isAlastriaVerified = this.userService.getIsAlastriaIdVerified();
-  }
-
   private addOptionInMenu() {
     const titleOption = 'Fill your AlastriaID profile';
-    if (this.isAlastriaVerified && !this.optionsMenu.includes(titleOption)) {
+    if (this.user.vinculated && !this.optionsMenu.includes(titleOption)) {
       this.optionsMenu.splice(this.optionsMenu.length - 1, 1);
       this.optionsMenu.push(titleOption);
     }
@@ -307,7 +299,7 @@ export class ProfileComponent implements OnInit {
 
   private createUserUpdateForVinculated(responseWs: any) {
     const userUpdate: any = {
-      objectIdentity: responseWs.data,
+      objectIdentity: responseWs,
     };
     userUpdate.id = this.user.id;
 
@@ -326,13 +318,16 @@ export class ProfileComponent implements OnInit {
         const userUpdate = this.createUserUpdateForVinculated(response);
         this.userService.updateUser(userUpdate)
           .then((result: any) => {
-            this.userService.setIsAlastriaIdVerified(result.user.vinculated);
-            this.userService.setUserLoggedIn(result.user);
+            const user = result.user.userData;
+            user.authToken = result.user.authToken;
+            this.userService.setUserLoggedIn(user);
             this.resultModal = {
               type: 'success',
               title: 'Congratulations!',
               description: 'Your Alastria ID has been created. Start to fill you new AlastriaID'
             };
+            this.user = this.userService.getUserLoggedIn();
+            this.isCreateAlastriaId = false;
             $('#modal-result').modal('show');
           })
         .catch((error: any) => {
@@ -341,22 +336,24 @@ export class ProfileComponent implements OnInit {
       })
     );
 
-    this.subscription.add(this.socketService.onSetUpAlastriaId()
+    this.subscription.add(this.socketService.onSession()
       .subscribe((response) => {
         this.socketService.sendDisconnect();
         const userUpdate = this.createUserUpdateForVinculated(response);
         this.userService.updateUser(userUpdate)
           .then((result: any) => {
-              this.userService.setIsAlastriaIdVerified(result.user.vinculated);
-              this.userService.setUserLoggedIn(result.user);
+              const user = result.user.userData;
+              user.authToken = result.user.authToken;
+              this.userService.setUserLoggedIn(user);
               this.resultModal = {
                 type: 'success',
                 title: 'Congratulations!',
                 description: `Your AlastriaID has been linked to your ${environment.entityName} profile. Now you can login next times with your AlastriaID`
               };
+              this.user = this.userService.getUserLoggedIn();
+              this.isCreateAlastriaId = false;
               $('#modal-result').modal('show');
           });
-        this.userService.setIsAlastriaIdVerified(true);
       })
     );
 

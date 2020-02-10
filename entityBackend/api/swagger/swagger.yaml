@@ -28,7 +28,7 @@ paths:
       description: check if user has account into the platform
       operationId: login
       parameters:
-        - name: user
+        - name: username
           in: query
           type: string
           description: username or email of the user
@@ -183,6 +183,43 @@ paths:
           schema:
             # a pointer to a definition
             $ref: "#/definitions/PresentationData"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "503":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /alastriaToken:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: entity.controller
+    post:
+      description: Verify Alastria Session from Wallet
+      # used as the method name of the controller
+      operationId: verifyAlastriaSession
+      parameters:
+        - name: alastriaSession
+          in: body
+          description: JWT signed by Wallet to create an Alastria Session
+          required: true
+          schema: 
+            $ref: "#/definitions/identityData"
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/userTokenAccess"
         # responses may fall through to errors
         "400":
           description: Bad Request
@@ -659,7 +696,7 @@ paths:
     get:
       x-swagger-router-controller: entity.controller
       description: get current Subject or Service Provider (Receiver) status for the given presentation
-      operationId: getpresentationStatus
+      operationId: getPresentationStatus
       parameters:
         - name: presentationHash
           in: path
@@ -813,14 +850,14 @@ definitions:
         type: string
       signedPresentation:
         type: string
-  credential:
-    properties:
-      header:
-        type: "object"
-      payload:
-        type: "object"
-      signature:
-        type: "object"
+  # credential:
+  #   properties:
+  #     header:
+  #       type: "object"
+  #     payload:
+  #       type: "object"
+  #     signature:
+  #       type: "object"
   alastriaIdentityResponse:
     properties:
       alastriaDID:
@@ -831,14 +868,14 @@ definitions:
         type: string
         #schema:
           #$ref: "#/definitions/credentialCatalog"
-  credentialCatalog:
-    properties:
-      credentialName:
-        type: string
-      status:
-        type: string
-      credentialType:
-        type: string
+  # credentialCatalog:
+  #   properties:
+  #     credentialName:
+  #       type: string
+  #     status:
+  #       type: string
+  #     credentialType:
+  #       type: string
   addCredentialResponse:
     properties:
       status:
