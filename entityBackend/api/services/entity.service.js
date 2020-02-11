@@ -126,7 +126,7 @@ function createAlastriaID(params) {
         .then(createSendSigned => {
           web3.eth.call({
             to: config.alastriaIdentityManager,
-            data: web3.eth.abi.encodeFunctionCall(config.contractsAbi['AlastriaIdentityManager']['identityKeys'], [issuerKeystore.address])
+            data: web3.eth.abi.encodeFunctionCall(config.contractsAbi['AlastriaIdentityManager']['identityKeys'], [subjectAddress.substr(2)])
           })
           .then(AlastriaIdentity => {
             let alastriaDID = tokensFactory.tokens.createDID('quor', AlastriaIdentity.slice(26));
