@@ -49,7 +49,7 @@ npm install
 After that, build and compile the project:
 
 ```sh
-npm run build
+npm run build --configuration=docker
 ```
 
 ## Run the Entity
