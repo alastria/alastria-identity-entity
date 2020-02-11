@@ -10,9 +10,8 @@
   "dependencies": {
     "alastria-identity-lib": "github:alastria/alastria-identity-lib#develop",
     "cors": "2.8.3",
-    "elliptic": "6.5.2",
+    "eth-crypto": "1.5.2",
     "express": "4.17.1",
-    "js-sha3": "0.8.0",
     "jsonwebtoken": "8.5.1",
     "log4js": "6.1.0",
     "mongodb": "3.5.1",
