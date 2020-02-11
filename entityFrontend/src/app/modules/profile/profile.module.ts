@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { QRCodeModule } from 'angularx-qrcode';
 import { AngularFontAwesomeModule } from 'angular-font-awesome';
 import { SharedModule } from '../shared/shared.module';
+import { DeviceDetectorService } from 'ngx-device-detector';
 
 // COMPONENTS
 import { ProfileComponent } from 'src/app/components/pages/profile/profile.component';
@@ -23,6 +24,9 @@ import { ModalCreateAlastriaIdComponent } from 'src/app/components/common/modal-
     QRCodeModule,
     AngularFontAwesomeModule,
     SharedModule
+  ],
+  providers: [
+    DeviceDetectorService
   ]
 })
 export class ProfileModule { }

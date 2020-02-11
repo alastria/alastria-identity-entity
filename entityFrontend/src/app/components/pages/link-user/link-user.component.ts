@@ -1,9 +1,8 @@
-import { EntityService } from './../../../services/entity/entity.service';
 import { HttpClient } from '@angular/common/http';
-import { ResultModal } from './../../../models/result-modal/result-modal';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { DeviceDetectorService} from 'ngx-device-detector';
 
 // SERVICES
 import { UserService } from 'src/app/services/user/user.service';
@@ -13,6 +12,7 @@ import { AlastriaLibService } from 'src/app/services/alastria-lib/alastria-lib.s
 // MODELS
 import { User } from 'src/app/models/user/user.model';
 import { Event } from 'src/app/models/enums/enums.model';
+import { ResultModal } from './../../../models/result-modal/result-modal';
 
 // COMPONENTS
 import { UserFormComponent } from '../../common/user-form/user-form.component';
@@ -32,6 +32,7 @@ export class LinkUserComponent implements OnInit {
     title: '',
     description: ''
   };
+  isDesktop: boolean;
   user: User;
   qrData: any = '';
   qrSize = 256;
@@ -116,8 +117,11 @@ export class LinkUserComponent implements OnInit {
                private userService: UserService,
                private socketService: SocketService,
                private alastriaLibService: AlastriaLibService,
-               private entityService: EntityService,
-               private http: HttpClient) { }
+               private deviceDetector: DeviceDetectorService,
+               private http: HttpClient) {
+
+    this.isDesktop = this.deviceDetector.isDesktop();
+  }
 
   ngOnInit() {
     this.user = {

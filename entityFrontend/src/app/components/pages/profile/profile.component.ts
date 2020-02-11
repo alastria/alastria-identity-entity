@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { environment } from './../../../../environments/environment';
-import { Identity } from './../../../models/identity/identity.model';
+import { DeviceDetectorService } from 'ngx-device-detector';
 import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 
 // COMPONENTS
@@ -16,10 +16,11 @@ import { AlastriaLibService } from 'src/app/services/alastria-lib/alastria-lib.s
 
 // MODELS
 import { User } from 'src/app/models/user/user.model';
-import { Event } from 'src/app/models/enums/enums.model';
 import { ResultModal } from './../../../models/result-modal/result-modal';
+import { Event } from 'src/app/models/enums/enums.model';
 
 declare var $: any;
+const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
 
 @Component({
   selector: 'app-profile',
@@ -41,6 +42,7 @@ export class ProfileComponent implements OnInit {
   @ViewChild(CreateAlastriaIdComponent) createAlastriaIdComponent: CreateAlastriaIdComponent;
   @ViewChild(UserFormComponent) userFormComponent: UserFormComponent;
   user: User;
+  isDesktop: boolean;
   qrAlastriaId: string;
   qrCredentials: any;
   optionsMenu = ['Edit profile', 'Reset password', 'Alastria ID'];
@@ -116,10 +118,12 @@ export class ProfileComponent implements OnInit {
 
   constructor(private userService: UserService,
               private socketService: SocketService,
-              private entityService: EntityService,
               private alastriaLibService: AlastriaLibService,
               private http: HttpClient,
-              private changeDetector: ChangeDetectorRef) { }
+              private changeDetector: ChangeDetectorRef,
+              private deviceDetectorService: DeviceDetectorService) {
+    this.isDesktop = this.deviceDetectorService.isDesktop();
+  }
 
   ngOnInit() {
     this.user = this.userService.getUserLoggedIn();
@@ -142,6 +146,9 @@ export class ProfileComponent implements OnInit {
         break;
       case 'Alastria ID':
         $('#modalCreateAlastriaId').modal('show');
+        break;
+      case 'Create Alastria ID':
+        this.sendAlastriaTokenToApp();
         break;
       default:
         this.optionSelected = (this.optionSelected === option) ? '' : option;
@@ -259,6 +266,29 @@ export class ProfileComponent implements OnInit {
     $('#simpleModal').modal('show');
   }
 
+  private async sendAlastriaTokenToApp() {
+    const alastriaToken = await this.createAlastriaToken();
+    window.parent.postMessage(alastriaToken, '*');
+  }
+
+  private async createAlastriaToken(): Promise<string> {
+    const currentDate = Math.floor(Date.now() / 1000);
+    const expDate = currentDate + 600;
+    const alastriaLibJson: any = await this.http.get(alastriaLibJsonUrl).toPromise();
+    const config = {
+      did: alastriaLibJson.header.kid,
+      providerUrl: alastriaLibJson.openAccess,
+      callbackUrl: `${environment.apiUrl}/entity/alastria/identity`,
+      alastriaNetId: 'redT',
+      tokenExpTime: expDate,
+      tokenActivationDate: currentDate,
+      jsonTokenId: Math.random().toString(36).substring(2)
+    };
+    const alastriaToken = this.alastriaLibService.createAlastriaToken(config);
+
+    return this.alastriaLibService.signJWT(alastriaToken, alastriaLibJson.privateKey);
+  }
+
   private async createPresentationRequest(fields: Array<string>) {
     try {
       const url = '../../../assets/alastria-lib.json';
@@ -286,10 +316,17 @@ export class ProfileComponent implements OnInit {
   }
 
   private addOptionInMenu() {
-    const titleOption = 'Fill your AlastriaID profile';
-    if (this.user.vinculated && !this.optionsMenu.includes(titleOption)) {
+    const titleOptionFill = 'Fill your AlastriaID profile';
+
+    if (this.user.vinculated && !this.optionsMenu.includes(titleOptionFill)) {
       this.optionsMenu.splice(this.optionsMenu.length - 1, 1);
-      this.optionsMenu.push(titleOption);
+      this.optionsMenu.push(titleOptionFill);
+    }
+
+    const titleOptionCreate = 'Create Alastria ID';
+    if (!this.isDesktop && this.optionsMenu.includes('Alastria ID')) {
+      this.optionsMenu.splice(this.optionsMenu.length - 1, 1);
+      this.optionsMenu.push(titleOptionCreate);
     }
   }
 
