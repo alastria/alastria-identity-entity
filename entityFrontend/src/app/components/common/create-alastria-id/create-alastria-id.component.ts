@@ -96,7 +96,7 @@ export class CreateAlastriaIdComponent implements OnInit {
     const config = {
       did: alastriaLibJson.header.kid,
       providerUrl: alastriaLibJson.openAccess,
-      callbackUrl: `${environment.apiUrl}/entity/alastria/identity`,
+      callbackUrl: `${environment.apiUrl}/entity/alastria/alastriaToken`,
       alastriaNetId: 'redT',
       tokenExpTime: expDate,
       tokenActivationDate: currentDate,
