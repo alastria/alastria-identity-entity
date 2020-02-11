@@ -339,6 +339,9 @@ function verifyAlastriaSession(alastriaSession) {
           log.error(`${serviceName}[${verifyAlastriaSession.name}] -----> ${error}`)
           reject(error)
         })
+      } else {
+        log.error(`${serviceName}[${verifyAlastriaSession.name}] -----> Unauthorized`)
+        reject('User Unauthorized')
       }
     })
     .catch(error => {
