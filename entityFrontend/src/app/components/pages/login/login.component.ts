@@ -82,7 +82,7 @@ const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
       const userLogin = await this.userService.login(user);
 
       this.userService.setUserLoggedIn(userLogin);
-      this.router.navigate(['/', 'home']);
+      this.router.navigate(['/', 'profile']);
     } catch (error) {
       if (error && error.status === 401) {
         this.errorLogin = 'User or password incorrect';
@@ -116,13 +116,13 @@ const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
 
   /**
    * Function handle when click ok in modal simple
-   * if user contain id then go to home page, but if user only contain authToken then go to vinculate
+   * if user contain id then go to profile page, but if user only contain authToken then go to vinculate
    */
   async onLogin(user: User): Promise<any> {
     try {
       this.userService.setUserLoggedIn(user);
       $('#simpleModal').modal('hide');
-      this.router.navigate(['/', 'home']);
+      this.router.navigate(['/', 'profile']);
     } catch (error) {
       if (error && error.status === 401) {
         this.errorLogin = 'User or password incorrect';

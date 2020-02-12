@@ -230,7 +230,7 @@ export class LinkUserComponent implements OnInit {
         this.userService.setUserLoggedIn(userLogin);
       }
       sessionStorage.removeItem('userVinculate');
-      this.router.navigate(['/', 'home']);
+      this.router.navigate(['/', '/profile']);
     } catch (error) {
       throw error;
     }
