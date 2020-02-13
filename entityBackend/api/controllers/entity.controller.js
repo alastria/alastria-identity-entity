@@ -237,10 +237,9 @@ function getCredentialStatus(req, res){
 function recivePresentationData(req, res) {
   try {
     log.debug(`${controller_name}[${recivePresentationData.name}] -----> IN ...`);
-    let signedTx = req.swagger.params.presentation.value.signedPresentation
-    let subjectPubkey = req.swagger.params.presentation.value.subjectPublicKey
+    let presentationSigned = req.swagger.params.presentation.value.signedPresentation
     log.debug(`${controller_name}[${recivePresentationData.name}] -----> Sending params: ${JSON.stringify(req.swagger.params.presentation.value)}`)
-    entityService.getSubjectData(subjectPubkey, signedTx)
+    entityService.getPresentationData(presentationSigned)
     .then(subjectData => {
       log.debug(`${controller_name}[${recivePresentationData.name}] -----> Successfully obtained presentation data`);
       io.emit('getPresentationData', {status: 200,

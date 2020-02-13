@@ -846,8 +846,6 @@ definitions:
         type: object
   Presentation:
     properties:
-      subjectPublicKey:
-        type: string
       signedPresentation:
         type: string
   # credential:
