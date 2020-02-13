@@ -270,11 +270,13 @@ function getCredentialStatus(credentialHash, issuer, subject) {
     log.debug(`${serviceName}[${getCredentialStatus.name}] -----> IN ...`)
     let credentialStatus = null;
     if (issuer != null) {
-      credentialStatus = transactionFactory.credentialRegistry.getIssuerCredentialStatus(web3, issuer, credentialHash);
+      let didIssuer = issuer.split(':')[4]
+      credentialStatus = transactionFactory.credentialRegistry.getIssuerCredentialStatus(web3, didIssuer, credentialHash);
     } else if (subject != null) {
-      credentialStatus = transactionFactory.credentialRegistry.getSubjectCredentialStatus(web3, subject, credentialHash);
+      let didSubject = subject.split(':')[4]
+      credentialStatus = transactionFactory.credentialRegistry.getSubjectCredentialStatus(web3, didSubject, credentialHash);
     }
-    if (credentialStatus != null) {
+    if (credentialStatus.exists == true) {
       web3.eth.call(credentialStatus)
       .then(result => {
         let resultStatus = web3.eth.abi.decodeParameters(["bool", "uint8"], result)
@@ -289,6 +291,11 @@ function getCredentialStatus(credentialHash, issuer, subject) {
         log.error(`${serviceName}[${getCredentialStatus.name}] -----> ${error}`)
         reject(error)
       })
+    } else {
+      let msg = {
+        message: "Credential not saved"
+      }
+      reject(msg)
     }
   })
 }
@@ -332,7 +339,7 @@ function verifyAlastriaSession(alastriaSession) {
             did: decode.payload.iss,
             proxyAddress: didSubject
           }
-          let loged = (user == null) || (user.did == null) ? data : user
+          let loged = ((user.userData == null) || (user.userData.did == null)) ? data : user
           resolve(loged)
         })
         .catch(error => {
