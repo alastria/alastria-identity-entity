@@ -11,7 +11,6 @@ import { UserFormComponent } from 'src/app/components/common/user-form/user-form
 // SERVICES
 import { UserService } from 'src/app/services/user/user.service';
 import { SocketService } from 'src/app/services/socket/socket.service';
-import { EntityService } from 'src/app/services/entity/entity.service';
 import { AlastriaLibService } from 'src/app/services/alastria-lib/alastria-lib.service';
 
 // MODELS

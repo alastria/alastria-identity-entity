@@ -7,8 +7,8 @@
     "payload": {
         "jti": "https://www.metrovacesa.com/alastria/presentationrequest/7864",
         "iss": "did:ala:quor:redT:b238ce01fa350387cd33d7007709422c521a0126",
-        "iat": 1525465044,
-        "exp": 1530735444,
+        "iat": null,
+        "exp": null,
         "nbf": 1525465044,
         "pr": {
             "@context": [
