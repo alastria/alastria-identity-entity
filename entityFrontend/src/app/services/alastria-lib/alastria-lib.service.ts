@@ -25,4 +25,12 @@ export class AlastriaLibService {
     return tokensFactory.tokens.createAlastriaToken(config.did, config.providerUrl, config.callbackUrl,
       config.alastriaNetId, config.tokenExpTime, config.tokenActivationDate, config.jsonTokenId);
   }
+
+  createCredential(header: any, payload: any) {
+    const currentDate = new Date().getTime();
+    payload.nbf = currentDate;
+    return tokensFactory.tokens.createCredential(
+      header.kid, payload.iss, payload.sub, payload.pr['@context'], payload.credentialSubject, payload.exp, payload.nbf, payload.jti
+    );
+  }
 }
