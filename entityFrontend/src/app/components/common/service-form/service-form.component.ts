@@ -44,9 +44,8 @@ export class ServiceFormComponent implements OnInit {
   }
 
   setValuesForm(formNewValues: any) {
-    this.serviceForm.get('creditCard').setValue(formNewValues.creditCard);
-    this.serviceForm.get('bloodGroup').setValue(formNewValues.bloodGroup);
-    this.serviceForm.get('over18').setValue(formNewValues.over18);
+    this.serviceForm.get('fullname').setValue(formNewValues.fullname);
+    this.serviceForm.get('address').setValue(formNewValues.address);
   }
 
   showModalQr() {
@@ -63,13 +62,13 @@ export class ServiceFormComponent implements OnInit {
             '@context': 'JWT',
             levelOfAssurance: 'High',
             required: true,
-            field_name: 'creditCard'
+            field_name: 'fullname'
         },
         {
           '@context': 'JWT',
           levelOfAssurance: 'High',
           required: true,
-          field_name: 'over18'
+          field_name: 'address'
         },
       ];
 
@@ -87,9 +86,8 @@ export class ServiceFormComponent implements OnInit {
   */
   private generateForm(): void {
     this.serviceForm = this.fb.group({
-      creditCard: ['', Validators.required],
-      bloodGroup: ['', Validators.required],
-      over18: [false]
+      fullname: ['', Validators.required],
+      address: ['', Validators.required]
     });
   }
 
