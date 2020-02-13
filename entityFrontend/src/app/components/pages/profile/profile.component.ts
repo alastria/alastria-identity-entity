@@ -226,8 +226,8 @@ export class ProfileComponent implements OnInit {
    */
   async handleEditProfile(user: User): Promise<any> {
     const userResult = await this.userService.updateUser(user);
-    userResult.authToken = this.user.authToken;
-    this.userService.setUserLoggedIn(userResult);
+    userResult.user.userData.authToken = this.user.authToken;
+    this.userService.setUserLoggedIn(userResult.user.userData);
     this.user = this.userService.getUserLoggedIn();
     this.userFormComponent.toggleFormState();
     this.optionSelected = '';
@@ -262,7 +262,10 @@ export class ProfileComponent implements OnInit {
     await $('#modalFillProfile').modal('hide');
     this.qrDataFillProfile = JSON.stringify(profileFields);
     this.initIoConnection();
-    this.createPresentationRequest(profileFields);
+    const credentials = await this.createCredentials(profileFields);
+    this.qrDataFillProfile = JSON.stringify({
+      verifiableCredential: credentials
+    });
     $('#simpleModal').modal('show');
   }
 
@@ -289,28 +292,24 @@ export class ProfileComponent implements OnInit {
     return this.alastriaLibService.signJWT(alastriaToken, alastriaLibJson.privateKey);
   }
 
-  private async createPresentationRequest(fields: Array<string>) {
+  private async createCredentials(fields: Array<string>) {
+    const url = '../../../assets/alastria-lib.json';
+    const alastriaLibJson: any = await this.http.get(url).toPromise();
     try {
-      const url = '../../../assets/alastria-lib.json';
-      const alastriaLibJson: any = await this.http.get(url).toPromise();
+      const credentials = [];
+      fields.map((field: string)  => {
+        alastriaLibJson.payload.credentialSubject = {
+          levelOfAssurance : 'High'
+        };
+        alastriaLibJson.payload.credentialSubject[field] = (field === 'fullname') ? `${this.user.name} ${this.user.surname}`
+          : this.user[field];
+        alastriaLibJson.payload.sub = this.user.did;
+        const credential =  this.alastriaLibService.createCredential(alastriaLibJson.header, alastriaLibJson.payload);
+        credentials.push(this.alastriaLibService.signJWT(credential.payload, alastriaLibJson.privateKey));
+      });
 
-      if (fields && fields.length) {
-        fields.map((field: string) => {
-          alastriaLibJson.payload.pr.data.push({
-            '@context': 'JWT',
-            levelOfAssurance: 'High',
-            required: true,
-            field_name: field
-          });
-        });
-      }
-
-      const presentationRequest = this.alastriaLibService.createPresentationRequest(alastriaLibJson.header, alastriaLibJson.payload);
-      // TODO GET PRIVATE KEY
-      const presentationRequestSigned = this.alastriaLibService.signJWT(presentationRequest, alastriaLibJson.privateKey);
-      this.qrDataFillProfile = JSON.stringify(presentationRequestSigned);
-
-    } catch (error) {
+      return credentials;
+    } catch(error) {
       console.error(error);
     }
   }
@@ -336,7 +335,7 @@ export class ProfileComponent implements OnInit {
 
   private createUserUpdateForVinculated(responseWs: any) {
     const userUpdate: any = {
-      objectIdentity: responseWs,
+      objectIdentity: responseWs.data,
     };
     userUpdate.id = this.user.id;
 
