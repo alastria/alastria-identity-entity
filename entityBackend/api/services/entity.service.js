@@ -103,7 +103,7 @@ module.exports = {
   getPresentationStatus,
   updateReceiverPresentationStatus,
   getCredentialStatus,
-  getSubjectData,
+  getPresentationData,
   verifyAlastriaSession
 }
 
@@ -270,11 +270,13 @@ function getCredentialStatus(credentialHash, issuer, subject) {
     log.debug(`${serviceName}[${getCredentialStatus.name}] -----> IN ...`)
     let credentialStatus = null;
     if (issuer != null) {
-      credentialStatus = transactionFactory.credentialRegistry.getIssuerCredentialStatus(web3, issuer, credentialHash);
+      let didIssuer = issuer.split(':')[4]
+      credentialStatus = transactionFactory.credentialRegistry.getIssuerCredentialStatus(web3, didIssuer, credentialHash);
     } else if (subject != null) {
-      credentialStatus = transactionFactory.credentialRegistry.getSubjectCredentialStatus(web3, subject, credentialHash);
+      let didSubject = subject.split(':')[4]
+      credentialStatus = transactionFactory.credentialRegistry.getSubjectCredentialStatus(web3, didSubject, credentialHash);
     }
-    if (credentialStatus != null) {
+    if (credentialStatus.exists == true) {
       web3.eth.call(credentialStatus)
       .then(result => {
         let resultStatus = web3.eth.abi.decodeParameters(["bool", "uint8"], result)
@@ -289,26 +291,32 @@ function getCredentialStatus(credentialHash, issuer, subject) {
         log.error(`${serviceName}[${getCredentialStatus.name}] -----> ${error}`)
         reject(error)
       })
+    } else {
+      let msg = {
+        message: "Credential not saved"
+      }
+      reject(msg)
     }
   })
 }
 
-function getSubjectData(pubkey, presentationSigned) { 
+function getPresentationData(presentationSigned) { 
   return new Promise((resolve, reject) => { 
-    log.debug(`${serviceName}[${getSubjectData.name}] -----> IN ...`) 
-    let verified = tokensFactory.tokens.verifyJWT(presentationSigned, `04${pubkey.substr(2)}`) 
-    if (verified == true) { 
-      log.debug(`${serviceName}[${getSubjectData.name}] -----> Subject presentation verified`) 
-      let presentationData = tokensFactory.tokens.decodeJWT(presentationSigned) 
-      if (presentationData.payload) { 
-        log.debug(`${serviceName}[${getSubjectData.name}] -----> JWT decoded successfuly`) 
-        resolve(presentationData) 
-      } else { 
-        log.error(`${serviceName}[${getSubjectData.name}] -----> Error decoding JWT`) 
-        reject(presentationData) 
-      } 
+    log.debug(`${serviceName}[${getPresentationData.name}] -----> IN ...`) 
+    let decodePresentation = tokensFactory.tokens.decodeJWT(presentationSigned)
+    let subjectPublicKey = decodePresentation.payload.pku.publicKeyHex
+    let verified = tokensFactory.tokens.verifyJWT(presentationSigned, `04${subjectPublicKey}`)
+    if (verified == true) {
+      log.debug(`${serviceName}[${getPresentationData.name}] -----> Subject presentation verified`)
+      let credentials = []
+      let verifiableCredential = decodePresentation.payload.vp.verifiableCredential
+      verifiableCredential.map( item => {
+        let credential = tokensFactory.tokens.decodeJWT(item)
+        credentials.push(credential)
+      })
+      resolve(credentials)
     } else { 
-      log.error(`${serviceName}[${getSubjectData.name}] -----> Error verifying JWT`) 
+      log.error(`${serviceName}[${getPresentationData.name}] -----> Error verifying JWT`) 
       reject(verified) 
     } 
   }) 
@@ -318,7 +326,8 @@ function verifyAlastriaSession(alastriaSession) {
   return new Promise((resolve, reject) => {
     log.debug(`${serviceName}[${verifyAlastriaSession.name}] -----> IN...`)
     let decode = tokensFactory.tokens.decodeJWT(alastriaSession.signedAIC)
-    let didSubject = decode.payload.iss.split(':')[4]
+    let subject = decode.payload.pku
+    let didSubject = subject.id.split(':')[4]
     log.debug(`${serviceName}[${verifyAlastriaSession.name}] -----> Obtained correctly the Subject DID`)
     getCurrentPublicKey(didSubject)
     .then(subjectPublicKey => {
@@ -326,13 +335,13 @@ function verifyAlastriaSession(alastriaSession) {
       log.debug(`${serviceName}[${verifyAlastriaSession.name}] -----> Obtained correctly the Subject PublicKey`)
       let verifiedAlastraSession = tokensFactory.tokens.verifyJWT(alastriaSession.signedAIC, `04${publicKey}`)
       if(verifiedAlastraSession == true) {
-        userModel.getUser(decode.payload.iss)
+        userModel.getUser(subject.id)
         .then(user => {
           let data = {
-            did: decode.payload.iss,
+            did: subject.id,
             proxyAddress: didSubject
           }
-          let loged = (user == null) || (user.did == null) ? data : user
+          let loged = ((user.userData == null) || (user.userData.did == null)) ? data : user
           resolve(loged)
         })
         .catch(error => {

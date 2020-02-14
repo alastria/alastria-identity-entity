@@ -209,32 +209,22 @@ function getCredentialStatus(req, res){
     let subject = req.swagger.params.subject.value;
     log.debug(`${controller_name}[${getCredentialStatus.name}] -----> Sending params: ${JSON.stringify(credentialHash, issuer, subject)}`)
     entityService.getCredentialStatus(credentialHash, issuer, subject)
-      .then(credentialStatus => { 
-        log.debug(`${controller_name}[${getCredentialStatus.name}] -----> Successfully obtained presentation status: ${JSON.stringify(credentialStatus)}`)
-        if (credentialStatus.exists == true){
-          log.debug(`${controller_name}[${getCredentialStatus.name}] -----> Successfully saved the credential`)
-          io.emit('fillYourProfile', {status: 200,
-                                      message: 'Guardada correctamente las credenciales.'})
-          res.status(200).send(credentialStatus);
-        } else {
-          log.error(`${controller_name}[${getCredentialStatus.name}] -----> ${error}`)
-          let msg = {
-            message: 'Error getting presentation status'
-          }
-          io.emit('error', {status: 404,
-                            message: 'No se ha guardado correctamente la credencial. Vuelva a intentarlo.'})
-          res.status(404).send(msg)
-        }        
-      })
-      .catch(error => {
-        log.debug(`${controller_name}[${getCredentialStatus.name}] -----> ${error}`)
-        let msg = {
-          message: 'Error getting presentation status'
-        }
-        io.emit('error', {status: 404,
-                          message: 'No se ha guardado correctamente la credencial. Vuelva a intentarlo.'})
-        res.status(404).send(msg)
-      })         
+    .then(credentialStatus => { 
+      log.debug(`${controller_name}[${getCredentialStatus.name}] -----> Successfully saved the credential`)
+      io.emit('fillYourProfile', {status: 200,
+                                  message: 'Guardada correctamente las credenciales.'})
+      res.status(200).send(credentialStatus);
+      
+    })
+    .catch(error => {
+      log.error(`${controller_name}[${getCredentialStatus.name}] -----> ${JSON.stringify(error.message)}`)
+      let msg = {
+        message: 'Error getting presentation status'
+      }
+      io.emit('error', {status: 404,
+                        message: 'No se ha guardado correctamente la credencial. Vuelva a intentarlo.'})
+      res.status(404).send(msg)
+    })         
   } catch (error) {
     log.error(`${controller_name}[${getCredentialStatus.name}] -----> ${error}`)
     let msg = {
@@ -247,10 +237,9 @@ function getCredentialStatus(req, res){
 function recivePresentationData(req, res) {
   try {
     log.debug(`${controller_name}[${recivePresentationData.name}] -----> IN ...`);
-    let signedTx = req.swagger.params.presentation.value.signedPresentation
-    let subjectPubkey = req.swagger.params.presentation.value.subjectPublicKey
+    let presentationSigned = req.swagger.params.presentation.value.signedPresentation
     log.debug(`${controller_name}[${recivePresentationData.name}] -----> Sending params: ${JSON.stringify(req.swagger.params.presentation.value)}`)
-    entityService.getSubjectData(subjectPubkey, signedTx)
+    entityService.getPresentationData(presentationSigned)
     .then(subjectData => {
       log.debug(`${controller_name}[${recivePresentationData.name}] -----> Successfully obtained presentation data`);
       io.emit('getPresentationData', {status: 200,
