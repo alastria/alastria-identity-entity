@@ -131,7 +131,6 @@ function createAlastriaID(params) {
           .then(AlastriaIdentity => {
             let alastriaDID = tokensFactory.tokens.createDID('quor', AlastriaIdentity.slice(26));
             let objectIdentity = {
-              proxyAddress: `0x${AlastriaIdentity.slice(26)}`,
               did: alastriaDID
             }
             resolve(objectIdentity)
