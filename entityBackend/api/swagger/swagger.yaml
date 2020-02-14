@@ -838,8 +838,6 @@ definitions:
         type: boolean
       did:
         type: string
-      proxyAddress:
-        type: string
   PresentationData:
     properties:
       data:

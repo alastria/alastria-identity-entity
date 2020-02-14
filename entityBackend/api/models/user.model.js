@@ -91,8 +91,7 @@ function login(params){
             email: found.email,
             address: found.address,
             vinculated: (found.vinculated == null) ? false : found.vinculated,
-            did: found.did,
-            proxyAddress: found.proxyAddress
+            did: found.did
           },
           authToken: token
         }
@@ -125,7 +124,6 @@ function createUser(params) {
         address: params.address,
         password: params.password,
         did: params.did,
-        proxyAddress: params.proxyAddress,
         vinculated: (params.vinculated == null) ? false : params.vinculated
       }
       let db = connected.db(mongoDatabase)
@@ -164,7 +162,6 @@ function updateUser(id, params) {
       } else if(params.objectIdentity) {
         update = {
           "did": params.objectIdentity.did,
-          "proxyAddress": params.objectIdentity.proxyAddress,
           "vinculated": true
         }
       } else {
