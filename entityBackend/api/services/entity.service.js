@@ -337,12 +337,7 @@ function verifyAlastriaSession(alastriaSession) {
       if(verifiedAlastraSession == true) {
         userModel.getUser(subject.id)
         .then(user => {
-          let data = {
-            did: subject.id,
-            proxyAddress: didSubject
-          }
-          let loged = ((user.userData == null) || (user.userData.did == null)) ? data : user
-          resolve(loged)
+          resolve(user)
         })
         .catch(error => {
           log.error(`${serviceName}[${verifyAlastriaSession.name}] -----> ${error}`)
