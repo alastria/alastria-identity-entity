@@ -336,7 +336,11 @@ function verifyAlastriaSession(alastriaSession) {
       if(verifiedAlastraSession == true) {
         userModel.getUser(subject.id)
         .then(user => {
-          resolve(user)
+          let msg = {
+            message: "User not found"
+          }
+          let result = (user == null) ? msg : user
+          resolve(result)
         })
         .catch(error => {
           log.error(`${serviceName}[${verifyAlastriaSession.name}] -----> ${error}`)
