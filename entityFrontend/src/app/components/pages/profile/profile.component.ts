@@ -270,7 +270,11 @@ export class ProfileComponent implements OnInit {
 
   private async sendAlastriaTokenToApp() {
     const alastriaToken = await this.createAlastriaToken();
-    window.parent.postMessage(alastriaToken, '*');
+    const message = {
+      alastriaToken,
+      callbackUrl: `${environment.apiUrl}/entity/user?id=${this.user.id}`
+    };
+    window.parent.postMessage(message, '*');
   }
 
   private async createAlastriaToken(): Promise<string> {
