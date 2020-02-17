@@ -841,11 +841,11 @@ definitions:
   PresentationData:
     properties:
       data:
-        type: object
+        type: string
   Presentation:
     properties:
       signedPresentation:
-        type: object
+        type: string
   # credential:
   #   properties:
   #     header:

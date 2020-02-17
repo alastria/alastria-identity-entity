@@ -300,20 +300,27 @@ function getCredentialStatus(credentialHash, issuer, subject) {
 function getPresentationData(data) { 
   return new Promise((resolve, reject) => {
     log.debug(`${serviceName}[${getPresentationData.name}] -----> IN ...`) 
-    let subjectPublicKey = data.payload.pku.publicKeyHex
-    let credentials = []
-    let verifiableCredential = data.payload.vp.verifiableCredential
-    verifiableCredential.map( item => {
-      let verifyCredential = tokensFactory.tokens.verifyJWT(item, `04${subjectPublicKey}`)
-      if(verifiableCredential == true) {
-        let credential = tokensFactory.tokens.decodeJWT(item)
-        credentials.push(credential)
-      } else {
-        log.error(`${serviceName}[${getPresentationData.name}] -----> Error verifying Credential JWT`)
-        reject(verifyCredential)
-      }
+    let presentationSigned = JSON.parse(data)
+    getCurrentPublicKey(presentationSigned.payload.aud)
+    .then(subjectPublicKey => {
+      let credentials = []
+      let verifiableCredential = presentationSigned.payload.vp.verifiableCredential
+      verifiableCredential.map( item => {
+        let verifyCredential = tokensFactory.tokens.verifyJWT(item, `04${subjectPublicKey}`)
+        if(verifiableCredential == true) {
+          let credential = tokensFactory.tokens.decodeJWT(item)
+          credentials.push(credential)
+        } else {
+          log.error(`${serviceName}[${getPresentationData.name}] -----> Error verifying Credential JWT`)
+          reject(verifyCredential)
+        }
+      })
+      resolve(credentials)
     })
-    resolve(credentials)
+    .catch(error => {
+      log.error(`${serviceName}[${getPresentationData.name}] -----> ${error}`)
+      reject(error)
+    })
   }) 
 }
 
