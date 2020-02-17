@@ -196,7 +196,7 @@ export class LinkUserComponent implements OnInit {
             '@context': 'JWT',
             levelOfAssurance: 'High',
             required: true,
-            field_name: 'name'
+            field_name: 'fullname'
         },
         {
           '@context': 'JWT',
@@ -242,9 +242,17 @@ export class LinkUserComponent implements OnInit {
     this.socketService.initSocket();
 
     this.subscription.add(this.socketService.onGetPresentationData()
-      .subscribe((newUser: User) => {
-        this.user = newUser;
-        this.userFormComponent.setValuesForm(newUser);
+      .subscribe((newUser: any) => {
+        const data = newUser.message;
+        let formNewValues = {};
+
+        if (data && data.length) {
+          formNewValues = {
+            fullname: (data[0].fullname) ? data[0].fullname : (data[1].fullname) ? data[1].fullname : '',
+            email: (data[1].email) ? data[1].email : (data[0].email) ? data[0].email : ''
+          };
+        }
+        this.userFormComponent.setValuesForm(formNewValues);
         this.socketService.sendDisconnect();
         $('#simpleModal').modal('hide');
       })

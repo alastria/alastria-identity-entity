@@ -66,7 +66,16 @@ export class ServiceDetailComponent implements OnInit {
 
     this.subscription.add(this.socketService.onGetPresentationData()
       .subscribe((detailUser: any) => {
-        this.serviceFormComponent.setValuesForm(detailUser);
+        const data = detailUser.message;
+        let formNewValues = {};
+
+        if (data && data.length) {
+          formNewValues = {
+            fullname: (data[0].fullname) ? data[0].fullname : (data[1].fullname) ? data[1].fullname : '',
+            address: (data[1].address) ? data[1].address : (data[0].address) ? data[0].address : ''
+          };
+        }
+        this.serviceFormComponent.setValuesForm(formNewValues);
         $('#simpleModal').modal('hide');
         this.socketService.sendDisconnect();
       })
