@@ -237,7 +237,7 @@ function getCredentialStatus(req, res){
 function recivePresentationData(req, res) {
   try {
     log.debug(`${controller_name}[${recivePresentationData.name}] -----> IN ...`);
-    let presentationSigned = req.swagger.params.presentation.value.signedPresentation
+    let presentationSigned = req.swagger.params.presentation.value
     log.debug(`${controller_name}[${recivePresentationData.name}] -----> Sending params: ${JSON.stringify(req.swagger.params.presentation.value)}`)
     entityService.getPresentationData(presentationSigned)
     .then(subjectData => {

@@ -300,13 +300,14 @@ function getCredentialStatus(credentialHash, issuer, subject) {
 function getPresentationData(data) { 
   return new Promise((resolve, reject) => {
     log.debug(`${serviceName}[${getPresentationData.name}] -----> IN ...`) 
-    let presentationSigned = JSON.parse(data)
+    let presentationSigned = data
     getCurrentPublicKey(presentationSigned.payload.aud)
     .then(subjectPublicKey => {
+      let publicKey = subjectPublicKey[0]
       let credentials = []
       let verifiableCredential = presentationSigned.payload.vp.verifiableCredential
       verifiableCredential.map( item => {
-        let verifyCredential = tokensFactory.tokens.verifyJWT(item, `04${subjectPublicKey}`)
+        let verifyCredential = tokensFactory.tokens.verifyJWT(item, `04${publicKey}`)
         if(verifiableCredential == true) {
           let credential = tokensFactory.tokens.decodeJWT(item)
           credentials.push(credential)
