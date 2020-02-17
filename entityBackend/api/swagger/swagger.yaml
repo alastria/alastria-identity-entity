@@ -845,7 +845,7 @@ definitions:
   Presentation:
     properties:
       signedPresentation:
-        type: string
+        type: object
   # credential:
   #   properties:
   #     header:

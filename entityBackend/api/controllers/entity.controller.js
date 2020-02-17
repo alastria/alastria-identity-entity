@@ -100,7 +100,7 @@ function addIssuerCredential(req, res) {
       message: 'Insternal Server Erorr'
     }
     res.status(503).send(msg)
-   }
+  }
 }
 
 function getCurrentPublicKey(req, res) {
@@ -145,26 +145,26 @@ function getPresentationStatus(req, res){
     let issuer = req.swagger.params.serviceProvider.value;
     let subject = req.swagger.params.subject.value;
     entityService.getPresentationStatus(presentationHash,issuer,subject)
-      .then(presentationStatus => { 
-        if (presentationStatus != null){
-          log.debug(`${controller_name}[${getPresentationStatus.name}] -----> Successfully obtained presentation status: ${presentationStatus}`);
-          res.status(200).send(presentationStatus);
-        }
-        else {
-          log.error(`${controller_name}[${getPresentationStatus.name}] -----> Error: Error getting presentation status`);
-          let msg = {
-            message: 'Error getting presentation status'
-          }
-          res.status(404).send(msg)
-        }        
-      })
-      .catch(error => {
-        log.error(`${controller_name}[${getPresentationStatus.name}] -----> ${error}`);
+    .then(presentationStatus => { 
+      if (presentationStatus != null){
+        log.debug(`${controller_name}[${getPresentationStatus.name}] -----> Successfully obtained presentation status: ${presentationStatus}`);
+        res.status(200).send(presentationStatus);
+      }
+      else {
+        log.error(`${controller_name}[${getPresentationStatus.name}] -----> Error: Error getting presentation status`);
         let msg = {
-          message: `${error}`
+          message: 'Error getting presentation status'
         }
-        res.status(400).send(msg)
-      })         
+        res.status(404).send(msg)
+      }        
+    })
+    .catch(error => {
+      log.error(`${controller_name}[${getPresentationStatus.name}] -----> ${error}`);
+      let msg = {
+        message: `${error}`
+      }
+      res.status(400).send(msg)
+    })         
   } catch (error) {
     log.error(`${controller_name}[${getPresentationStatus.name}] -----> ${error}`)
     let msg = {
@@ -259,12 +259,12 @@ function recivePresentationData(req, res) {
   }
   catch(error) {
     log.error(`${controller_name}[${recivePresentationData.name}] -----> Error: ${error}`);
-      let msg = {
-        message: 'Internal server error'
-      }
-      io.emit('error', {status: 503,
-                        message: msg.message})
-      res.status(503).send(msg)
+    let msg = {
+      message: 'Internal server error'
+    }
+    io.emit('error', {status: 503,
+                      message: msg.message})
+    res.status(503).send(msg)
   }
 }
 
