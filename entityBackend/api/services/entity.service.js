@@ -308,9 +308,9 @@ function getPresentationData(data) {
       let verifiableCredential = presentationSigned.payload.vp.verifiableCredential
       verifiableCredential.map( item => {
         let verifyCredential = tokensFactory.tokens.verifyJWT(item, `04${publicKey}`)
-        if(verifiableCredential == true) {
+        if(verifyCredential == true) {
           let credential = tokensFactory.tokens.decodeJWT(item)
-          credentials.push(credential)
+          credentials.push(JSON.parse(credential.payload).vc.credentialSubject)
         } else {
           log.error(`${serviceName}[${getPresentationData.name}] -----> Error verifying Credential JWT`)
           reject(verifyCredential)
