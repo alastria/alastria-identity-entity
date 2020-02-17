@@ -338,7 +338,7 @@ export class ProfileComponent implements OnInit {
 
   private createUserUpdateForVinculated(responseWs: any) {
     const userUpdate: any = {
-      objectIdentity: responseWs.data,
+      objectIdentity: responseWs.userData,
     };
     userUpdate.id = this.user.id;
 
@@ -377,21 +377,23 @@ export class ProfileComponent implements OnInit {
 
     this.subscription.add(this.socketService.onSession()
       .subscribe((response) => {
+        console.log('response ', response);
         this.socketService.sendDisconnect();
         const userUpdate = this.createUserUpdateForVinculated(response);
         this.userService.updateUser(userUpdate)
           .then((result: any) => {
-              const user = result.user.userData;
-              user.authToken = result.user.authToken;
-              this.userService.setUserLoggedIn(user);
-              this.resultModal = {
-                type: 'success',
-                title: 'Congratulations!',
-                description: `Your AlastriaID has been linked to your ${environment.entityName} profile. Now you can login next times with your AlastriaID`
-              };
-              this.user = this.userService.getUserLoggedIn();
-              this.isCreateAlastriaId = false;
-              $('#modal-result').modal('show');
+            console.log('result ', result);
+            const user = result.user.userData;
+            user.authToken = result.user.authToken;
+            this.userService.setUserLoggedIn(user);
+            this.resultModal = {
+              type: 'success',
+              title: 'Congratulations!',
+              description: `Your AlastriaID has been linked to your ${environment.entityName} profile. Now you can login next times with your AlastriaID`
+            };
+            this.user = this.userService.getUserLoggedIn();
+            this.isCreateAlastriaId = false;
+            $('#modal-result').modal('show');
           });
       })
     );
