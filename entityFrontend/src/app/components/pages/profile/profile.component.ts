@@ -336,15 +336,6 @@ export class ProfileComponent implements OnInit {
     $('#modalFillProfile').modal('show');
   }
 
-  private createUserUpdateForVinculated(responseWs: any) {
-    const userUpdate: any = {
-      objectIdentity: responseWs.userData,
-    };
-    userUpdate.id = this.user.id;
-
-    return userUpdate;
-  }
-
   /**
    * Function for init connection with websocket and subscribe in differents events
    */
@@ -354,8 +345,9 @@ export class ProfileComponent implements OnInit {
     this.subscription.add(this.socketService.onCreateIdentity()
       .subscribe((response: any) => {
         this.socketService.sendDisconnect();
-        const userUpdate = this.createUserUpdateForVinculated(response);
-        this.userService.updateUser(userUpdate)
+        const userUpdated = response.userData;
+        userUpdated.vinculated = true;
+        this.userService.updateUser(userUpdated)
           .then((result: any) => {
             const user = result.user.userData;
             user.authToken = result.user.authToken;
@@ -378,20 +370,19 @@ export class ProfileComponent implements OnInit {
     this.subscription.add(this.socketService.onSession()
       .subscribe((response) => {
         this.socketService.sendDisconnect();
-        const userUpdate = this.createUserUpdateForVinculated(response);
-        this.userService.updateUser(userUpdate)
+        let user = this.userService.getUserLoggedIn();
+        if (response.userData) {
+          user = response.userData;
+          user.authToken = response.authToken;
+        } else if (response.did) {
+          user.did = response.did;
+          user.vinculated = true;
+        }
+        this.userService.updateUser(user)
           .then((result: any) => {
-            let user = this.userService.getUserLoggedIn();
-            if (result.userData) {
-              user = result.userData;
-              user.authToken = result.authToken;
-            } else if (result.did) {
-              user.did = result.did;
-            }
-
-            console.log('user ', user);
-
-            this.userService.setUserLoggedIn(user);
+            const userUpdated = result.user.userData;
+            userUpdated.authToken = result.user.authToken;
+            this.userService.setUserLoggedIn(userUpdated);
             this.resultModal = {
               type: 'success',
               title: 'Congratulations!',
