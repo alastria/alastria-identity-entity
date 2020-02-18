@@ -381,8 +381,16 @@ export class ProfileComponent implements OnInit {
         const userUpdate = this.createUserUpdateForVinculated(response);
         this.userService.updateUser(userUpdate)
           .then((result: any) => {
-            const user = result.user.userData;
-            user.authToken = result.user.authToken;
+            let user = this.userService.getUserLoggedIn();
+            if (result.userData) {
+              user = result.userData;
+              user.authToken = result.authToken;
+            } else if (result.did) {
+              user.did = result.did;
+            }
+
+            console.log('user ', user);
+
             this.userService.setUserLoggedIn(user);
             this.resultModal = {
               type: 'success',
