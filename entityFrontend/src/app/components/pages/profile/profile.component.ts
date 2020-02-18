@@ -272,7 +272,7 @@ export class ProfileComponent implements OnInit {
     const alastriaToken = await this.createAlastriaToken();
     const message = {
       alastriaToken,
-      callbackUrl: `${environment.apiUrl}/entity/user?id=${this.user.id}`
+      callbackUrl: `${environment.callbackUrl}/entity/user?id=${this.user.id}`
     };
     window.parent.postMessage(message, '*');
   }
@@ -284,7 +284,7 @@ export class ProfileComponent implements OnInit {
     const config = {
       did: alastriaLibJson.header.kid,
       providerUrl: alastriaLibJson.openAccess,
-      callbackUrl: `${environment.apiUrl}/entity/alastria/identity`,
+      callbackUrl: `${environment.callbackUrl}/entity/alastria/identity`,
       alastriaNetId: 'redT',
       tokenExpTime: expDate,
       tokenActivationDate: currentDate,

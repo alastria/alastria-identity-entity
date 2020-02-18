@@ -6,7 +6,8 @@ export const environment = {
   production: false,
   apiUrl: 'http://localhost:10010',
   websocketUrl: 'ws://localhost:8080',
-  entityName: '[Entity]'
+  entityName: '[Entity]',
+  callbackUrl: 'http://localhost:10010'
 };
 
 /*

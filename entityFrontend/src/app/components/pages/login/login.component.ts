@@ -143,7 +143,7 @@ const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
     const config = {
       did: alastriaLibJson.header.kid,
       providerUrl: alastriaLibJson.openAccess,
-      callbackUrl: `${environment.apiUrl}/entity/alastriaToken`,
+      callbackUrl: `${environment.callbackUrl}/entity/alastriaToken`,
       alastriaNetId: 'redT',
       tokenExpTime: expDate,
       tokenActivationDate: currentDate,
