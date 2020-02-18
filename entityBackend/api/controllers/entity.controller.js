@@ -39,12 +39,12 @@ function createAlastriaID(req, res) {
     let params = req.swagger.params.body.value
     log.debug(`${controller_name}[${createAlastriaID.name}] -----> Sending params: ${JSON.stringify(params)}`)
     entityService.createAlastriaID(params)
-    .then(alastriaID => {
+    .then(DID => {
       if (alastriaID) {
         log.debug(`${controller_name}[${createAlastriaID.name}] -----> Successfully created new AlastriaId`)
         io.emit('createIdentity', {status: 200,
                                      message: 'Identidad de Alastria creada correctamente.',
-                                     alastriaID})
+                                     DID})
         res.status(200).send(alastriaID)
       }
       else {
