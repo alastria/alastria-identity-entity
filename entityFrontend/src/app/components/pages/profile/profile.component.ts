@@ -344,14 +344,22 @@ export class ProfileComponent implements OnInit {
 
     this.subscription.add(this.socketService.onCreateIdentity()
       .subscribe((response: any) => {
+        console.log('response ', response);
         this.socketService.sendDisconnect();
-        const userUpdated = response.userData;
-        userUpdated.vinculated = true;
-        this.userService.updateUser(userUpdated)
+        let user = this.userService.getUserLoggedIn();
+        if (response.userData) {
+          user = response.userData;
+          user.authToken = response.authToken;
+        } else if (response.did) {
+          user.did = response.did;
+          user.vinculated = true;
+        }
+        console.log('user ', user);
+        this.userService.updateUser(user)
           .then((result: any) => {
-            const user = result.user.userData;
-            user.authToken = result.user.authToken;
-            this.userService.setUserLoggedIn(user);
+            const userUpdated = result.user.userData;
+            userUpdated.authToken = result.user.authToken;
+            this.userService.setUserLoggedIn(userUpdated);
             this.resultModal = {
               type: 'success',
               title: 'Congratulations!',
