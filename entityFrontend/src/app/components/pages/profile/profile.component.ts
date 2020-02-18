@@ -377,12 +377,10 @@ export class ProfileComponent implements OnInit {
 
     this.subscription.add(this.socketService.onSession()
       .subscribe((response) => {
-        console.log('response ', response);
         this.socketService.sendDisconnect();
         const userUpdate = this.createUserUpdateForVinculated(response);
         this.userService.updateUser(userUpdate)
           .then((result: any) => {
-            console.log('result ', result);
             const user = result.user.userData;
             user.authToken = result.user.authToken;
             this.userService.setUserLoggedIn(user);

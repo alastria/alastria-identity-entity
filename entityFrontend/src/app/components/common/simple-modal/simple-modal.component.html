@@ -21,7 +21,7 @@
         <button type="button" class="btn btn-primary" (click)=loginOk()>Ok!</button>
       </div>
       <div *ngIf="type !== 'info'" class="modal-footer">
-        <button type="button" class="btn btn-primary" (click)=loginOk()>Ok!</button>
+        <button *ngIf="type !== 'qr'" type="button" class="btn btn-primary" (click)=loginOk()>Ok!</button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
       </div>
     </div>
