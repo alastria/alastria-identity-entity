@@ -132,7 +132,7 @@ function createAlastriaID(params) {
             let alastriaDID = tokensFactory.tokens.createDID('quor', AlastriaIdentity.slice(26));
             let msg = {
               message: "Successfuly created Alastria ID",
-              DID: alastriaDID
+              did: alastriaDID
             }
             resolve(msg)
           })
