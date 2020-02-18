@@ -167,7 +167,7 @@ export class LinkUserComponent implements OnInit {
     try {
       await this.login(userRegister, false);
     } catch (error) {
-      if (error && error.status === 403) {
+      if (error && error.status === 401) {
         this.errorPasswordLogin = 'Incorrect email or password';
       } else {
         this.errorPasswordLogin = (error && error.message) ? error.message : 'Internal server error';
