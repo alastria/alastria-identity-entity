@@ -130,7 +130,11 @@ function createAlastriaID(params) {
           })
           .then(AlastriaIdentity => {
             let alastriaDID = tokensFactory.tokens.createDID('quor', AlastriaIdentity.slice(26));
-            resolve(alastriaDID)
+            let msg = {
+              message: "Successfuly created Alastria ID",
+              DID: alastriaDID
+            }
+            resolve(msg)
           })
           .catch(error => {
             log.error(`${serviceName}[${createAlastriaID.name}] -----> ${error}`)
