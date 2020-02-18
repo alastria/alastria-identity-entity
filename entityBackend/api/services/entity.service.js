@@ -115,7 +115,7 @@ function createAlastriaID(params) {
   return new Promise((resolve, reject) => {
     log.debug(`${serviceName}[${createAlastriaID.name}] -----> IN ...`)
     let decodedAIC = tokensFactory.tokens.decodeJWT(params.signedAIC)
-    let subjectAddress = getAddressFromPubKey(decodedAIC.payload.publicKey).substr(2)
+    let subjectAddress = getAddressFromPubKey(decodedAIC.payload.publicKey)
     let signedCreateTransaction = decodedAIC.payload.createAlastriaTX
     let preparedId = preparedAlastriaId(subjectAddress)
     issuerGetKnownTransaction(preparedId)
@@ -126,7 +126,7 @@ function createAlastriaID(params) {
         .then(createSendSigned => {
           web3.eth.call({
             to: config.alastriaIdentityManager,
-            data: web3.eth.abi.encodeFunctionCall(config.contractsAbi['AlastriaIdentityManager']['identityKeys'], [subjectAddress])
+            data: web3.eth.abi.encodeFunctionCall(config.contractsAbi['AlastriaIdentityManager']['identityKeys'], [subjectAddress.substr(2)])
           })
           .then(AlastriaIdentity => {
             let alastriaDID = tokensFactory.tokens.createDID('quor', AlastriaIdentity.slice(26));
@@ -340,7 +340,8 @@ function verifyAlastriaSession(alastriaSession) {
         userModel.getUser(didSubject)
         .then(user => {
           let msg = {
-            message: "User not found"
+            message: "User not found",
+            did: didSubject
           }
           let result = (user == null) ? msg : user
           resolve(result)

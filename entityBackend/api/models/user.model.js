@@ -154,47 +154,39 @@ function updateUser(id, params) {
     log.debug(`${moduleName}[${updateUser.name}] -----> IN...`)
     mongoHelper.connect(myConfig.mongo)
     .then(connected => {
-      let update = {}
-      if(params.password) {
-        update = {
-          "password": params.password,
+      getUser(id)
+      .then(user => {
+        let update = {
+          username: ((params.username == null) || (params.username == undefined)) ? user.userData.username : params.username,
+          name: ((params.name == null) || (params.name == undefined)) ? user.userData.name : params.name,
+          surname: ((params.surname == null) || (params.surname == undefined)) ? user.userData.surname : params.surname,
+          email: ((params.email == null) || (params.email == undefined)) ? user.userData.email : params.email,
+          address: ((params.address == null) || (params.address == undefined)) ? user.userData.address : params.address,
+          did: ((params.did == null) || (params.did == undefined)) ? user.userData.did : params.did,
+          vinculated: ((params.vinculated == null) || (params.vinculated == undefined)) ? user.userData.vinculated : params.vinculated,
         }
-      } else if(params.objectIdentity) {
-        update = {
-          "did": params.objectIdentity.did,
-          "vinculated": true
+        if(params.password) {
+          update.password = params.password
         }
-      } else {
-        update = {
-          "username": params.username,
-          "name": params.name,
-          "surname": params.surname,
-          "email": params.email,
-          "address": params.address
-        }
-      }
-      let db = connected.db(mongoDatabase)
-      db.collection(mongoCollection).updateOne(
-        {"_id": new ObjectId(id)},
-        {
-          "$set": update
-      })
-      .then(updated => {
-        log.debug(`${moduleName}[${updateUser.name}] -----> Updated Records: ${updated.result.nModified}`)
-        getUser(id)
-        .then(gettedUser => {
-          let result = {
-            updated: updated.result.nModified,
-            user: gettedUser
-          }
-          connected.close()
-          resolve(result)
+        let db = connected.db(mongoDatabase)
+        db.collection(mongoCollection).updateOne({"_id": new ObjectId(id)},{"$set": update })
+        .then(updated => {
+          log.debug(`${moduleName}[${updateUser.name}] -----> Updated Records: ${updated.result.nModified}`)
+          getUser(id)
+          .then(gettedUser => {
+            let result = {
+              updated: updated.result.nModified,
+              user: gettedUser
+            }
+            connected.close()
+            resolve(result)
+          })
         })
-      })
-      .catch(error => {
-        log.error(`${moduleName}[${updateUser.name}] -----> Error: ${error}`)
-        connected.close()
-        reject(error)
+        .catch(error => {
+          log.error(`${moduleName}[${updateUser.name}] -----> Error: ${error}`)
+          connected.close()
+          reject(error)
+        })
       })
     })
     .catch(error => {
