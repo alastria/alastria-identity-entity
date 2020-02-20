@@ -48,10 +48,18 @@ loadJsonFile(pathFile)
 
     const server = myConfig.socketPort
     const io = require('socket.io')(server)
+    const CLIENTS = []
 
-    io.on('connect', () => {
-      log.debug(`[App] -----> WebSocket connection attached`)
+    io.on('connect', ws => {
+      CLIENTS.push(ws)
+      ws.on('message', message => {
+        log.debug(`[App] -----> Received %s ${message}`)
+      })
+      log.debug(`[App] -----> Websocket attached!`)
+      ws.send('NEW USER JOINED')
     })
+
+
     wsHelper.setWSObject(io)
 
     var config = {
