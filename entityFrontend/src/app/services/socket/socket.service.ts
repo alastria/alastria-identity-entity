@@ -34,6 +34,10 @@ export class SocketService {
     this.socket.emit('createIdentity', message);
   }
 
+  public sendCreateIdentityWs(message: any): void {
+    this.socket.emit('createIdentityWs', message);
+  }
+
   public sendSetUp(): void {
     this.socket.emit('setUpAlastriaId');
   }

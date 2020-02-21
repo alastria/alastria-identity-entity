@@ -274,7 +274,8 @@ export class ProfileComponent implements OnInit {
       alastriaToken,
       callbackUrl: `${environment.callbackUrl}/entity/user?id=${this.user.id}`
     };
-    window.parent.postMessage(message, '*');
+
+    this.socketService.sendCreateIdentityWs(message);
   }
 
   private async createAlastriaToken(): Promise<string> {
