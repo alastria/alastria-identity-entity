@@ -7,7 +7,7 @@
     "alastria": "http://63.33.206.111/rpc"
   },
   "mongo": {
-    "url": "mongodb://localhost:27017",
+    "url": "mongodb://mongo:27017",
     "dbName": "alastriaUsers",
     "collection": "users",
     "interceptorElapse": 100

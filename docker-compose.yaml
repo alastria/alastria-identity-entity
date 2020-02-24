@@ -17,6 +17,7 @@ services:
       - "10011:8080"
     volumes:
       - ./entityBackend/api:/app/api
+      - ./entityBackend/config.json:/app/config.json
     command: npm run start
 
   entityfrontend:

@@ -57,6 +57,7 @@ loadJsonFile(pathFile)
       })
       ws.on('createIdentityWs', message => {
         io.emit('createIdentityWs', message)
+	log.debug(`[App] -----> Message: ${message}`)
       })
       log.debug(`[App] -----> Websocket attached!`)
       ws.send('NEW USER JOINED')
