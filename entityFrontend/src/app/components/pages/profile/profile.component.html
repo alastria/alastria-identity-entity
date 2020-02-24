@@ -67,7 +67,8 @@
   </app-modal-result>
   <app-simple-modal *ngIf="user.vinculated"
     (handleOk)="handleOkFillYourProfile()" 
-    [qrSize]="256"
+    [qrSize]="512"
+    size="xl"
     type="qr"
     [qrData]="qrDataFillProfile">
   </app-simple-modal>
