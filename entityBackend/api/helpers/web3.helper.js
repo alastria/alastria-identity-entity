@@ -26,19 +26,19 @@ module.exports = {
 let myWeb3 = {}
 
 function setWeb3(web3) {
-  log.debug(`${helper_name}[${setWeb3.name}] -----> Setting Web3 ...`)
+  log.info(`${helper_name}[${setWeb3.name}] -----> Setting Web3 ...`)
   myWeb3 = web3
 }
 
 function getWeb3() {
-  log.debug(`${helper_name}[${getWeb3.name}] -----> Getting Web3 Object ...`)
+  log.info(`${helper_name}[${getWeb3.name}] -----> Getting Web3 Object ...`)
   return myWeb3
 }
 
 function instanceWeb3(nodeUrl) {
   return new Promise((resolve, reject) => {
     try {
-      log.debug(`${helper_name}[${instanceWeb3.name}] -----> Instantiating Web3 ...`)
+      log.info(`${helper_name}[${instanceWeb3.name}] -----> Instantiating Web3 ...`)
       myWeb3 = new Web3(new Web3.providers.HttpProvider(nodeUrl))
       resolve(myWeb3)
     }

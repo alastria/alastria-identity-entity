@@ -28,10 +28,10 @@ let issuerIdentity, issuerPrivateKey
 
 function getIssuerIdentity() {
   try {
-    log.debug(`${serviceName}[${getIssuerIdentity.name}] -----> IN ...`)
+    log.info(`${serviceName}[${getIssuerIdentity.name}] -----> IN ...`)
     issuerPrivateKey = keythereum.recover(myConfig.addressPassword, issuerKeystore)
     issuerIdentity = new UserIdentity(web3, `0x${issuerKeystore.address}`, issuerPrivateKey)
-    log.debug(`${serviceName}[${getIssuerIdentity.name}] -----> Issuer Getted`)
+    log.info(`${serviceName}[${getIssuerIdentity.name}] -----> Issuer Getted`)
     return issuerIdentity
   } catch (error) {
     log.error(`${serviceName}[${getIssuerIdentity.name}] -----> ${error}`)
@@ -41,10 +41,10 @@ function getIssuerIdentity() {
 
 function sendSigned(transactionSigned) {
   return new Promise((resolve, reject) => {
-    log.debug(`${serviceName}[${sendSigned.name}] -----> IN ...`)
+    log.info(`${serviceName}[${sendSigned.name}] -----> IN ...`)
     web3.eth.sendSignedTransaction(transactionSigned)
     .on('transactionHash', function (hash) {
-      log.debug(`${serviceName}[${sendSigned.name}] -----> HASH: ${hash} ...`)
+      log.info(`${serviceName}[${sendSigned.name}] -----> HASH: ${hash} ...`)
     })
     .on('receipt', receipt => {
       resolve(receipt)
@@ -71,9 +71,9 @@ function issuerGetKnownTransaction(issuerCredential) {
 
 function getAddressFromPubKey(publicKey) {
   try {
-    log.debug(`${serviceName}[${getAddressFromPubKey.name}] -----> IN ...`)
+    log.info(`${serviceName}[${getAddressFromPubKey.name}] -----> IN ...`)
     let address = EthCrypto.publicKey.toAddress(publicKey)
-    log.debug(`${serviceName}[${getAddressFromPubKey.name}] -----> Getted address`)
+    log.info(`${serviceName}[${getAddressFromPubKey.name}] -----> Getted address`)
     return address
   }
   catch(error) {
@@ -113,7 +113,7 @@ module.exports = {
 
 function createAlastriaID(params) {
   return new Promise((resolve, reject) => {
-    log.debug(`${serviceName}[${createAlastriaID.name}] -----> IN ...`)
+    log.info(`${serviceName}[${createAlastriaID.name}] -----> IN ...`)
     let decodedAIC = tokensFactory.tokens.decodeJWT(params.signedAIC)
     let subjectAddress = getAddressFromPubKey(decodedAIC.payload.publicKey)
     let signedCreateTransaction = decodedAIC.payload.createAlastriaTX
@@ -160,7 +160,7 @@ function createAlastriaID(params) {
 
 function addIssuerCredential(params) {
   return new Promise((resolve, reject) => {
-    log.debug(`${serviceName}[${addIssuerCredential.name}] -----> IN ...`)
+    log.info(`${serviceName}[${addIssuerCredential.name}] -----> IN ...`)
     log.debug(`${serviceName}[${addIssuerCredential.name}] -----> Calling addIssuer credential With params: ${JSON.stringify(params)}`)
     let issuerCredential = transactionFactory.credentialRegistry.addIssuerCredential(web3, params.issuerCredentialHash)
     issuerGetKnownTransaction(issuerCredential)
@@ -175,7 +175,7 @@ function addIssuerCredential(params) {
             "exists": result[0],
             "status": result[1]
           }
-          log.debug(`${serviceName}[${addIssuerCredential.name}] -----> Success`)
+          log.info(`${serviceName}[${addIssuerCredential.name}] -----> Success`)
           resolve(credentialStatus)
         })
         .catch(error => {
@@ -197,11 +197,11 @@ function addIssuerCredential(params) {
 
 function getCurrentPublicKey(subject) {
   return new Promise((resolve, reject) => {
-    log.debug(`${serviceName}[${getCurrentPublicKey.name}] -----> IN ...`)
+    log.info(`${serviceName}[${getCurrentPublicKey.name}] -----> IN ...`)
     let currentPubKey = transactionFactory.publicKeyRegistry.getCurrentPublicKey(web3, subject.split(':')[4]) // Remove split when the library accepts the DID and not the proxyAddress
     web3.eth.call(currentPubKey)
     .then(result => {
-      log.debug(`${serviceName}[${getCurrentPublicKey.name}] -----> Success`)
+      log.info(`${serviceName}[${getCurrentPublicKey.name}] -----> Success`)
       let pubKey = web3.eth.abi.decodeParameters(['string'], result) 
       resolve(pubKey)
     })
@@ -214,7 +214,7 @@ function getCurrentPublicKey(subject) {
 
 function getPresentationStatus(presentationHash, issuer, subject) {
   return new Promise((resolve, reject) => {
-    log.debug(`${serviceName}[${getPresentationStatus.name}] -----> IN ...`)
+    log.info(`${serviceName}[${getPresentationStatus.name}] -----> IN ...`)
     let presentationStatus = null;
     if (issuer != null) {
       presentationStatus = transactionFactory.presentationRegistry.getReceiverPresentationStatus(web3, issuer, presentationHash);
@@ -229,7 +229,7 @@ function getPresentationStatus(presentationHash, issuer, subject) {
           exist: resultStatus[0],
           status: resultStatus[1]
         }
-        log.debug(`${serviceName}[${getPresentationStatus.name}] -----> Success`)
+        log.info(`${serviceName}[${getPresentationStatus.name}] -----> Success`)
         resolve(resultStatusJson);
       })
       .catch(error => {
@@ -242,13 +242,13 @@ function getPresentationStatus(presentationHash, issuer, subject) {
 
 function updateReceiverPresentationStatus(presentationHash, newStatus) {
   return new Promise((resolve, reject) => {
-    log.debug(`${serviceName}[${updateReceiverPresentationStatus.name}] -----> IN ...`)
+    log.info(`${serviceName}[${updateReceiverPresentationStatus.name}] -----> IN ...`)
     let updatepresentationStatus = transactionFactory.presentationRegistry.updateReceiverPresentation(web3, presentationHash, newStatus.newStatus);
     issuerGetKnownTransaction(updatepresentationStatus)
     .then(updatepresentationStatusSigned => {
       sendSigned(updatepresentationStatusSigned)
       .then(receipt => {
-        log.debug(`${serviceName}[${updateReceiverPresentationStatus.name}] -----> Success`)
+        log.info(`${serviceName}[${updateReceiverPresentationStatus.name}] -----> Success`)
         resolve();
       })
       .catch(error => {
@@ -265,7 +265,7 @@ function updateReceiverPresentationStatus(presentationHash, newStatus) {
 
 function getCredentialStatus(credentialHash, issuer, subject) {
   return new Promise((resolve, reject) => {
-    log.debug(`${serviceName}[${getCredentialStatus.name}] -----> IN ...`)
+    log.info(`${serviceName}[${getCredentialStatus.name}] -----> IN ...`)
     let credentialStatus = null;
     if (issuer != null) {
       let didIssuer = issuer.split(':')[4]
@@ -282,7 +282,7 @@ function getCredentialStatus(credentialHash, issuer, subject) {
           exist: resultStatus[0],
           status: resultStatus[1]
         }
-        log.debug(`${serviceName}[${getCredentialStatus.name}] -----> Success`)
+        log.info(`${serviceName}[${getCredentialStatus.name}] -----> Success`)
         resolve(resultStatusJson);
       })
       .catch(error => {
@@ -300,7 +300,7 @@ function getCredentialStatus(credentialHash, issuer, subject) {
 
 function getPresentationData(data) { 
   return new Promise((resolve, reject) => {
-    log.debug(`${serviceName}[${getPresentationData.name}] -----> IN ...`) 
+    log.info(`${serviceName}[${getPresentationData.name}] -----> IN ...`) 
     let presentationSigned = data
     getCurrentPublicKey(presentationSigned.payload.aud)
     .then(subjectPublicKey => {
@@ -328,14 +328,14 @@ function getPresentationData(data) {
 
 function verifyAlastriaSession(alastriaSession) {
   return new Promise((resolve, reject) => {
-    log.debug(`${serviceName}[${verifyAlastriaSession.name}] -----> IN...`)
+    log.info(`${serviceName}[${verifyAlastriaSession.name}] -----> IN...`)
     let decode = tokensFactory.tokens.decodeJWT(alastriaSession.signedAIC)
     let didSubject = decode.payload.pku.id
-    log.debug(`${serviceName}[${verifyAlastriaSession.name}] -----> Obtained correctly the Subject DID`)
+    log.info(`${serviceName}[${verifyAlastriaSession.name}] -----> Obtained correctly the Subject DID`)
     getCurrentPublicKey(didSubject)
     .then(subjectPublicKey => {
       let publicKey = subjectPublicKey[0]
-      log.debug(`${serviceName}[${verifyAlastriaSession.name}] -----> Obtained correctly the Subject PublicKey`)
+      log.info(`${serviceName}[${verifyAlastriaSession.name}] -----> Obtained correctly the Subject PublicKey`)
       let verifiedAlastraSession = tokensFactory.tokens.verifyJWT(alastriaSession.signedAIC, `04${publicKey}`)
       if(verifiedAlastraSession == true) {
         userModel.getUser(didSubject)

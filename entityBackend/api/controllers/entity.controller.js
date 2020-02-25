@@ -35,13 +35,13 @@ module.exports = {
 
 function createAlastriaID(req, res) {
   try {
-    log.debug(`${controller_name}[${createAlastriaID.name}] -----> IN ...`)
+    log.info(`${controller_name}[${createAlastriaID.name}] -----> IN ...`)
     let params = req.swagger.params.body.value
     log.debug(`${controller_name}[${createAlastriaID.name}] -----> Sending params: ${JSON.stringify(params)}`)
     entityService.createAlastriaID(params)
     .then(alastriaId => {
       if (alastriaId) {
-        log.debug(`${controller_name}[${createAlastriaID.name}] -----> Successfully created new AlastriaId`)
+        log.info(`${controller_name}[${createAlastriaID.name}] -----> Successfully created new AlastriaId`)
         io.emit('createIdentity', alastriaId)
         res.status(200).send(alastriaId)
       }
@@ -76,12 +76,12 @@ function createAlastriaID(req, res) {
 
 function addIssuerCredential(req, res) {
   try {
-    log.debug(`${controller_name}[${addIssuerCredential.name}] -----> IN ...`)
+    log.info(`${controller_name}[${addIssuerCredential.name}] -----> IN ...`)
     let params = req.swagger.params.body.value
     log.debug(`${controller_name}[${addIssuerCredential.name}] -----> Sending params: ${JSON.stringify(params)}`)
     entityService.addIssuerCredential(params)
     .then(addSubjectPres => {
-      log.debug(`${controller_name}[${addIssuerCredential.name}] -----> Successfully added credential: ${JSON.stringify(addSubjectPres)}`)
+      log.info(`${controller_name}[${addIssuerCredential.name}] -----> Successfully added credential`)
       res.status(200).send(addSubjectPres)
     })
     .catch(error => {
@@ -103,20 +103,20 @@ function addIssuerCredential(req, res) {
 
 function getCurrentPublicKey(req, res) {
   try {
-    log.debug(`${controller_name}[${getCurrentPublicKey.name}] -----> IN ...`)
+    log.info(`${controller_name}[${getCurrentPublicKey.name}] -----> IN ...`)
     let alastriaId = req.swagger.params.alastriaDID.value
     log.debug(`${controller_name}[${getCurrentPublicKey.name}] -----> Sending params: ${JSON.stringify(alastriaId)}`)
     entityService.getCurrentPublicKey(alastriaId)
     .then(publickey => {
       if (publickey[0].length > 0) {
-        log.debug(`${controller_name}[${getCurrentPublicKey.name}] -----> Successfully obtained Public Key`)
+        log.info(`${controller_name}[${getCurrentPublicKey.name}] -----> Successfully obtained Public Key`)
         let result = {
           publicKey: publickey[0]
         }
         res.status(200).send(result)
       }
       else {
-        log.debug(`${controller_name}[${getCurrentPublicKey.name}] -----> Error getting publicKey`)
+        log.info(`${controller_name}[${getCurrentPublicKey.name}] -----> Error getting publicKey`)
         let msg = {
           message: 'Error getting Public Key'
         }
@@ -137,7 +137,7 @@ function getCurrentPublicKey(req, res) {
 
 function getPresentationStatus(req, res){
   try {
-    log.debug(`${controller_name}[${getPresentationStatus.name}] -----> IN ...`);
+    log.info(`${controller_name}[${getPresentationStatus.name}] -----> IN ...`);
     let presentationHash = req.swagger.params.presentationHash.value;
     log.debug(`${controller_name}[${getPresentationStatus.name}] -----> Sending params: ${JSON.stringify(presentationHash)}`)
     let issuer = req.swagger.params.serviceProvider.value;
@@ -145,7 +145,7 @@ function getPresentationStatus(req, res){
     entityService.getPresentationStatus(presentationHash,issuer,subject)
     .then(presentationStatus => { 
       if (presentationStatus != null){
-        log.debug(`${controller_name}[${getPresentationStatus.name}] -----> Successfully obtained presentation status: ${presentationStatus}`);
+        log.info(`${controller_name}[${getPresentationStatus.name}] -----> Successfully obtained presentation status`);
         res.status(200).send(presentationStatus);
       }
       else {
@@ -174,13 +174,13 @@ function getPresentationStatus(req, res){
 
 function updateReceiverPresentationStatus(req, res){
   try {
-    log.debug(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> IN ...`);
+    log.info(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> IN ...`);
     let presentationHash = req.swagger.params.presentationHash.value;
     log.debug(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> Sending params: ${JSON.stringify(presentationHash)}`)
     let newStatus = req.swagger.params.body.value;    
     entityService.updateReceiverPresentationStatus(presentationHash,newStatus)
     .then(() => { 
-      log.debug(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> Successfully updated status presentation`);
+      log.info(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> Successfully updated status presentation`);
       res.status(200).send();
     })
     .catch(error => {
@@ -201,14 +201,14 @@ function updateReceiverPresentationStatus(req, res){
 
 function getCredentialStatus(req, res){
   try {
-    log.debug(`${controller_name}[${getCredentialStatus.name}] -----> IN ...`);
+    log.info(`${controller_name}[${getCredentialStatus.name}] -----> IN ...`);
     let credentialHash = req.swagger.params.credentialHash.value;
     let issuer = req.swagger.params.issuer.value;
     let subject = req.swagger.params.subject.value;
     log.debug(`${controller_name}[${getCredentialStatus.name}] -----> Sending params: ${JSON.stringify(credentialHash, issuer, subject)}`)
     entityService.getCredentialStatus(credentialHash, issuer, subject)
     .then(credentialStatus => { 
-      log.debug(`${controller_name}[${getCredentialStatus.name}] -----> Successfully saved the credential`)
+      log.info(`${controller_name}[${getCredentialStatus.name}] -----> Successfully saved the credential`)
       io.emit('fillYourProfile', {status: 200,
                                   message: 'Guardada correctamente las credenciales.'})
       res.status(200).send(credentialStatus);
@@ -234,12 +234,12 @@ function getCredentialStatus(req, res){
 
 function recivePresentationData(req, res) {
   try {
-    log.debug(`${controller_name}[${recivePresentationData.name}] -----> IN ...`);
+    log.info(`${controller_name}[${recivePresentationData.name}] -----> IN ...`);
     let presentationSigned = req.swagger.params.presentation.value
     log.debug(`${controller_name}[${recivePresentationData.name}] -----> Sending params: ${JSON.stringify(req.swagger.params.presentation.value)}`)
     entityService.getPresentationData(presentationSigned)
     .then(subjectData => {
-      log.debug(`${controller_name}[${recivePresentationData.name}] -----> Successfully obtained presentation data`);
+      log.info(`${controller_name}[${recivePresentationData.name}] -----> Successfully obtained presentation data`);
       io.emit('getPresentationData', {status: 200,
                                       message: subjectData})
       res.status(200).send(subjectData)
@@ -268,12 +268,12 @@ function recivePresentationData(req, res) {
 
 function verifyAlastriaSession(req, res) {
   try {
-    log.debug(`${controller_name}[${verifyAlastriaSession.name}] -----> IN ...`)
+    log.info(`${controller_name}[${verifyAlastriaSession.name}] -----> IN ...`)
     let alastriaSession = req.swagger.params.alastriaSession.value
     log.debug(`${controller_name}[${verifyAlastriaSession.name}] -----> Sending params: ${JSON.stringify(alastriaSession)}`)
     entityService.verifyAlastriaSession(alastriaSession)
     .then(verified => {
-      log.debug(`${controller_name}[${verifyAlastriaSession.name}] -----> Alastria Sesion verified successfuly`)
+      log.info(`${controller_name}[${verifyAlastriaSession.name}] -----> Alastria Sesion verified successfuly`)
       io.emit('session', verified)
       res.status(200).send(verified)
     })

@@ -11,17 +11,16 @@ const app = require('express')();
 const Log = require('log4js')
 const loadJsonFile = require('load-json-file')
 const cors = require('cors')
+const io = require('socket.io')()
 const pathFile = 'config.json'
 const log = Log.getLogger()
 const wsHelper = require('./api/helpers/ws.helper')
-
-const mongoHelper = require('./api/helpers/mongo.helper')
 
 /////////////////////////////////////////////////////////
 ///////              PUBLIC FUNCTIONS             ///////
 /////////////////////////////////////////////////////////
 
-log.level = 'debug'
+log.level = 'info'
 let myConfig = {}
 let nodeurl = ''
 
@@ -33,7 +32,7 @@ loadJsonFile(pathFile)
   configHelper.setConfig(config)
   myConfig = configHelper.getConfig()
   log.debug(`[App] -----> Congif getted ${JSON.stringify(myConfig)}`)
-
+  
   if(!process.env.NODE_ENDPOINT) {
     nodeurl = myConfig.nodeUrl.alastria // change to local or alastria when yo are developing (swagger project start)
   } else if(process.env.NODE_ENDPOINT == 'localEndpoint') {
@@ -41,28 +40,31 @@ loadJsonFile(pathFile)
   } else if(process.env.NODE_ENDPOINT == 'alastria') {
     nodeurl = myConfig.nodeUrl.alastria
   }
-  log.debug(`[App] -----> Connected via RPC to ${nodeurl}`)
+  log.info(`[App] -----> Connected via RPC to ${nodeurl}`)
   
   web3Helper.instanceWeb3(nodeurl)
   .then(web3Instantiated => {
-
+    
     const server = myConfig.socketPort
-    const io = require('socket.io')(server)
-    const CLIENTS = []
+    io.attach(server, {'force new connection':true})
 
-    io.on('connect', ws => {
-      CLIENTS.push(ws)
-      ws.on('message', message => {
-        log.debug(`[App] -----> Received %s ${message}`)
-      })
-      ws.on('createIdentityWs', message => {
-        io.emit('createIdentityWs', message)
-	log.debug(`[App] -----> Message: ${message}`)
-      })
-      log.debug(`[App] -----> Websocket attached!`)
-      ws.send('NEW USER JOINED')
+    io.on('connect', (socket) => {
+      log.info(`[App] -----> Websocket ${socket.id} attached`)
     })
+    // const CLIENTS = []
 
+    // io.on('connect', ws => {
+    //   CLIENTS.push(ws)
+    //   ws.on('message', message => {
+    //     log.info(`[App] -----> Received %s ${message}`)
+    //   })
+    //   ws.on('createIdentityWs', message => {
+    //     io.emit('createIdentityWs', message)
+	  //     log.info(`[App] -----> Message: ${JSON.stringify(message)}`)
+    //   })
+    //   log.info(`[App] -----> Websocket attached!`)
+    //   ws.send('NEW USER JOINED')
+    // })
 
     wsHelper.setWSObject(io)
 
@@ -70,7 +72,7 @@ loadJsonFile(pathFile)
       appRoot: __dirname // required config
     };
   
-    log.debug('[App] -----> Web3 instantiated correctly')
+    log.info('[App] -----> Web3 instantiated correctly')
     web3Helper.setWeb3(web3Instantiated)
     
     SwaggerExpress.create(config, function(err, swaggerExpress) {
@@ -81,7 +83,7 @@ loadJsonFile(pathFile)
     
       var port = process.env.PORT || 10010;
       app.listen(port, function(){
-        log.debug(`[App] -----> Server started in http://localhost:${port}`)
+        log.info(`[App] -----> Server started in http://localhost:${port}`)
       });
   
       // Enable CORS

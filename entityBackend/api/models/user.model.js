@@ -11,7 +11,7 @@ const myConfig = configHelper.getConfig()
 const log = Log.getLogger()
 const mongoHelper = require('../helpers/mongo.helper')
 log.level = myConfig.Log.level
-const moduleName = '[Entity Model]'
+const moduleName = '[User Model]'
 const ObjectId = require('mongodb').ObjectID
 
 let mongoDatabase = myConfig.mongo.dbName
@@ -35,10 +35,10 @@ module.exports = {
 
 function isAuth(data) {
   return new Promise((resolve, reject) => {
-    log.debug(`${moduleName}[${isAuth.name}] -----> IN...`);
+    log.info(`${moduleName}[${isAuth.name}] -----> IN...`);
     mongoHelper.connect(myConfig.mongo)
     .then(connected => {
-      log.debug(`${moduleName}[${isAuth.name}] -----> Checking if user is authenticated`);
+      log.info(`${moduleName}[${isAuth.name}] -----> Checking if user is authenticated`);
       let db = connected.db(mongoDatabase)
       db.collection(mongoCollection).findOne({"$or":[{"username": data.user}, {"email": data.user}], "password": data.password})
       .then(found => {
@@ -65,7 +65,7 @@ function isAuth(data) {
 
 function login(params){
   return new Promise((resolve, reject) => {
-    log.debug(`${moduleName}[${login.name}] -----> IN...`);
+    log.info(`${moduleName}[${login.name}] -----> IN...`);
     let username = params.username
     let pwd = params.password
     mongoHelper.connect(myConfig.mongo)
@@ -81,7 +81,7 @@ function login(params){
           password: pwd
         }
         let token = jwt.sign({data: jsonObjet}, pwd, { expiresIn: 60 * 60})
-        log.debug(`${moduleName}[${login.name}] -----> JWT created`);
+        log.info(`${moduleName}[${login.name}] -----> JWT created`);
         let userObject = {
           userData: {
             id: found._id,
@@ -113,7 +113,7 @@ function login(params){
 
 function createUser(params) {
   return new Promise((resolve, reject) => {
-    log.debug(`${moduleName}[${createUser.name}] -----> IN...`)
+    log.info(`${moduleName}[${createUser.name}] -----> IN...`)
     mongoHelper.connect(myConfig.mongo)
     .then(connected => {
       let userData = {
@@ -129,7 +129,7 @@ function createUser(params) {
       let db = connected.db(mongoDatabase)
       db.collection(mongoCollection).insertOne(userData)
       .then(created => {
-        log.debug(`${moduleName}[${createUser.name}] -----> User created successfuly`)
+        log.info(`${moduleName}[${createUser.name}] -----> User created successfuly`)
         let msg = {
           message: 'Created new user correctly'
         }
@@ -151,7 +151,7 @@ function createUser(params) {
 
 function updateUser(id, params) {
   return new Promise((resolve, reject) => {
-    log.debug(`${moduleName}[${updateUser.name}] -----> IN...`)
+    log.info(`${moduleName}[${updateUser.name}] -----> IN...`)
     mongoHelper.connect(myConfig.mongo)
     .then(connected => {
       getUser(id)
@@ -171,7 +171,7 @@ function updateUser(id, params) {
         let db = connected.db(mongoDatabase)
         db.collection(mongoCollection).updateOne({"_id": new ObjectId(id)},{"$set": update })
         .then(updated => {
-          log.debug(`${moduleName}[${updateUser.name}] -----> Updated Records: ${updated.result.nModified}`)
+          log.info(`${moduleName}[${updateUser.name}] -----> Updated Records: ${updated.result.nModified}`)
           getUser(id)
           .then(gettedUser => {
             let result = {
@@ -198,7 +198,7 @@ function updateUser(id, params) {
 
 function getUser(id) {
   return new Promise((resolve, reject) => {
-    log.debug(`${moduleName}[${getUser.name}] -----> IN...`)
+    log.info(`${moduleName}[${getUser.name}] -----> IN...`)
     let find = (id.startsWith('did') == true) ? {"did":id} : {"_id": new ObjectId(id)}
     mongoHelper.connect(myConfig.mongo)
     .then(connected => {
@@ -206,13 +206,13 @@ function getUser(id) {
       db.collection(mongoCollection).findOne(find)
       .then(user => {
         if (user == null){
-          log.debug(`${moduleName}[${getUser.name}] -----> User not found in the DataBase`)
+          log.info(`${moduleName}[${getUser.name}] -----> User not found in the DataBase`)
           resolve(user)
         } else {
-          log.debug(`${moduleName}[${getUser.name}] -----> Data obtained`)
+          log.info(`${moduleName}[${getUser.name}] -----> Data obtained`)
           login(user)
           .then(loged => {
-            log.debug(`${moduleName}[${getUser.name}] -----> User loged`)
+            log.info(`${moduleName}[${getUser.name}] -----> User loged`)
             resolve(loged)
           })
           .catch(error => {
@@ -237,12 +237,12 @@ function getUser(id) {
 
 function checkAuth(token) {
   return new Promise((resolve, reject) => {
-    log.debug(`${moduleName}[${checkAuth.name}] -----> IN...`)
+    log.info(`${moduleName}[${checkAuth.name}] -----> IN...`)
     let decoded = jwt.decode(token)
-    log.debug(`${moduleName}[${checkAuth.name}] -----> Decoded token`)
+    log.info(`${moduleName}[${checkAuth.name}] -----> Decoded token`)
     isAuth(decoded.data)
     .then(auth => {
-      log.debug(`${moduleName}[${checkAuth.name}] -----> Sending result`)
+      log.info(`${moduleName}[${checkAuth.name}] -----> Sending result`)
       resolve(auth)
     })
     .catch(error => {

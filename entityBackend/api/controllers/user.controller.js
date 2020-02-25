@@ -32,7 +32,7 @@ module.exports = {
 
 function login(req, res) {
   try {
-    log.debug(`${controller_name}[${login.name}] -----> IN ...`)
+    log.info(`${controller_name}[${login.name}] -----> IN ...`)
     let loginData =  {
       username: req.swagger.params.username.value,
       password: req.swagger.params.password.value
@@ -47,7 +47,7 @@ function login(req, res) {
         }
         res.status(401).send(msg)
       } else {
-        log.debug(`${controller_name}[${login.name}] -----> User loged correctly`)
+        log.info(`${controller_name}[${login.name}] -----> User loged correctly`)
         res.status(200).send(authenticated)
       }
     })
@@ -74,7 +74,7 @@ function login(req, res) {
 
 function addUser(req, res) {
   try {
-    log.debug(`${controller_name}[${addUser.name}] -----> IN ...`)
+    log.info(`${controller_name}[${addUser.name}] -----> IN ...`)
     let params = req.swagger.params.body.value
     log.debug(`${controller_name}[${addUser.name}] -----> Sending params: ${JSON.stringify(params)}`)
     userModel.createUser(params)
@@ -105,7 +105,7 @@ function addUser(req, res) {
 
 function updateUser(req, res) {
   try {
-    log.debug(`${controller_name}[${updateUser.name}] -----> IN ...`)
+    log.info(`${controller_name}[${updateUser.name}] -----> IN ...`)
     let id = req.swagger.params.id.value
     let params = req.swagger.params.body.value
     log.debug(`${controller_name}[${updateUser.name}] -----> Sending params: ${JSON.stringify(params)}`)
@@ -113,13 +113,13 @@ function updateUser(req, res) {
     .then(updated => {
       let modifieds = updated.updated
       if(modifieds == 0){
-        log.debug(`${controller_name}[${updateUser.name}] -----> No records updated`)
+        log.info(`${controller_name}[${updateUser.name}] -----> No records updated`)
         let msg = {
           message: `No se ha actualizado ningun registro`
         }
         res.status(200).send(msg)
       } else {
-        log.debug(`${controller_name}[${updateUser.name}] -----> Records updated`)
+        log.info(`${controller_name}[${updateUser.name}] -----> Records updated`)
         let response = {
           message: `Exito al actulaizar el usuario`,
           user: updated.user
@@ -139,19 +139,19 @@ function updateUser(req, res) {
 
 function getUser(req, res) {
   try {
-    log.debug(`${controller_name}[${getUser.name}] -----> IN ...`)
+    log.info(`${controller_name}[${getUser.name}] -----> IN ...`)
     let id = req.swagger.params.userID.value
     log.debug(`${controller_name}[${getUser.name}] -----> Sending params: ${JSON.stringify(id)}`)
     userModel.getUser(id)
     .then(userData => {
       if (userData == null) {
-        log.debug(`${controller_name}[${getUser.name}] -----> User not found`)
+        log.info(`${controller_name}[${getUser.name}] -----> User not found`)
         let msg = {
           message: `User not found`
         }
         res.status(404).send(msg)
       } else {
-        log.debug(`${controller_name}[${getUser.name}] -----> User found`)
+        log.info(`${controller_name}[${getUser.name}] -----> User found`)
         let userInfo = {
           user: userData
         }
@@ -159,7 +159,7 @@ function getUser(req, res) {
       }
     })
     .catch(error => {
-      log.debug(`${controller_name}[${getUser.name}] -----> Error: ${error}`)
+      log.info(`${controller_name}[${getUser.name}] -----> Error: ${error}`)
       let msg = {
         message: `${error}`
       }
@@ -177,16 +177,16 @@ function getUser(req, res) {
 
 function checkUserAuth(req, res) {
   try {
-    log.debug(`${controller_name}[${checkUserAuth.name}] -----> IN ...`)
+    log.info(`${controller_name}[${checkUserAuth.name}] -----> IN ...`)
     let token = req.swagger.params.authToken.value
     log.debug(`${controller_name}[${checkUserAuth.name}] -----> Sending params: ${JSON.stringify(token)}`)
     userModel.checkAuth(token)
     .then(isAuth => {
       if(isAuth == null) {
-        log.debug(`${controller_name}[${checkUserAuth.name}] -----> User not authenticated`)
+        log.info(`${controller_name}[${checkUserAuth.name}] -----> User not authenticated`)
         res.status(200).send({ status: false })
       } else {
-        log.debug(`${controller_name}[${checkUserAuth.name}] -----> User Authenticated`)
+        log.info(`${controller_name}[${checkUserAuth.name}] -----> User Authenticated`)
         res.status(200).send({ status: true })
       }
     })
