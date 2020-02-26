@@ -46,25 +46,25 @@ loadJsonFile(pathFile)
   .then(web3Instantiated => {
     
     const server = myConfig.socketPort
-    io.attach(server, {'force new connection':true})
+    io.attach(server)
 
-    io.on('connect', (socket) => {
-      log.info(`[App] -----> Websocket ${socket.id} attached`)
-    })
-    // const CLIENTS = []
-
-    // io.on('connect', ws => {
-    //   CLIENTS.push(ws)
-    //   ws.on('message', message => {
-    //     log.info(`[App] -----> Received %s ${message}`)
-    //   })
-    //   ws.on('createIdentityWs', message => {
-    //     io.emit('createIdentityWs', message)
-	  //     log.info(`[App] -----> Message: ${JSON.stringify(message)}`)
-    //   })
-    //   log.info(`[App] -----> Websocket attached!`)
-    //   ws.send('NEW USER JOINED')
+    // io.on('connect', (socket) => {
+    //   log.info(`[App] -----> Websocket ${socket.id} attached`)
     // })
+    const CLIENTS = []
+
+    io.on('connect', ws => {
+      CLIENTS.push(ws)
+      ws.on('message', message => {
+        log.info(`[App] -----> Received %s ${message}`)
+      })
+      ws.on('createIdentityWs', message => {
+        io.emit('createIdentityWs', message)
+	      log.info(`[App] -----> Message: ${JSON.stringify(message)}`)
+      })
+      log.info(`[App] -----> Websocket attached!`)
+      ws.send('NEW USER JOINED')
+    })
 
     wsHelper.setWSObject(io)
 
