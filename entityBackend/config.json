@@ -1,6 +1,6 @@
 {
   "Log": {
-    "level": "debug"
+    "level": "info"
   },
   "nodeUrl": {
     "local": "http://localhost:8545",

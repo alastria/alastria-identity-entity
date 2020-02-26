@@ -20,7 +20,6 @@ const wsHelper = require('./api/helpers/ws.helper')
 ///////              PUBLIC FUNCTIONS             ///////
 /////////////////////////////////////////////////////////
 
-log.level = 'info'
 let myConfig = {}
 let nodeurl = ''
 
@@ -31,6 +30,7 @@ loadJsonFile(pathFile)
 .then(config => {
   configHelper.setConfig(config)
   myConfig = configHelper.getConfig()
+  log.level = myConfig.Log.level
   log.debug(`[App] -----> Congif getted ${JSON.stringify(myConfig)}`)
   
   if(!process.env.NODE_ENDPOINT) {
