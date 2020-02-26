@@ -24,7 +24,7 @@ module.exports = {
 let myConfig = {}
 
 function setConfig(config) {
-  log.info(`${helper_name}[${setConfig.name}] -----> Seting obtained config ...`)
+  log.info(`${helper_name}[${setConfig.name}] -----> Setting obtained config ...`)
   myConfig = config
 }
 
