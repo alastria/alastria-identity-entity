@@ -201,7 +201,7 @@ function getCurrentPublicKey(subject) {
     let currentPubKey = transactionFactory.publicKeyRegistry.getCurrentPublicKey(web3, subject.split(':')[4]) // Remove split when the library accepts the DID and not the proxyAddress
     web3.eth.call(currentPubKey)
     .then(result => {
-      log.info(`${serviceName}[${getCurrentPublicKey.name}] -----> Success`)
+      log.info(`${serviceName}[${getCurrentPublicKey.name}] -----> Public Key Success`)
       let pubKey = web3.eth.abi.decodeParameters(['string'], result) 
       resolve(pubKey)
     })
@@ -212,14 +212,14 @@ function getCurrentPublicKey(subject) {
   })
 }
 
-function getPresentationStatus(presentationHash, issuer, subject) {
+function getPresentationStatus(subject, issuer, presentationHash) {
   return new Promise((resolve, reject) => {
     log.info(`${serviceName}[${getPresentationStatus.name}] -----> IN ...`)
     let presentationStatus = null;
     if (issuer != null) {
-      presentationStatus = transactionFactory.presentationRegistry.getReceiverPresentationStatus(web3, issuer, presentationHash);
+      presentationStatus = transactionFactory.presentationRegistry.getReceiverPresentationStatus(web3, issuer.split(':')[4], presentationHash);
     } else if (subject != null) {
-      presentationStatus = transactionFactory.presentationRegistry.getSubjectPresentationStatus(web3, subject, presentationHash);
+      presentationStatus = transactionFactory.presentationRegistry.getSubjectPresentationStatus(web3, subject.split(':')[4], presentationHash);
     }
     if (presentationStatus != null) {
       web3.eth.call(presentationStatus)
@@ -229,7 +229,7 @@ function getPresentationStatus(presentationHash, issuer, subject) {
           exist: resultStatus[0],
           status: resultStatus[1]
         }
-        log.info(`${serviceName}[${getPresentationStatus.name}] -----> Success`)
+        log.info(`${serviceName}[${getPresentationStatus.name}] -----> Presentation Status Success`)
         resolve(resultStatusJson);
       })
       .catch(error => {
@@ -282,7 +282,7 @@ function getCredentialStatus(credentialHash, issuer, subject) {
           exist: resultStatus[0],
           status: resultStatus[1]
         }
-        log.info(`${serviceName}[${getCredentialStatus.name}] -----> Success`)
+        log.info(`${serviceName}[${getCredentialStatus.name}] -----> Credential Status Success`)
         resolve(resultStatusJson);
       })
       .catch(error => {
@@ -302,22 +302,41 @@ function getPresentationData(data) {
   return new Promise((resolve, reject) => {
     log.info(`${serviceName}[${getPresentationData.name}] -----> IN ...`) 
     let presentationSigned = data
-    getCurrentPublicKey(presentationSigned.payload.aud)
-    .then(subjectPublicKey => {
-      let publicKey = subjectPublicKey[0]
-      let credentials = []
-      let verifiableCredential = presentationSigned.payload.vp.verifiableCredential
-      verifiableCredential.map( item => {
-        let verifyCredential = tokensFactory.tokens.verifyJWT(item, `04${publicKey}`)
-        if(verifyCredential == true) {
-          let credential = tokensFactory.tokens.decodeJWT(item)
-          credentials.push(JSON.parse(credential.payload).vc.credentialSubject)
-        } else {
-          log.error(`${serviceName}[${getPresentationData.name}] -----> Error verifying Credential JWT`)
-          reject(verifyCredential)
+    let subjectDID = presentationSigned.header.kid
+    let subjectPSMHash = presentationSigned.payload.vp.procHash
+    getPresentationStatus(subjectDID, null, subjectPSMHash)
+    .then(status => {
+      log.debug(`${serviceName}[${getPresentationData.name}] -----> STATUS: ${JSON.stringify(status)}`)
+      if (status.exist) {
+        getCurrentPublicKey(subjectDID)
+        .then(subjectPublicKey => {
+          let publicKey = subjectPublicKey[0]
+          let credentials = []
+          let verifiableCredential = presentationSigned.payload.vp.verifiableCredential
+          verifiableCredential.map( item => {
+            let verifyCredential = tokensFactory.tokens.verifyJWT(item, `04${publicKey}`)
+            if(verifyCredential == true) {
+              let credential = tokensFactory.tokens.decodeJWT(item)
+              credentials.push(JSON.parse(credential.payload).vc.credentialSubject)
+            } else {
+              log.error(`${serviceName}[${getPresentationData.name}] -----> Error verifying Credential JWT`)
+              reject(verifyCredential)
+            }
+          })
+          log.info(`${serviceName}[${getPresentationData.name}] -----> Credential obtained Success`)
+          resolve(credentials)
+        })
+        .catch(error => {
+          log.error(`${serviceName}[${getPresentationData.name}] -----> ${error}`)
+          reject(error)
+        })
+      } else {
+        let msg = {
+          message: 'Presentation not registered'
         }
-      })
-      resolve(credentials)
+        log.error(`${serviceName}[${getPresentationData.name}] -----> ${msg.message}`)
+        reject(msg)
+      }
     })
     .catch(error => {
       log.error(`${serviceName}[${getPresentationData.name}] -----> ${error}`)
