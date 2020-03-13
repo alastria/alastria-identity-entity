@@ -95,6 +95,13 @@ export class ProfileComponent implements OnInit {
       value: 'address',
       icon: 'map-marker'
     },
+    {
+      label: 'Title',
+      type: 'text',
+      name: 'titleLegalBlockchain',
+      value: 'titleLegalBlockchain',
+      icon: 'envelope'
+    }
   ];
   inputsResetPassword: Array<any> = [
     {

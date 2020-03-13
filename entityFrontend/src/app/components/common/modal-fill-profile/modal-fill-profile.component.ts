@@ -24,6 +24,11 @@ export class ModalFillProfileComponent implements OnInit {
       id: 3,
       label: 'Address',
       value: 'address'
+    },
+    {
+      id: 4,
+      label: 'Experto Legal en Blockchain',
+      value: 'titleLegalBlockchain'
     }
   ];
 
