@@ -91,6 +91,7 @@ function login(params){
             email: found.email,
             address: found.address,
             vinculated: (found.vinculated == null) ? false : found.vinculated,
+            titleLegalBlockchain: found.titleLegalBlockchain,
             did: found.did
           },
           authToken: token
@@ -124,7 +125,8 @@ function createUser(params) {
         address: params.address,
         password: params.password,
         did: params.did,
-        vinculated: (params.vinculated == null) ? false : params.vinculated
+        vinculated: (params.vinculated == null) ? false : params.vinculated,
+        titleLegalBlockchain: myConfig.title
       }
       let db = connected.db(mongoDatabase)
       db.collection(mongoCollection).insertOne(userData)
