@@ -98,11 +98,12 @@ module.exports = {
   addEntity,
   getEntities,
   getEntity,
+  addIssuer,
+  isIssuer,
   getPresentationStatus,
   updateReceiverPresentationStatus,
   getCredentialStatus,
-  getPresentationData,
-  verifyAlastriaSession
+  getPresentationData
 }
 
 /////////////////////////////////////////////////////////
@@ -288,6 +289,41 @@ async function getEntity(entityDID) {
   }
 }
 
+async function addIssuer(issuerData) {
+  try {
+    log.info(`${serviceName}[${addIssuer.name}] -----> IN ...`)
+    let issuer = await isIssuer(issuerData.didEntity)
+    if(issuer) {
+      throw " This EntityDID is already an Issuer"
+    }
+    let addIssuerTX = await transactionFactory.identityManager.addIdentityIssuer(web3, issuerData.didEntity.split(':')[4], issuerData.eidasLevel)
+    let issuerSignedTX = await issuerGetKnownTransaction(addIssuerTX)
+    let sendSignedTX = await sendSigned(issuerSignedTX)
+    log.info(`${serviceName}[${addIssuer.name}] -----> Added New Issuer`)
+    issuer = await isIssuer(issuerData.didEntity)
+    return issuer
+  }
+  catch(error) {
+    log.error(`${serviceName}[${addIssuer.name}] -----> ${error}`)
+    throw error
+  }
+}
+
+async function isIssuer(issuerDID) {
+  try {
+    log.info(`${serviceName}[${isIssuer.name}] -----> IN ...`)
+    let issuer = await transactionFactory.identityManager.isIdentityIssuer(web3, issuerDID.split(':')[4])
+    let isIssuerStatus = await web3.eth.call(issuer)
+    let result = web3.eth.abi.decodeParameter("bool", isIssuerStatus)
+    log.info(`${serviceName}[${isIssuer.name}] -----> Getted Issuer status`)
+    return result
+  }
+  catch(error) {
+    log.error(`${serviceName}[${isIssuer.name}] -----> ${error}`)
+    throw error
+  }
+}
+
 function addIssuerCredential(params) {
   return new Promise((resolve, reject) => {
     log.info(`${serviceName}[${addIssuerCredential.name}] -----> IN ...`)
@@ -320,23 +356,6 @@ function addIssuerCredential(params) {
     })
     .catch(error => {
       log.error(`${serviceName}[${addIssuerCredential.name}] -----> ${error}`)
-      reject(error)
-    })
-  })
-}
-
-function getCurrentPublicKey(subject) {
-  return new Promise((resolve, reject) => {
-    log.info(`${serviceName}[${getCurrentPublicKey.name}] -----> IN ...`)
-    let currentPubKey = transactionFactory.publicKeyRegistry.getCurrentPublicKey(web3, subject.split(':')[4]) // Remove split when the library accepts the DID and not the proxyAddress
-    web3.eth.call(currentPubKey)
-    .then(result => {
-      log.info(`${serviceName}[${getCurrentPublicKey.name}] -----> Public Key Success`)
-      let pubKey = web3.eth.abi.decodeParameters(['string'], result) 
-      resolve(pubKey)
-    })
-    .catch(error => {
-      log.error(`${serviceName}[${getCurrentPublicKey.name}] -----> ${error}`)
       reject(error)
     })
   })
@@ -444,9 +463,9 @@ function getPresentationData(data) {
           let credentials = []
           let verifiableCredential = presentationSigned.payload.vp.verifiableCredential
           verifiableCredential.map( item => {
-            let verifyCredential = tokensFactory.tokens.verifyJWT(item, `04${publicKey}`)
+            let verifyCredential = tokenHelper.verifyJWT(item, `04${publicKey}`)
             if(verifyCredential == true) {
-              let credential = tokensFactory.tokens.decodeJWT(item)
+              let credential = tokenHelper.decodeJWT(item)
               credentials.push(JSON.parse(credential.payload).vc.credentialSubject)
             } else {
               log.error(`${serviceName}[${getPresentationData.name}] -----> Error verifying Credential JWT`)
@@ -474,41 +493,3 @@ function getPresentationData(data) {
     })
   }) 
 }
-
-function verifyAlastriaSession(alastriaSession) {
-  return new Promise((resolve, reject) => {
-    log.info(`${serviceName}[${verifyAlastriaSession.name}] -----> IN...`)
-    let decode = tokensFactory.tokens.decodeJWT(alastriaSession.signedAIC)
-    let didSubject = decode.payload.pku.id
-    log.info(`${serviceName}[${verifyAlastriaSession.name}] -----> Obtained correctly the Subject DID`)
-    getCurrentPublicKey(didSubject)
-    .then(subjectPublicKey => {
-      let publicKey = subjectPublicKey[0]
-      log.info(`${serviceName}[${verifyAlastriaSession.name}] -----> Obtained correctly the Subject PublicKey`)
-      let verifiedAlastraSession = tokensFactory.tokens.verifyJWT(alastriaSession.signedAIC, `04${publicKey}`)
-      if(verifiedAlastraSession == true) {
-        userModel.getUser(didSubject)
-        .then(user => {
-          let msg = {
-            message: "User not found",
-            did: didSubject
-          }
-          let result = (user == null) ? msg : user
-          resolve(result)
-        })
-        .catch(error => {
-          log.error(`${serviceName}[${verifyAlastriaSession.name}] -----> ${error}`)
-          reject(error)
-        })
-      } else {
-        log.error(`${serviceName}[${verifyAlastriaSession.name}] -----> Unauthorized`)
-        reject('User Unauthorized')
-      }
-    })
-    .catch(error => {
-      log.error(`${serviceName}[${verifyAlastriaSession.name}] -----> ${error}`)
-      reject(error)
-    })
-  })
- }
-

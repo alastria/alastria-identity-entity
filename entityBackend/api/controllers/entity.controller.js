@@ -23,17 +23,18 @@ module.exports = {
   createAlastriaToken,
   verifyAlastriaSession,
   createAlastriaID,
-  addIssuerCredential,
   getCurrentPublicKey,
   getCurrentPublicKeyList,
   addEntity,
   getEntities,
   getEntity,
+  addIssuer,
+  isIssuer,
   getPresentationStatus,
   updateReceiverPresentationStatus,
   getCredentialStatus,
-  recivePresentationData,
-  verifyAlastriaSession
+  recivePresentationData
+  // addIssuerCredential,
 }
 
 /////////////////////////////////////////////////////////
@@ -192,20 +193,43 @@ function getEntity(req, res) {
   })
 }
 
+function addIssuer(req, res) {
+  log.info(`${controller_name}[${addIssuer.name}] -----> IN ...`)
+  let issuerData = req.swagger.params.issuerData.value
+  log.debug(`${controller_name}[${addIssuer.name}] -----> Sending params: ${issuerData}`)
+  entityService.addIssuer(issuerData)
+  .then(issuer => {
+    log.info(`${controller_name}[${addIssuer.name}] -----> Successfully added new Issuer`)
+    let status = issuer
+    res.status(200).send(status)
+
+  })
+  .catch(error => {
+    log.error(`${controller_name}[${addIssuer.name}] -----> ${error}`)
+    Errmsg.message = error
+    res.status(404).send(Errmsg)
+  })
+}
+
+function isIssuer(req, res) {
+  try {
+    log.info(`${controller_name}[${isIssuer.name}] -----> IN ...`)
+    let issuerDID = req.swagger.params.issuerDID.value
+    log.debug(`${controller_name}[${isIssuer.name}] -----> Sending params: ${issuerDID}`)
+    entityService.isIssuer(issuerDID)
+    .then(issuer => {
+      log.info(`${controller_name}[${isIssuer.name}] -----> Successfully getted Issuer`)
+      let status = issuer
+      res.status(200).send(status)
     })
   }
   catch(error) {
-    log.error(`${controller_name}[${createAlastriaID.name}] -----> ${error}`)
-    let msg = {
-      message: `${error}`
-    }
-    io.emit('error', {status: 503,
-                      message: msg.message})
-    res.status(503).send(msg)
-   }
+    log.error(`${controller_name}[${isIssuer.name}] -----> ${error}`)
+    Errmsg.message = error
+    res.status(404).send(Errmsg)
+  }
 }
 
-function addIssuerCredential(req, res) {
   try {
     log.info(`${controller_name}[${addIssuerCredential.name}] -----> IN ...`)
     let params = req.swagger.params.body.value
