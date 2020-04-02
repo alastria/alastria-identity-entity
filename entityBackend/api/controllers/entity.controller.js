@@ -13,12 +13,14 @@ const io = wsHelper.getWSObject()
 const log = Log.getLogger()
 log.level = myConfig.Log.level
 const controller_name = '[Entity Controller]'
+const Errmsg = {}
 
 /////////////////////////////////////////////////////////
 ///////               MODULE EXPORTS              ///////
 /////////////////////////////////////////////////////////
 
 module.exports = {
+  createAlastriaToken,
   createAlastriaID,
   addIssuerCredential,
   getCurrentPublicKey,
@@ -53,10 +55,21 @@ function createAlastriaID(req, res) {
                           message: msg.message})
         res.status(404).send(msg)
       }
+function createAlastriaToken(req, res) {
+  log.info(`${controller_name}[${createAlastriaToken.name}] -----> IN ...`)
+  log.debug(`${controller_name}[${verifyAlastriaSession.name}] -----> Calleing Entity Service`)
+  entityService.createAlastriaToken()
+  .then(AT => {
+    log.info(`${controller_name}[${createAlastriaToken.name}] -----> Created Alastria Token`)
+    res.status(200).send(AT)
+  })
+  .catch(error => {
+    log.error(`${controller_name}[${createAlastriaToken.name}] -----> ${error}`)
+    Errmsg.message = error
+    res.status(400).send(Errmsg)
     })
-    .catch(error => {
-      let msg = {
-        message: `${error}`
+}
+
       }
       io.emit('error', {status: 400,
                         message: msg.message})
