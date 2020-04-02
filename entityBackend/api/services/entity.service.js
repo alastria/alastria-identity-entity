@@ -4,8 +4,7 @@
 ///////                 constants                 ///////
 /////////////////////////////////////////////////////////
 
-const { transactionFactory, UserIdentity, config, tokensFactory } = require('alastria-identity-lib')
-const keythereum = require('keythereum')
+const { transactionFactory, config } = require('alastria-identity-lib')
 const EthCrypto = require('eth-crypto')
 const configHelper = require('../helpers/config.helper')
 const myConfig = configHelper.getConfig()
@@ -19,54 +18,47 @@ const Log = require('log4js')
 const log = Log.getLogger()
 log.level = myConfig.Log.level
 
-
-
-
 /////////////////////////////////////////////////////////
 ///////             PRIVATE FUNCTIONS             ///////
 /////////////////////////////////////////////////////////
 
-function getIssuerIdentity() {
+// function sendSigned(transactionSigned) {
+//   return new Promise((resolve, reject) => {
+//   log.info(`${serviceName}[${sendSigned.name}] -----> IN ...`)
+//   web3.eth.sendSignedTransaction(transactionSigned)
+//   .on('transactionHash', function (hash) {
+//       log.info(`${serviceName}[${sendSigned.name}] -----> HASH: ${hash} ...`)
+//   })
+//   .on('receipt', receipt => {
+//       resolve(receipt)
+//   })
+//   .on('error', error => {
+//       log.error(`${serviceName}[${sendSigned.name}] -----> ${error}`)
+//       reject(error)
+//     });
+//   })
+// }
+        
+async function sendSigned(transactionSigned) {
   try {
-    log.info(`${serviceName}[${getIssuerIdentity.name}] -----> IN ...`)
-    issuerPrivateKey = keythereum.recover(myConfig.addressPassword, issuerKeystore)
-    issuerIdentity = new UserIdentity(web3, `0x${issuerKeystore.address}`, issuerPrivateKey)
-    log.info(`${serviceName}[${getIssuerIdentity.name}] -----> Issuer Getted`)
-    return issuerIdentity
-  } catch (error) {
-    log.error(`${serviceName}[${getIssuerIdentity.name}] -----> ${error}`)
+    log.info(`${serviceName}[${sendSigned.name}] -----> IN ...`)
+    let result = await web3.eth.sendSignedTransaction(transactionSigned)
+    return result
+  }
+  catch(error) {
     throw error
   }
 }
 
-function sendSigned(transactionSigned) {
-  return new Promise((resolve, reject) => {
-    log.info(`${serviceName}[${sendSigned.name}] -----> IN ...`)
-    web3.eth.sendSignedTransaction(transactionSigned)
-    .on('transactionHash', function (hash) {
-      log.info(`${serviceName}[${sendSigned.name}] -----> HASH: ${hash} ...`)
-    })
-    .on('receipt', receipt => {
-      resolve(receipt)
-    })
-    .on('error', error => {
-      log.error(`${serviceName}[${sendSigned.name}] -----> ${error}`)
-      reject(error)
-    });
-  })
-}
-
-function issuerGetKnownTransaction(issuerCredential) {
-  return new Promise((resolve, reject) => {
-    let issuerID = getIssuerIdentity()
-    issuerID.getKnownTransaction(issuerCredential)
-    .then(receipt => {
-      resolve(receipt)
-    })
-    .catch(error => {
-      reject(error)
-    })
-  })
+async function issuerGetKnownTransaction(issuerCredential) {
+  try {
+    let issuerID = await identityUser.getUserIdentity(web3, myConfig.entityEthAddress, myConfig.entityPrivateKey)
+    let issuerTX = await issuerID.getKnownTransaction(issuerCredential)
+    return issuerTX
+  }
+  catch(error) {
+    return error
+  }
 }
 
 function getAddressFromPubKey(publicKey) {
@@ -167,49 +159,32 @@ async function verifyAlastriaSession(alastriaSession) {
   }
  }
 
+ async function createAlastriaID(params) {
+  try {
+    console.log(params)
     log.info(`${serviceName}[${createAlastriaID.name}] -----> IN ...`)
-    let decodedAIC = tokensFactory.tokens.decodeJWT(params.signedAIC)
+    let decodedAIC = await tokenHelper.decodeJWT(params)
     let subjectAddress = getAddressFromPubKey(decodedAIC.payload.publicKey)
     let signedCreateTransaction = decodedAIC.payload.createAlastriaTX
     let preparedId = preparedAlastriaId(subjectAddress)
-    issuerGetKnownTransaction(preparedId)
-    .then(signedPreparedTransaction => {
-      sendSigned(signedPreparedTransaction)
-      .then(prepareSendSigned => {
-        sendSigned(signedCreateTransaction)
-        .then(createSendSigned => {
-          web3.eth.call({
-            to: config.alastriaIdentityManager,
-            data: web3.eth.abi.encodeFunctionCall(config.contractsAbi['AlastriaIdentityManager']['identityKeys'], [subjectAddress.substr(2)])
-          })
-          .then(AlastriaIdentity => {
-            let alastriaDID = tokensFactory.tokens.createDID('quor', AlastriaIdentity.slice(26));
-            let msg = {
-              message: "Successfuly created Alastria ID",
-              did: alastriaDID
-            }
-            resolve(msg)
-          })
-          .catch(error => {
-            log.error(`${serviceName}[${createAlastriaID.name}] -----> ${error}`)
-            reject(error)
-          })
-        })
-        .catch(error => {
-          log.error(`${serviceName}[${createAlastriaID.name}] -----> ${error}`)
-          reject(error)
-        })
-      })
-      .catch(error => {
-        log.error(`${serviceName}[${createAlastriaID.name}] -----> ${error}`)
-        reject(error)
-      })
+    let signedPreparedTransaction = await issuerGetKnownTransaction(preparedId)
+    let prepareSendSigned = await sendSigned(signedPreparedTransaction)
+    let createSendSigned = await sendSigned(signedCreateTransaction)
+    let alastriaIdentity = await web3.eth.call({
+      to: config.alastriaIdentityManager,
+      data: web3.eth.abi.encodeFunctionCall(config.contractsAbi['AlastriaIdentityManager']['identityKeys'], [subjectAddress.substr(2)])
     })
-    .catch(error => {
-      log.error(`${serviceName}[${createAlastriaID.name}] -----> ${error}`)
-      reject(error)
-    })
-  })
+    let alastriaDID = await tokenHelper.createDID('quor', alastriaIdentity.slice(26));
+    let msg = {
+      message: "Successfuly created Alastria ID",
+      did: alastriaDID
+    }
+    return msg
+  }
+  catch(error) {
+    log.error(`${serviceName}[${createAlastriaID.name}] -----> ${error}`)
+    throw error
+  }
 }
 
 function addIssuerCredential(params) {

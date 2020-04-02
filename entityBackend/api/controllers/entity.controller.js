@@ -36,26 +36,6 @@ module.exports = {
 ///////              PUBLIC FUNCTIONS             ///////
 /////////////////////////////////////////////////////////
 
-function createAlastriaID(req, res) {
-  try {
-    log.info(`${controller_name}[${createAlastriaID.name}] -----> IN ...`)
-    let params = req.swagger.params.body.value
-    log.debug(`${controller_name}[${createAlastriaID.name}] -----> Sending params: ${JSON.stringify(params)}`)
-    entityService.createAlastriaID(params)
-    .then(alastriaId => {
-      if (alastriaId) {
-        log.info(`${controller_name}[${createAlastriaID.name}] -----> Successfully created new AlastriaId`)
-        io.emit('createIdentity', alastriaId)
-        res.status(200).send(alastriaId)
-      }
-      else {
-        let msg = {
-          message: 'Error creating new AlastriaID'
-        }
-        io.emit('error', {status: 404,
-                          message: msg.message})
-        res.status(404).send(msg)
-      }
 function createAlastriaToken(req, res) {
   log.info(`${controller_name}[${createAlastriaToken.name}] -----> IN ...`)
   log.debug(`${controller_name}[${verifyAlastriaSession.name}] -----> Calleing Entity Service`)
@@ -68,7 +48,9 @@ function createAlastriaToken(req, res) {
     log.error(`${controller_name}[${createAlastriaToken.name}] -----> ${error}`)
     Errmsg.message = error
     res.status(400).send(Errmsg)
-    })
+  })
+}
+
 function verifyAlastriaSession(req, res) {
   log.info(`${controller_name}[${verifyAlastriaSession.name}] -----> IN ...`)
   let alastriaSession = req.swagger.params.alastriaSession.value
@@ -88,6 +70,33 @@ function verifyAlastriaSession(req, res) {
   })
 }
 
+function createAlastriaID(req, res) {
+  log.info(`${controller_name}[${createAlastriaID.name}] -----> IN ...`)
+  let params = req.swagger.params.AIC.value
+  log.debug(`${controller_name}[${createAlastriaID.name}] -----> Sending params: ${JSON.stringify(params)}`)
+  entityService.createAlastriaID(params)
+  .then(alastriaId => {
+    if (alastriaId) {
+      log.info(`${controller_name}[${createAlastriaID.name}] -----> Successfully created new AlastriaId`)
+      io.emit('createIdentity', alastriaId)
+      res.status(200).send(alastriaId)
+    }
+    else {
+      log.error(`${controller_name}[${createAlastriaID.name}] -----> ${error}`)
+      Errmsg.message = error
+      io.emit('error', {status: 404,
+                        message: Errmsg.message})
+      res.status(404).send(Errmsg)
+    }
+  })
+  .catch(error => {
+    log.error(`${controller_name}[${createAlastriaID.name}] -----> ${error.message}`)
+    Errmsg.message = error.message
+    io.emit('error', {status: 400,
+                      message: Errmsg.message})
+    res.status(400).send(Errmsg)
+  })
+}
       }
       io.emit('error', {status: 400,
                         message: msg.message})
