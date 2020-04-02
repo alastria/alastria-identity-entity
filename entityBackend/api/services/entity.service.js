@@ -94,6 +94,7 @@ module.exports = {
   createAlastriaID,
   addIssuerCredential,
   getCurrentPublicKey,
+  getCurrentPublicKeyList,
   getPresentationStatus,
   updateReceiverPresentationStatus,
   getCredentialStatus,
@@ -187,6 +188,38 @@ async function verifyAlastriaSession(alastriaSession) {
   }
 }
 
+async function getCurrentPublicKey(subject) {
+  try {
+    log.info(`${serviceName}[${getCurrentPublicKey.name}] -----> IN ...`)
+    let currentPubKey = await transactionFactory.publicKeyRegistry.getCurrentPublicKey(web3, subject.split(':')[4]) // Remove split when the library accepts the DID and not the proxyAddress
+    let result = await web3.eth.call(currentPubKey)
+    log.info(`${serviceName}[${getCurrentPublicKey.name}] -----> Public Key Success`)
+    let identityPubKey = web3.eth.abi.decodeParameters(['string'], result) 
+    return identityPubKey
+  }
+  catch(error) {
+    log.error(`${serviceName}[${getCurrentPublicKey.name}] -----> ${error}`)
+    throw error
+  }
+}
+
+async function getCurrentPublicKeyList(subject) {
+  try {
+    log.info(`${serviceName}[${getCurrentPublicKeyList.name}] -----> IN ...`)
+    let publicKeyList = []
+    let currentPubKey = await transactionFactory.publicKeyRegistry.getCurrentPublicKey(web3, subject.split(':')[4])
+    let result = await web3.eth.call(currentPubKey)
+    log.info(`${serviceName}[${getCurrentPublicKey.name}] -----> Public Key Success`)
+    let identityPubKey = web3.eth.abi.decodeParameters(['string'], result)
+    let publicKeyStatus = await transactionFactory.publicKeyRegistry.getPublicKeyStatus(web3, subject.split(':')[4], identityPubKey[0])
+    publicKeyList.push(publicKeyStatus)
+    return publicKeyList
+  }
+  catch(error) {
+    log.error(`${serviceName}[${getCurrentPublicKeyList.name}] -----> ${error.message.split(':')[0]}`)
+    throw error.message.split(':')[0]
+  }
+}
 function addIssuerCredential(params) {
   return new Promise((resolve, reject) => {
     log.info(`${serviceName}[${addIssuerCredential.name}] -----> IN ...`)

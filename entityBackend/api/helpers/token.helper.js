@@ -40,9 +40,9 @@ async function decodeJWT(tokenJWT) {
   }
 }
 
-async function verifyJWT(tokenJWT) {
+async function verifyJWT(tokenJWT, publicKey) {
   try {
-    let verify = await tokensFactory.tokens.verifyJWT(tokenJWT)
+    let verify = await tokensFactory.tokens.verifyJWT(tokenJWT, publicKey)
     log.info(`${helper_name}[${verifyJWT.name}] -----> Token Verified`)
     return verify
   }

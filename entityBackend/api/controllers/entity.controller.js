@@ -25,6 +25,7 @@ module.exports = {
   createAlastriaID,
   addIssuerCredential,
   getCurrentPublicKey,
+  getCurrentPublicKeyList,
   getPresentationStatus,
   updateReceiverPresentationStatus,
   getCredentialStatus,
@@ -97,10 +98,48 @@ function createAlastriaID(req, res) {
     res.status(400).send(Errmsg)
   })
 }
+
+function getCurrentPublicKey(req, res) {
+  log.info(`${controller_name}[${getCurrentPublicKey.name}] -----> IN ...`)
+  let did = req.swagger.params.alastriaDID.value
+  log.debug(`${controller_name}[${getCurrentPublicKey.name}] -----> Sending params: ${JSON.stringify(did)}`)
+  entityService.getCurrentPublicKey(did)
+  .then(publickey => {
+    if (publickey[0].length > 0) {
+      log.info(`${controller_name}[${getCurrentPublicKey.name}] -----> Successfully obtained Public Key`)
+      let result = {
+        publicKey: publickey[0]
       }
-      io.emit('error', {status: 400,
-                        message: msg.message})
-      res.status(400).send(msg)
+      res.status(200).send(result)
+    }
+    else {
+      Errmsg.message = "Error getting publicKey"
+      log.error(`${controller_name}[${getCurrentPublicKey.name}] -----> Error: ${Errmsg.message}`)
+      res.status(404).send(Errmsg)
+    }
+  })
+  .catch(error => {
+    log.error(`${controller_name}[${getCurrentPublicKey.name}] -----> ${error}`)
+    Errmsg.message = error
+    res.status(400).send(Errmsg)
+  })
+}
+
+function getCurrentPublicKeyList(req, res) {
+  log.info(`${controller_name}[${getCurrentPublicKeyList.name}] -----> IN ...`)
+  let did = req.swagger.params.alastriaDID.value
+  log.debug(`${controller_name}[${getCurrentPublicKeyList.name}] -----> Sending params: ${JSON.stringify(did)}`)
+  entityService.getCurrentPublicKeyList(did)
+  .then(list => {
+    log.info(`${controller_name}[${getCurrentPublicKeyList.name}] -----> Successfully obtained Public Key List`)
+    res.status(200).send(list)
+  })
+  .catch(error => {
+    log.error(`${controller_name}[${getCurrentPublicKeyList.name}] -----> ${error}`)
+    Errmsg.message = error
+    res.status(400).send(Errmsg)
+  })
+}
     })
   }
   catch(error) {
