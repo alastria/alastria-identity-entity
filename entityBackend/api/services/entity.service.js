@@ -5,7 +5,6 @@
 /////////////////////////////////////////////////////////
 
 const { transactionFactory, UserIdentity, config, tokensFactory } = require('alastria-identity-lib')
-const Log = require('log4js')
 const keythereum = require('keythereum')
 const EthCrypto = require('eth-crypto')
 const configHelper = require('../helpers/config.helper')
@@ -13,12 +12,13 @@ const myConfig = configHelper.getConfig()
 const web3Helper = require('../helpers/web3.helper')
 const web3 = web3Helper.getWeb3()
 const userModel = require('../models/user.model')
+const identityUser = require('../helpers/userIdentity.helper')
+const tokenHelper = require('../helpers/token.helper')
 const serviceName = '[Entity Service]'
+const Log = require('log4js')
 const log = Log.getLogger()
 log.level = myConfig.Log.level
 
-let issuerKeystore = myConfig.issuerKeystore
-let issuerIdentity, issuerPrivateKey
 
 
 
@@ -97,6 +97,8 @@ function preparedAlastriaId(subjectAddress) {
 /////////////////////////////////////////////////////////
 
 module.exports = {
+  createAlastriaToken,
+  verifyAlastriaSession,
   createAlastriaID,
   addIssuerCredential,
   getCurrentPublicKey,
@@ -111,8 +113,60 @@ module.exports = {
 ///////              PUBLIC FUNCTIONS             ///////
 /////////////////////////////////////////////////////////
 
-function createAlastriaID(params) {
-  return new Promise((resolve, reject) => {
+async function createAlastriaToken() {
+  try {
+    log.info(`${serviceName}[${createAlastriaToken.name}] -----> IN ...`)
+    const currentDate = Math.floor(Date.now() / 1000);
+    const expDate = currentDate + 600;
+    let alastriaTokenData = {
+      iss: myConfig.entityDID,
+      gwu: myConfig.nodeUrl.alastria,
+      cbu: `${myConfig.callbackUrl}alastria/alastriaToken`,
+      exp: expDate,
+      ani: myConfig.netID,
+      nbf: currentDate,
+      jti: Math.random().toString(36).substring(2)
+    }
+    let alastriaToken = await tokenHelper.createAlastriaToken(alastriaTokenData)
+    let AlastriaTokenSigned = await tokenHelper.signJWT(alastriaToken, myConfig.entityPrivateKey)
+    return AlastriaTokenSigned
+  }
+  catch(error) {
+    log.error(`${serviceName}[${createAlastriaToken.name}] -----> ${error}`)
+    throw error
+  }
+}
+
+async function verifyAlastriaSession(alastriaSession) {
+  try {
+    log.info(`${serviceName}[${verifyAlastriaSession.name}] -----> IN...`)
+    let decodeAS = await tokenHelper.decodeJWT(alastriaSession)
+    let didSubject = decodeAS.payload.pku.id
+    log.info(`${serviceName}[${verifyAlastriaSession.name}] -----> Obtained correctly the Subject DID`)
+    let subjectPublicKey = await getCurrentPublicKey(didSubject)
+    let publicKey = subjectPublicKey[0]
+    log.info(`${serviceName}[${verifyAlastriaSession.name}] -----> Obtained correctly the Subject PublicKey`)
+    let verifiedAlastraSession = await tokenHelper.verifyJWT(alastriaSession, `04${publicKey}`)
+    if(verifiedAlastraSession == true) {
+      let user = await userModel.getUser(didSubject)
+      let msg = {
+        message: "User not found, Unauthorized",
+        did: didSubject
+      }
+      let result = (user == null) ? msg : user
+      return result
+    } else {
+      log.error(`${serviceName}[${verifyAlastriaSession.name}] -----> Error verifying the Alastria Session`)
+      throw 'User Unauthorized'
+    }
+
+  }
+  catch(error) {
+    log.error(`${serviceName}[${verifyAlastriaSession.name}] -----> ${error}`)
+    throw error
+  }
+ }
+
     log.info(`${serviceName}[${createAlastriaID.name}] -----> IN ...`)
     let decodedAIC = tokensFactory.tokens.decodeJWT(params.signedAIC)
     let subjectAddress = getAddressFromPubKey(decodedAIC.payload.publicKey)

@@ -21,6 +21,7 @@ const Errmsg = {}
 
 module.exports = {
   createAlastriaToken,
+  verifyAlastriaSession,
   createAlastriaID,
   addIssuerCredential,
   getCurrentPublicKey,
@@ -68,6 +69,23 @@ function createAlastriaToken(req, res) {
     Errmsg.message = error
     res.status(400).send(Errmsg)
     })
+function verifyAlastriaSession(req, res) {
+  log.info(`${controller_name}[${verifyAlastriaSession.name}] -----> IN ...`)
+  let alastriaSession = req.swagger.params.alastriaSession.value
+  log.debug(`${controller_name}[${verifyAlastriaSession.name}] -----> Sending params: ${JSON.stringify(alastriaSession)}`)
+  entityService.verifyAlastriaSession(alastriaSession)
+  .then(verified => {
+    log.info(`${controller_name}[${verifyAlastriaSession.name}] -----> Alastria Sesion verified successfuly`)
+    io.emit('session', verified)
+    res.status(200).send(verified)
+  })
+  .catch(error => {
+    log.error(`${controller_name}[${verifyAlastriaSession.name}] -----> ${error}`)
+    Errmsg.message = JSON.stringify(error)
+  io.emit('error', {status: 401,
+                    message: Errmsg.message})
+  res.status(401).send(Errmsg)
+  })
 }
 
       }
