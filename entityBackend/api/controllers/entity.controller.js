@@ -26,6 +26,9 @@ module.exports = {
   addIssuerCredential,
   getCurrentPublicKey,
   getCurrentPublicKeyList,
+  addEntity,
+  getEntities,
+  getEntity,
   getPresentationStatus,
   updateReceiverPresentationStatus,
   getCredentialStatus,
@@ -140,6 +143,55 @@ function getCurrentPublicKeyList(req, res) {
     res.status(400).send(Errmsg)
   })
 }
+
+function addEntity(req, res) {
+  log.info(`${controller_name}[${addEntity.name}] -----> IN ...`)
+  let entityData = req.swagger.params.entityData.value
+  log.debug(`${controller_name}[${addEntity.name}] -----> Sending params: ${JSON.stringify(entityData)}`)
+  entityService.addEntity(entityData)
+  .then(data => {
+    log.info(`${controller_name}[${addEntity.name}] -----> Successfully added new Entity`)
+    res.status(200).send(data)
+  })
+  .catch(error => {
+    log.error(`${controller_name}[${addEntity.name}] -----> ${error}`)
+    Errmsg.message = error
+    res.status(404).send(Errmsg)
+  })
+}
+
+function getEntities(req, res) {
+  log.info(`${controller_name}[${getEntities.name}] -----> IN ...`)
+  log.debug(`${controller_name}[${getEntities.name}] -----> Calling Entity Service`)
+  entityService.getEntities()
+  .then(entities => {
+    log.info(`${controller_name}[${getEntities.name}] -----> Successfully getted all Entities`)
+    console.log(entities)
+    res.status(200).send(entities)
+  })
+  .catch(error => {
+    log.error(`${controller_name}[${getEntities.name}] -----> ${error}`)
+    Errmsg.message = error
+    res.status(404).send(Errmsg)
+  })
+}
+
+function getEntity(req, res) {
+  log.info(`${controller_name}[${getEntity.name}] -----> IN ...`)
+  let entityDID = req.swagger.params.entityDID.value
+  log.debug(`${controller_name}[${getEntity.name}] -----> Sending params: ${entityDID}`)
+  entityService.getEntity(entityDID)
+  .then(entity => {
+    log.info(`${controller_name}[${getEntity.name}] -----> Successfully getted Entity`)
+    res.status(200).send(entity)
+  })
+  .catch(error => {
+    log.error(`${controller_name}[${getEntity.name}] -----> ${error}`)
+    Errmsg.message = error
+    res.status(404).send(Errmsg)
+  })
+}
+
     })
   }
   catch(error) {

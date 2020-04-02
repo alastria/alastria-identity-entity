@@ -95,6 +95,9 @@ module.exports = {
   addIssuerCredential,
   getCurrentPublicKey,
   getCurrentPublicKeyList,
+  addEntity,
+  getEntities,
+  getEntity,
   getPresentationStatus,
   updateReceiverPresentationStatus,
   getCredentialStatus,
@@ -220,6 +223,71 @@ async function getCurrentPublicKeyList(subject) {
     throw error.message.split(':')[0]
   }
 }
+
+async function addEntity(entityData) {
+  try {
+    log.info(`${serviceName}[${addEntity.name}] -----> IN ...`)
+    console.log(entityData)
+    let entity = await getEntity(entityData.didEntity)
+    if(entity) {
+      throw "This AlastriaDID is already an Entity"
+    }
+    let entityTX = await transactionFactory.identityManager.addEntity(web3, entityData.didEntity.split(':')[4], entityData.name, entityData.cif,
+                                                                        entityData.logoURL, entityData.createAlastriaIdentityURL, entityData.alastriaOpenAccessURL,
+                                                                        entityData.active)
+    let entitySignedTX = await issuerGetKnownTransaction(entityTX)
+    let sendSignedTX = await sendSigned(entitySignedTX)
+    log.info(`${serviceName}[${addEntity.name}] -----> Added New Entity`)
+    entity = await getEntity(entityData.didEntity)
+    return entity
+  }
+  catch(error) {
+    log.error(`${serviceName}[${addEntity.name}] -----> ${error}`)
+    throw error
+  }
+}
+
+async function getEntities() {
+  try {
+    log.info(`${serviceName}[${getEntities.name}] -----> IN ...`)
+    let entitiesList = await transactionFactory.identityManager.entitiesList(web3)
+    let list = await web3.eth.call(entitiesList)
+		let resultList = web3.eth.abi.decodeParameter("address[]", list)
+    log.info(`${serviceName}[${getEntities.name}] -----> Getted Entities List`)
+    return resultList
+  }
+  catch(error) {
+    log.error(`${serviceName}[${getEntities.name}] -----> ${error}`)
+    throw error
+  }
+}
+
+async function getEntity(entityDID) {
+  try {
+    log.info(`${serviceName}[${getEntity.name}] -----> IN ...`)
+    let entityTX = await transactionFactory.identityManager.getEntity(web3, entityDID.split(':')[4])
+    let result = await web3.eth.call(entityTX)
+    let entityDecode = web3.eth.abi.decodeParameters(["string", "string", "string", "string", "string", "bool"], result)
+    let entity = {
+      "name": entityDecode[0],
+      "cif":entityDecode[1],
+      "urlLogo":entityDecode[2],
+      "urlCreateAID":entityDecode[3],
+      "urlAOA":entityDecode[4],
+      "status":entityDecode[5]
+    }
+    log.info(`${serviceName}[${getEntity.name}] -----> Getted Entity Data`)
+    if(entity.status == false) {
+      throw "This AlastriaDID is not an Entity"
+    }
+    return entity
+  }
+  catch(error) {
+    log.error(`${serviceName}[${getEntity.name}] -----> ${error}`)
+    throw error
+  }
+}
+
 function addIssuerCredential(params) {
   return new Promise((resolve, reject) => {
     log.info(`${serviceName}[${addIssuerCredential.name}] -----> IN ...`)
