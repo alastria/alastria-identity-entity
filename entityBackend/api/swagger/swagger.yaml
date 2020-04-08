@@ -643,7 +643,7 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: "#/definitions/obtainedStatus"
+            $ref: "#/definitions/obtainedStatusResponse"
         "400":
           description: Bad Request
           schema:
@@ -700,7 +700,7 @@ paths:
         - name: issuerCredentialHash
           in: query
           type: string
-          description: issuerCredential hash
+          description: IssuerC redential hash
           required: true
         - name: issuerDID
           in: query
@@ -1045,13 +1045,9 @@ definitions:
     type: object
     properties:
       status:
-        type: string
+        type: integer
       credentialHash:
         type: string
-  obtainedStatus:
-    properties:
-      status:
-        type: integer
   presentationRequestData:
     type: array
     items:
@@ -1084,10 +1080,11 @@ definitions:
         items:
           type: string
   credentialStatusResponse:
-    type: object
     properties:
-      exists:
-        type: boolean
+      status:
+        type: integer
+  obtainedStatusResponse:
+    properties:
       status:
         type: integer
   alastriaIdentityResponse:

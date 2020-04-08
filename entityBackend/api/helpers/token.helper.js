@@ -20,7 +20,7 @@ module.exports = {
   createAlastriaToken,
   createCredential,
   createPresentationRequest,
-  PSMHash,
+  psmHash,
   createDID
 }
 
@@ -102,14 +102,14 @@ function createPresentationRequest(kid, iss, context, procUrl, procHash, data, e
   }
 }
 
-async function PSMHash(web3, jwt, did) {
+function psmHash(web3, jwt, did) {
   try {
-    let psmHash = await tokensFactory.tokens.PSMHash(web3, jwt, did)
-    log.info(`${helper_name}[${PSMHash.name}] -----> Created PSMHash`)
+    let psmHash = tokensFactory.tokens.PSMHash(web3, jwt, did)
+    log.info(`${helper_name}[${psmHash.name}] -----> Created PSMHash`)
     return psmHash
   }
   catch (error) {
-    log.error(`${helper_name}[${PSMHash.name}] -----> ${error}`)
+    log.error(`${helper_name}[${psmHash.name}] -----> ${error}`)
     throw error
   }
 }

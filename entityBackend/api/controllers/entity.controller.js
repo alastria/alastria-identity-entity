@@ -33,11 +33,13 @@ module.exports = {
   createCredential,
   getSubjectCredentialList,
   getSubjectCredentialStatus,
-  getPresentationStatus,
-  updateReceiverPresentationStatus,
-  getCredentialStatus,
-  recivePresentationData
-  // addIssuerCredential,
+  updateIssuerCredentialStatus,
+  getIssuerCredentialStatus,
+  createPresentationRequest,
+  addReceiverPresentation,
+  // getPresentationStatus,
+  // updateReceiverPresentationStatus,
+  // recivePresentationData
 }
 
 /////////////////////////////////////////////////////////
@@ -238,7 +240,7 @@ function createCredential(req, res) {
   log.debug(`${controller_name}[${createCredential.name}] -----> Sending params: ${JSON.stringify(credentials)}, ${identityDID}`)
   entityService.createCredential(identityDID, credentials)
   .then(credential => {
-    log.info(`${controller_name}[${createCredential.name}] -----> Credentials created: ${credential}`)
+    log.info(`${controller_name}[${createCredential.name}] -----> Credentials created`)
     let credentialToken = {
       verifiableCredential: credential
     }
@@ -274,7 +276,7 @@ function getSubjectCredentialStatus(req, res) {
     log.debug(`${controller_name}[${getSubjectCredentialStatus.name}] -----> Sending params: ${subjectPSMHash}, ${subjectDID}`)
     entityService.getSubjectCredentialStatus(subjectDID, subjectPSMHash)
     .then(resultStatus => {
-      log.debug(`${controller_name}[${getSubjectCredentialStatus.name}] -----> Successfully osbtained subject credential status`)
+      log.info(`${controller_name}[${getSubjectCredentialStatus.name}] -----> Successfully osbtained subject credential status`)
       let credentialStatus = {
         resultStatus
       }
@@ -288,44 +290,40 @@ function getSubjectCredentialStatus(req, res) {
 }
 
 function updateIssuerCredentialStatus(req, res) {
-  try {
-    log.info(`${controller_name}[${updateIssuerCredentialStatus.name}] -----> IN ...`)
-
-  }
-  catch(error) {
-
-  }
-}
-
+  log.info(`${controller_name}[${updateIssuerCredentialStatus.name}] -----> IN ...`)
+  let updateData = req.swagger.params.credentialStatusData.value
+  log.debug(`${controller_name}[${updateIssuerCredentialStatus.name}] -----> Sending params: ${JSON.stringify(updateData)}`)
+  entityService.updateIssuerCredentialStatus(updateData)
+  .then(updatedStatus => {
+    log.info(`${controller_name}[${updateIssuerCredentialStatus.name}] -----> Status Updated`)
+    let statusUpdated = updatedStatus
+    res.status(200).send(statusUpdated)
+  })
+  .catch(error => {
+    log.error(`${controller_name}[${updateIssuerCredentialStatus.name}] -----> ${error}`)
     Errmsg.message = error
     res.status(404).send(Errmsg)
-  }
+  })
 }
 
-  try {
-    log.info(`${controller_name}[${addIssuerCredential.name}] -----> IN ...`)
-    let params = req.swagger.params.body.value
-    log.debug(`${controller_name}[${addIssuerCredential.name}] -----> Sending params: ${JSON.stringify(params)}`)
-    entityService.addIssuerCredential(params)
-    .then(addSubjectPres => {
-      log.info(`${controller_name}[${addIssuerCredential.name}] -----> Successfully added credential`)
-      res.status(200).send(addSubjectPres)
-    })
-    .catch(error => {
-      log.error(`${controller_name}[${addIssuerCredential.name}] -----> ${error}`)
-      let msg = {
-        message: 'Error: Transaction has been reverted by the EVM'
-      }
-      res.status(400).send(msg)
-    })
-  }
-  catch(error) {
-    log.error(`${controller_name}[${addIssuerCredential.name}] -----> ${error}`)
-    let msg = {
-      message: 'Insternal Server Erorr'
-    }
-    res.status(503).send(msg)
-  }
+function getIssuerCredentialStatus(req, res) {
+  log.info(`${controller_name}[${getIssuerCredentialStatus.name}] -----> IN ...`)
+  let credentialHash = req.swagger.params.issuerCredentialHash.value
+  let issuerDID = req.swagger.params.issuerDID.value
+  log.debug(`${controller_name}[${getIssuerCredentialStatus.name}] -----> Sending params: ${credentialHash}, ${issuerDID}`)
+  entityService.getIssuerCredentialStatus(issuerDID, credentialHash)
+  .then(statusGetted => {
+    log.info(`${controller_name}[${getIssuerCredentialStatus.name}] -----> Status getted`)
+    let status = statusGetted
+    res.status(200).send(status)
+  })
+  .catch(error => {
+    log.error(`${controller_name}[${getIssuerCredentialStatus.name}] -----> ${error}`)
+    Errmsg.message = error
+    res.status(404).send(Errmsg)
+  })
+}
+
 }
 
 function getCurrentPublicKey(req, res) {

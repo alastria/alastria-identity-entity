@@ -21,33 +21,16 @@ log.level = myConfig.Log.level
 /////////////////////////////////////////////////////////
 ///////             PRIVATE FUNCTIONS             ///////
 /////////////////////////////////////////////////////////
-
-// function sendSigned(transactionSigned) {
-//   return new Promise((resolve, reject) => {
-//   log.info(`${serviceName}[${sendSigned.name}] -----> IN ...`)
-//   web3.eth.sendSignedTransaction(transactionSigned)
-//   .on('transactionHash', function (hash) {
-//       log.info(`${serviceName}[${sendSigned.name}] -----> HASH: ${hash} ...`)
-//   })
-//   .on('receipt', receipt => {
-//       resolve(receipt)
-//   })
-//   .on('error', error => {
-//       log.error(`${serviceName}[${sendSigned.name}] -----> ${error}`)
-//       reject(error)
-//     });
-//   })
-// }
         
 async function sendSigned(transactionSigned) {
-  try {
-    log.info(`${serviceName}[${sendSigned.name}] -----> IN ...`)
-    let result = await web3.eth.sendSignedTransaction(transactionSigned)
-    return result
-  }
-  catch(error) {
-    throw error
-  }
+  log.info(`${serviceName}[${sendSigned.name}] -----> IN ...`)
+  let result = await web3.eth.sendSignedTransaction(transactionSigned)
+  log.info(`${serviceName}[${sendSigned.name}] -----> Transaction Sended`)
+    .catch(error => {
+      log.debug(`${serviceName}[${sendSigned.name}] -----> ${error}`)
+      throw error
+    })
+  return result
 }
 
 async function issuerGetKnownTransaction(issuerCredential) {
@@ -58,7 +41,8 @@ async function issuerGetKnownTransaction(issuerCredential) {
     return issuerTX
   }
   catch(error) {
-    return error
+    log.error(`${serviceName}[${issuerGetKnownTransaction.name}] -----> ${error}`)
+    throw error
   }
 }
 
@@ -81,6 +65,7 @@ function preparedAlastriaId(subjectAddress) {
     return preparedId
   } 
   catch(error) {
+    log.error(`${serviceName}[${preparedAlastriaId.name}] -----> ${error}`)
     throw error
   }
 }
@@ -93,7 +78,6 @@ module.exports = {
   createAlastriaToken,
   verifyAlastriaSession,
   createAlastriaID,
-  addIssuerCredential,
   getCurrentPublicKey,
   getCurrentPublicKeyList,
   addEntity,
@@ -101,14 +85,17 @@ module.exports = {
   getEntity,
   addIssuer,
   isIssuer,
-  createCredential,
   getSubjectCredentialList,
-  createPresentationRequest,
+  createCredential,
+  updateIssuerCredentialStatus,
+  getIssuerCredentialStatus,
   getSubjectCredentialStatus,
-  getPresentationStatus,
-  updateReceiverPresentationStatus,
-  getCredentialStatus,
-  getPresentationData
+  createPresentationRequest,
+  addReceiverPresentation
+  // getPresentationStatus,
+  // updateReceiverPresentationStatus,
+  // getCredentialStatus,
+  // getPresentationData
 }
 
 /////////////////////////////////////////////////////////
@@ -329,32 +316,6 @@ async function isIssuer(issuerDID) {
   }
 }
 
-async function createCredential(identityDID, credentials) {
-  try {
-    log.info(`${serviceName}[${createCredential.name}] -----> IN ...`)
-    let user = await userModel.getUser(identityDID)
-    let credentialsJWT = []
-    credentials.map(credential => {
-      const currentDate = Math.floor(Date.now() / 1000);
-      const expDate = currentDate + 600;
-      let jti = Math.random().toString(36).substring(2)
-      let credentialSubject = {
-        field_name: user.userData[credential.field_name],
-        credentialFormat: typeof user.userData[credential.field_name]
-      }
-      let credentialObject = tokenHelper.createCredential(myConfig.entityDID, myConfig.entityDID, identityDID,
-                                                                myConfig.context, credentialSubject, expDate, currentDate, jti)
-      let credentialSigned = tokenHelper.signJWT(credentialObject, myConfig.entityPrivateKey)
-      credentialsJWT.push(credentialSigned)
-    })
-    return credentialsJWT
-  }
-  catch(error){
-    log.error(`${serviceName}[${createCredential.name}] -----> ${error}`)
-    throw error
-  }
-}
-
 async function getSubjectCredentialList(identityDID){
   try {
     log.info(`${serviceName}[${getSubjectCredentialList.name}] -----> IN ...`)
@@ -373,21 +334,99 @@ async function getSubjectCredentialList(identityDID){
   }
 }
 
+async function createCredential(identityDID, credentials) {
+  try {
+    log.info(`${serviceName}[${createCredential.name}] -----> IN ...`)
+    let user = await userModel.getUser(identityDID)
+    let credentialsJWT = []
+    let credentialsTXSigned = []
+    let sendCredentialTX = []
+    credentials.map(async credential => {
+      const currentDate = Math.floor(Date.now() / 1000);
+      const expDate = currentDate + 600;
+      let jti = Math.random().toString(36).substring(2)
+      let credentialSubject = {
+        field_name: user.userData[credential.field_name],
+        credentialFormat: typeof user.userData[credential.field_name]
+      }
+      let credentialObject = tokenHelper.createCredential(myConfig.entityDID, myConfig.entityDID, identityDID,
+                                                                myConfig.context, credentialSubject, expDate, currentDate, jti)
+      let credentialSigned = tokenHelper.signJWT(credentialObject, myConfig.entityPrivateKey)
+      let credentialPsmHash = tokenHelper.psmHash(web3, credentialSigned, myConfig.entityDID)
+      let credentialTX = transactionFactory.credentialRegistry.addIssuerCredential(web3, credentialPsmHash)
+      credentialsTXSigned.push(credentialTX)
+      credentialsJWT.push(credentialSigned)
+    })
+    credentialsTXSigned.map(async (item) => {
+      let issuerTXSigned = await issuerGetKnownTransaction(item)
+      log.info(`${serviceName}[${createCredential.name}] -----> Preparing to send transaction`)
+      sendCredentialTX.push(issuerTXSigned)
+      sendCredentialTX.map(async TXToSend => {
+        log.info(`${serviceName}[${createCredential.name}] -----> Sending transaction`)
+        let sendSignedCredential = await sendSigned(TXToSend)
+      })
+    })
+    log.info(`${serviceName}[${createCredential.name}] -----> Created Successfully`)
+    return credentialsJWT
+  }
+  catch(error){
+    log.error(`${serviceName}[${createCredential.name}] -----> ${error}`)
+    throw error
+  }
+}
+
 async function getSubjectCredentialStatus(subjectDID, subjectPSMHash) {
   try {
     log.info(`${serviceName}[${getSubjectCredentialStatus.name}] -----> IN ...`)
     let credentialStatusCall = await transactionFactory.credentialRegistry.getSubjectCredentialStatus(web3, subjectDID.split(':')[4], subjectPSMHash)
     let statusObject = await web3.eth.call(credentialStatusCall)
     let resultStatus = await web3.eth.abi.decodeParameters(['bool', 'uint8'], statusObject)
-    // if(!resultStatus[0]) {
-    //   log.error(`${serviceName}[${getSubjectCredentialStatus.name}] -----> Credential not exist`)
-    //   throw "Credential not exist"
-    // }
+    if(!resultStatus[0]) {
+      log.error(`${serviceName}[${getSubjectCredentialStatus.name}] -----> Credential not exist`)
+      throw "Credential not exist"
+    }
     log.info(`${serviceName}[${getSubjectCredentialStatus.name}] -----> Obtained status`)
     return resultStatus[1]
   }
   catch(error) {
     log.error(`${serviceName}[${getSubjectCredentialStatus.name}] -----> ${error}`)
+    throw error
+  }
+}
+
+async function updateIssuerCredentialStatus(updateData) {
+  try {
+    log.info(`${serviceName}[${createPresentationRequest.name}] -----> IN ...`)
+    console.log('updateData -----> ', updateData)
+    let updateTX = transactionFactory.credentialRegistry.updateCredentialStatus(web3, updateData.credentialHash, updateData.status)
+    console.log('updateTX -----> ', updateTX)
+    let updateTXSigned = await issuerGetKnownTransaction(updateTX)
+    console.log('updateTXSigned -----> ', updateTXSigned)
+    let sendUpdateTX = await sendSigned(updateTXSigned)
+    console.log('Send update TX', sendUpdateTX)
+    let issuerCredentialUpdated = await getIssuerCredentialStatus(myConfig.entityDID, updateData.credentialHash)
+    let updatedStatus = issuerCredentialUpdated
+    log.info(`${serviceName}[${createPresentationRequest.name}] -----> Credential status updated`)
+    return updatedStatus
+  }
+  catch(error) {
+    log.error(`${serviceName}[${createPresentationRequest.name}] -----> ${error}`)
+    throw error
+  }
+}
+
+async function getIssuerCredentialStatus(identityDID, credentialHash) {
+  try {
+    log.info(`${serviceName}[${getIssuerCredentialStatus.name}] -----> IN ...`)
+    let issuerCredential = await transactionFactory.credentialRegistry.getIssuerCredentialStatus(web3, identityDID.split(':')[4], credentialHash)
+    let issuerCredentialCall = await web3.eth.call(issuerCredential)
+    let result = web3.eth.abi.decodeParameters(["bool", "uint8"], issuerCredentialCall)
+    let status = result[1]
+    log.info(`${serviceName}[${getIssuerCredentialStatus.name}] -----> Credential status getted`)
+    return status
+  }
+  catch(errror) {
+    log.error(`${serviceName}[${getIssuerCredentialStatus.name}] -----> ${error}`)
     throw error
   }
 }
