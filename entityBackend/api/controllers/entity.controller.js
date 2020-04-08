@@ -31,6 +31,8 @@ module.exports = {
   addIssuer,
   isIssuer,
   createCredential,
+  getSubjectCredentialList,
+  getSubjectCredentialStatus,
   getPresentationStatus,
   updateReceiverPresentationStatus,
   getCredentialStatus,
@@ -213,15 +215,22 @@ function addIssuer(req, res) {
 }
 
 function isIssuer(req, res) {
-  try {
-    log.info(`${controller_name}[${isIssuer.name}] -----> IN ...`)
-    let issuerDID = req.swagger.params.issuerDID.value
-    log.debug(`${controller_name}[${isIssuer.name}] -----> Sending params: ${issuerDID}`)
-    entityService.isIssuer(issuerDID)
-    .then(issuer => {
-      log.info(`${controller_name}[${isIssuer.name}] -----> Successfully getted Issuer`)
-      let status = issuer
-      res.status(200).send(status)
+  log.info(`${controller_name}[${isIssuer.name}] -----> IN ...`)
+  let issuerDID = req.swagger.params.issuerDID.value
+  log.debug(`${controller_name}[${isIssuer.name}] -----> Sending params: ${issuerDID}`)
+  entityService.isIssuer(issuerDID)
+  .then(issuer => {
+    log.info(`${controller_name}[${isIssuer.name}] -----> Successfully getted Issuer`)
+    let status = issuer
+    res.status(200).send(status)
+  })
+  .catch(error => {
+    log.error(`${controller_name}[${isIssuer.name}] -----> ${error}`)
+    Errmsg.message = error
+    res.status(404).send(Errmsg)
+  })
+}
+
 function createCredential(req, res) {
   log.info(`${controller_name}[${createCredential.name}] -----> IN ...`)
   let credentials = req.swagger.params.credential.value
@@ -257,10 +266,37 @@ function getSubjectCredentialList(req, res) {
     res.status(404).send(Errmsg)
   })
 }
+
+function getSubjectCredentialStatus(req, res) {
+    log.info(`${controller_name}[${getSubjectCredentialStatus.name}] -----> IN ...`)
+    let subjectPSMHash = req.swagger.params.subjectCredentialHash.value
+    let subjectDID = req.swagger.params.subjectDID.value
+    log.debug(`${controller_name}[${getSubjectCredentialStatus.name}] -----> Sending params: ${subjectPSMHash}, ${subjectDID}`)
+    entityService.getSubjectCredentialStatus(subjectDID, subjectPSMHash)
+    .then(resultStatus => {
+      log.debug(`${controller_name}[${getSubjectCredentialStatus.name}] -----> Successfully osbtained subject credential status`)
+      let credentialStatus = {
+        resultStatus
+      }
+      res.status(200).send(credentialStatus)
     })
+    .catch(error => {
+      log.error(`${controller_name}[${getSubjectCredentialStatus.name}] -----> ${error}`)
+      Errmsg.message = error
+      res.status(404).send(Errmsg)
+    })
+}
+
+function updateIssuerCredentialStatus(req, res) {
+  try {
+    log.info(`${controller_name}[${updateIssuerCredentialStatus.name}] -----> IN ...`)
+
   }
   catch(error) {
-    log.error(`${controller_name}[${isIssuer.name}] -----> ${error}`)
+
+  }
+}
+
     Errmsg.message = error
     res.status(404).send(Errmsg)
   }

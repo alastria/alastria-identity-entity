@@ -643,7 +643,7 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: "#/definitions/updateCredentialData"
+            $ref: "#/definitions/obtainedStatus"
         "400":
           description: Bad Request
           schema:
@@ -1048,9 +1048,9 @@ definitions:
         type: string
       credentialHash:
         type: string
-  updateCredentialData:
+  obtainedStatus:
     properties:
-      newStatus:
+      status:
         type: integer
   presentationRequestData:
     type: array
