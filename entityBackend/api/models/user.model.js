@@ -26,6 +26,7 @@ module.exports = {
   createUser,
   updateUser,
   getUser,
+  getCredentialIdentityCatalog,
   checkAuth
 }
 
@@ -72,18 +73,9 @@ async function login(params){
     }
     let token = jwt.sign({data: jsonObjet}, pwd, { expiresIn: 60 * 60})
     log.info(`${moduleName}[${login.name}] -----> JWT created`);
+    delete found.password
     let userObject = {
-      userData: {
-        id: found._id,
-        username: found.username,
-        name: found.name,
-        surname: found.surname,
-        email: found.email,
-        address: found.address,
-        vinculated: (found.vinculated == null) ? false : found.vinculated,
-        titleLegalBlockchain: found.titleLegalBlockchain,
-        did: found.did
-      },
+      userData: found,
       authToken: token
     }
     connected.close();
@@ -124,7 +116,7 @@ async function createUser(params) {
   catch(error) {
     log.error(`${moduleName}[${createUser.name}] -----> Error: ${error}`)
     connected.close()
-    return error
+    throw error
   }
 }
 
@@ -160,7 +152,7 @@ async function updateUser(id, params) {
   catch(error) {
     log.error(`${moduleName}[${updateUser.name}] -----> Error: ${error}`)
     connected.close()
-    return error
+    throw error
   }
 }
 
@@ -177,7 +169,7 @@ async function getUser(id) {
     } else {
       log.info(`${moduleName}[${getUser.name}] -----> Data obtained`)
       let loged = await login(user)
-      log.info(`${moduleName}[${getUser.name}] -----> User loged`)
+      log.info(`${moduleName}[${getUser.name}] -----> User data getted`)
       connected.close()
       return loged
     }
@@ -185,7 +177,38 @@ async function getUser(id) {
   catch(error) {
     log.error(`${moduleName}[${getUser.name}] -----> Error: ${error}`)
     connected.close()
-    return error
+    throw error
+  }
+}
+
+async function getCredentialIdentityCatalog(identityDID) {
+  try {
+    log.info(`${moduleName}[${getCredentialIdentityCatalog.name}] -----> IN...`)
+    let credentialCatalog = []
+    let user = await getUser(identityDID)
+    if (user == null) {
+      throw 'User not found in the DataBase'
+    } else {
+      delete user.userData._id
+      delete user.userData.vinculated
+      delete user.userData.did
+      let fields = Object.keys(user.userData)
+      fields.map(field => {
+        let object = {
+          credentialName: field,
+          credentialType: typeof user.userData[field],
+          credentialValue: user.userData[field],
+          credentialFormat: typeof user.userData[field]
+        }
+        credentialCatalog.push(object)
+      })
+      log.info(`${moduleName}[${getCredentialIdentityCatalog.name}] -----> Obtained credential catalog`)
+      return credentialCatalog
+    }
+  }
+  catch(error) {
+    log.error(`${moduleName}[${getCredentialIdentityCatalog.name}] -----> Error: ${error}`)
+    throw error
   }
 }
 
@@ -200,6 +223,6 @@ async function checkAuth(token) {
   }
   catch(error) {
     log.error(`${moduleName}[${checkAuth.name}] -----> Error: ${error}`)
-    return error
+    throw error
   }
 }

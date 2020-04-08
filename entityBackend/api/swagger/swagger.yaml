@@ -497,12 +497,17 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /alastria/credential:
+  /alastria/credential/{identityDID}:
     x-swagger-router-controller: entity.controller
     post:
       description: Create and Registry Credential by the issuer
       operationId: createCredential
       parameters:
+        - name: identityDID
+          in: path
+          type: string
+          description: Identity DID of who is going to create the credential
+          required: true
         - name: credential
           in: body
           description: Necessary data to add a new subject credential
@@ -531,32 +536,6 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
     get:
-      description: Get available credentials catalog from an issuer
-      operationId: getCredentialCatalog
-      responses:
-        "200":
-          description: Success
-          schema:
-            $ref: "#/definitions/credentialCatalogList"
-        "400":
-          description: Bad Request
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "404":
-          description: Address not found
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "503":
-          description: Internal Server Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        default:
-          description: Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-  /alastria/credential/{identityDID}:
-    get:
-      x-swagger-router-controller: entity.controller
       description: Get all the credentials available for the Subject (IdentityDID) with the status {available, valid, expired}
       operationId: getSubjectCredentialList
       parameters:
@@ -1002,7 +981,7 @@ definitions:
         type: string
       credentialValue:
         type: string
-      credentialFormats:
+      credentialFormat:
         type: object
   credentialStatusData:
     type: object
@@ -1079,9 +1058,8 @@ definitions:
     items:
       $ref: "#/definitions/entityData"
   presentationRequestResponse:
-    properties:
-      presentationRequest:
-        type: string
+    description: Presentation Request signed by entity
+    type: string
   presentationResponse:
     properties:
       status:

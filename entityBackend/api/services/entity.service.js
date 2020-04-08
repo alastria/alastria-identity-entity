@@ -52,6 +52,7 @@ async function sendSigned(transactionSigned) {
 
 async function issuerGetKnownTransaction(issuerCredential) {
   try {
+    log.info(`${serviceName}[${issuerGetKnownTransaction.name}] -----> IN ...`)
     let issuerID = await identityUser.getUserIdentity(web3, myConfig.entityEthAddress, myConfig.entityPrivateKey)
     let issuerTX = await issuerID.getKnownTransaction(issuerCredential)
     return issuerTX
@@ -65,7 +66,6 @@ function getAddressFromPubKey(publicKey) {
   try {
     log.info(`${serviceName}[${getAddressFromPubKey.name}] -----> IN ...`)
     let address = EthCrypto.publicKey.toAddress(publicKey)
-    log.info(`${serviceName}[${getAddressFromPubKey.name}] -----> Getted address`)
     return address
   }
   catch(error) {
@@ -76,6 +76,7 @@ function getAddressFromPubKey(publicKey) {
 
 function preparedAlastriaId(subjectAddress) {
   try {
+    log.info(`${serviceName}[${preparedAlastriaId.name}] -----> IN ...`)
     let preparedId = transactionFactory.identityManager.prepareAlastriaID(web3, subjectAddress)
     return preparedId
   } 
@@ -100,6 +101,7 @@ module.exports = {
   getEntity,
   addIssuer,
   isIssuer,
+  createCredential,
   getPresentationStatus,
   updateReceiverPresentationStatus,
   getCredentialStatus,

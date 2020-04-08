@@ -28,9 +28,9 @@ module.exports = {
 ///////              PUBLIC FUNCTIONS             ///////
 /////////////////////////////////////////////////////////
 
-async function decodeJWT(tokenJWT) {
+function decodeJWT(tokenJWT) {
   try {
-    let decode = await tokensFactory.tokens.decodeJWT(tokenJWT)
+    let decode = tokensFactory.tokens.decodeJWT(tokenJWT)
     log.info(`${helper_name}[${decodeJWT.name}] -----> Token Decoded`)
     return decode
   }
@@ -40,9 +40,9 @@ async function decodeJWT(tokenJWT) {
   }
 }
 
-async function verifyJWT(tokenJWT, publicKey) {
+function verifyJWT(tokenJWT, publicKey) {
   try {
-    let verify = await tokensFactory.tokens.verifyJWT(tokenJWT, publicKey)
+    let verify = tokensFactory.tokens.verifyJWT(tokenJWT, `04${publicKey}`)
     log.info(`${helper_name}[${verifyJWT.name}] -----> Token Verified`)
     return verify
   }
@@ -52,9 +52,9 @@ async function verifyJWT(tokenJWT, publicKey) {
   }
 }
 
-async function signJWT(object, privateKey) {
+ function signJWT(object, privateKey) {
   try {
-    let verify = await tokensFactory.tokens.signJWT(object, privateKey)
+    let verify = tokensFactory.tokens.signJWT(object, privateKey)
     log.info(`${helper_name}[${signJWT.name}] -----> Token Signed`)
     return verify
   }
@@ -64,9 +64,9 @@ async function signJWT(object, privateKey) {
   }
 }
 
-async function createAlastriaToken(tokenData) {
+function createAlastriaToken(tokenData) {
   try {
-    let alastriaToken = await tokensFactory.tokens.createAlastriaToken(tokenData.iss, tokenData.gwu, tokenData.cbu,
+    let alastriaToken = tokensFactory.tokens.createAlastriaToken(tokenData.iss, tokenData.gwu, tokenData.cbu,
       tokenData.ani, tokenData.exp, tokenData.nbf, 
       tokenData.jti)
     log.info(`${helper_name}[${createAlastriaToken.name}] -----> Created Alastria Token`)
@@ -78,9 +78,9 @@ async function createAlastriaToken(tokenData) {
   }
 }
 
-async function createCredential(kid, iss, sub, contect, credentialSubject, exp, nbf, jtiz) {
+ function createCredential(kid, iss, sub, contect, credentialSubject, exp, nbf, jti) {
   try {
-    let credential = await tokensFactory.tokens.createCredential(kid, iss, sub, contect, credentialSubject, exp, nbf, jti)
+    let credential =  tokensFactory.tokens.createCredential(kid, iss, sub, contect, credentialSubject, exp, nbf, jti)
     log.info(`${helper_name}[${createCredential.name}] -----> Created Credential`)
     return credential
   }
@@ -90,9 +90,9 @@ async function createCredential(kid, iss, sub, contect, credentialSubject, exp, 
   }
 }
 
-async function createPresentationRequest(kid, iss, sub, contect, credentialSubject, exp, nbf, jti) {
+function createPresentationRequest(kid, iss, context, procUrl, procHash, data, exp, nbf, jti) {
   try {
-    let credential = await tokensFactory.tokens.createPresentationRequest(kid, iss, sub, contect, credentialSubject, exp, nbf, jti)
+    let credential = tokensFactory.tokens.createPresentationRequest(kid, iss, context, procUrl, procHash, data, exp, nbf, jti)
     log.info(`${helper_name}[${createPresentationRequest.name}] -----> Created Presentation Reques`)
     return credential
   }
@@ -114,9 +114,9 @@ async function PSMHash(web3, jwt, did) {
   }
 }
 
-async function createDID(createAlastriaTX, alastriaToken, publicKey) {
+function createDID(createAlastriaTX, alastriaToken, publicKey) {
   try {
-    let did = await tokensFactory.tokens.createDID(createAlastriaTX, alastriaToken, publicKey)
+    let did = tokensFactory.tokens.createDID(createAlastriaTX, alastriaToken, publicKey)
     log.info(`${helper_name}[${createDID.name}] -----> Created DID`)
     return did
   }
