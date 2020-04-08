@@ -324,6 +324,21 @@ function getIssuerCredentialStatus(req, res) {
   })
 }
 
+function createPresentationRequest(req, res) {
+  log.info(`${controller_name}[${createPresentationRequest.name}] -----> IN ...`)
+  let requestData = req.swagger.params.presentationRequestInfo.value
+  log.debug(`${controller_name}[${createPresentationRequest.name}] -----> Sending params: ${JSON.stringify(requestData)}`)
+  entityService.createPresentationRequest(requestData)
+  .then(jwt => {
+    log.info(`${controller_name}[${createPresentationRequest.name}] -----> Successfully generated Presentation Request`)
+    let presentationRequest = jwt
+    res.status(200).send(presentationRequest)
+  })
+  .catch(error => {
+    log.error(`${controller_name}[${createPresentationRequest.name}] -----> ${error}`)
+    Errmsg.message = error
+    res.status(404).send(Errmsg)
+  })
 }
 
 function getCurrentPublicKey(req, res) {
