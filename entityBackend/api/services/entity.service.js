@@ -102,6 +102,9 @@ module.exports = {
   addIssuer,
   isIssuer,
   createCredential,
+  getSubjectCredentialList,
+  createPresentationRequest,
+  getSubjectCredentialStatus,
   getPresentationStatus,
   updateReceiverPresentationStatus,
   getCredentialStatus,
@@ -126,8 +129,8 @@ async function createAlastriaToken() {
       nbf: currentDate,
       jti: Math.random().toString(36).substring(2)
     }
-    let alastriaToken = await tokenHelper.createAlastriaToken(alastriaTokenData)
-    let AlastriaTokenSigned = await tokenHelper.signJWT(alastriaToken, myConfig.entityPrivateKey)
+    let alastriaToken = tokenHelper.createAlastriaToken(alastriaTokenData)
+    let AlastriaTokenSigned = tokenHelper.signJWT(alastriaToken, myConfig.entityPrivateKey)
     return AlastriaTokenSigned
   }
   catch(error) {
@@ -139,13 +142,13 @@ async function createAlastriaToken() {
 async function verifyAlastriaSession(alastriaSession) {
   try {
     log.info(`${serviceName}[${verifyAlastriaSession.name}] -----> IN...`)
-    let decodeAS = await tokenHelper.decodeJWT(alastriaSession)
+    let decodeAS = tokenHelper.decodeJWT(alastriaSession)
     let didSubject = decodeAS.payload.pku.id
     log.info(`${serviceName}[${verifyAlastriaSession.name}] -----> Obtained correctly the Subject DID`)
     let subjectPublicKey = await getCurrentPublicKey(didSubject)
     let publicKey = subjectPublicKey[0]
     log.info(`${serviceName}[${verifyAlastriaSession.name}] -----> Obtained correctly the Subject PublicKey`)
-    let verifiedAlastraSession = await tokenHelper.verifyJWT(alastriaSession, `04${publicKey}`)
+    let verifiedAlastraSession = tokenHelper.verifyJWT(alastriaSession, `04${publicKey}`)
     if(verifiedAlastraSession == true) {
       let user = await userModel.getUser(didSubject)
       let msg = {
@@ -170,7 +173,7 @@ async function verifyAlastriaSession(alastriaSession) {
   try {
     console.log(params)
     log.info(`${serviceName}[${createAlastriaID.name}] -----> IN ...`)
-    let decodedAIC = await tokenHelper.decodeJWT(params)
+    let decodedAIC = tokenHelper.decodeJWT(params)
     let subjectAddress = getAddressFromPubKey(decodedAIC.payload.publicKey)
     let signedCreateTransaction = decodedAIC.payload.createAlastriaTX
     let preparedId = preparedAlastriaId(subjectAddress)
@@ -181,7 +184,7 @@ async function verifyAlastriaSession(alastriaSession) {
       to: config.alastriaIdentityManager,
       data: web3.eth.abi.encodeFunctionCall(config.contractsAbi['AlastriaIdentityManager']['identityKeys'], [subjectAddress.substr(2)])
     })
-    let alastriaDID = await tokenHelper.createDID('quor', alastriaIdentity.slice(26));
+    let alastriaDID = tokenHelper.createDID('quor', alastriaIdentity.slice(26));
     let msg = {
       message: "Successfuly created Alastria ID",
       did: alastriaDID
@@ -326,6 +329,87 @@ async function isIssuer(issuerDID) {
   }
 }
 
+async function createCredential(identityDID, credentials) {
+  try {
+    log.info(`${serviceName}[${createCredential.name}] -----> IN ...`)
+    let user = await userModel.getUser(identityDID)
+    let credentialsJWT = []
+    credentials.map(credential => {
+      const currentDate = Math.floor(Date.now() / 1000);
+      const expDate = currentDate + 600;
+      let jti = Math.random().toString(36).substring(2)
+      let credentialSubject = {
+        field_name: user.userData[credential.field_name],
+        credentialFormat: typeof user.userData[credential.field_name]
+      }
+      let credentialObject = tokenHelper.createCredential(myConfig.entityDID, myConfig.entityDID, identityDID,
+                                                                myConfig.context, credentialSubject, expDate, currentDate, jti)
+      let credentialSigned = tokenHelper.signJWT(credentialObject, myConfig.entityPrivateKey)
+      credentialsJWT.push(credentialSigned)
+    })
+    return credentialsJWT
+  }
+  catch(error){
+    log.error(`${serviceName}[${createCredential.name}] -----> ${error}`)
+    throw error
+  }
+}
+
+async function getSubjectCredentialList(identityDID){
+  try {
+    log.info(`${serviceName}[${getSubjectCredentialList.name}] -----> IN ...`)
+    let listTX = await transactionFactory.credentialRegistry.getSubjectCredentialList(web3, identityDID.split(':')[4])
+    let credentialCall = await web3.eth.call(listTX)
+    let listDecoded = web3.eth.abi.decodeParameters(["uint256", "bytes32[]"], credentialCall)
+    let list = {
+      index: listDecoded[0],
+      credential: listDecoded[1]
+    }
+    return list
+  }
+  catch(error) {
+    log.error(`${serviceName}[${getSubjectCredentialList.name}] -----> ${error}`)
+    throw error
+  }
+}
+
+async function getSubjectCredentialStatus(subjectDID, subjectPSMHash) {
+  try {
+    log.info(`${serviceName}[${getSubjectCredentialStatus.name}] -----> IN ...`)
+    let credentialStatusCall = await transactionFactory.credentialRegistry.getSubjectCredentialStatus(web3, subjectDID.split(':')[4], subjectPSMHash)
+    let statusObject = await web3.eth.call(credentialStatusCall)
+    let resultStatus = await web3.eth.abi.decodeParameters(['bool', 'uint8'], statusObject)
+    // if(!resultStatus[0]) {
+    //   log.error(`${serviceName}[${getSubjectCredentialStatus.name}] -----> Credential not exist`)
+    //   throw "Credential not exist"
+    // }
+    log.info(`${serviceName}[${getSubjectCredentialStatus.name}] -----> Obtained status`)
+    return resultStatus[1]
+  }
+  catch(error) {
+    log.error(`${serviceName}[${getSubjectCredentialStatus.name}] -----> ${error}`)
+    throw error
+  }
+}
+
+async function createPresentationRequest(requestData) {
+  try {
+    log.info(`${serviceName}[${createPresentationRequest.name}] -----> IN ...`)
+    const currentDate = Math.floor(Date.now() / 1000);
+    const expDate = currentDate + 600;
+    let jti = Math.random().toString(36).substring(2)
+    let objectRequest = tokenHelper.createPresentationRequest(myConfig.entityDID, myConfig.entityDID, myConfig.context,
+                                                                   `${myConfig.callbackUrl}alastria/presentationRequest`, myConfig.procHash, requestData,
+                                                                    expDate, currentDate, jti)
+    let presentationRequest = tokenHelper.signJWT(objectRequest, myConfig.entityPrivateKey)
+    return presentationRequest
+  }
+  catch(error) {
+    log.error(`${serviceName}[${createPresentationRequest.name}] -----> ${error}`)
+    throw error
+  }
+}
+
 function addIssuerCredential(params) {
   return new Promise((resolve, reject) => {
     log.info(`${serviceName}[${addIssuerCredential.name}] -----> IN ...`)
@@ -345,6 +429,7 @@ function addIssuerCredential(params) {
           }
           log.info(`${serviceName}[${addIssuerCredential.name}] -----> Success`)
           resolve(credentialStatus)
+
         })
         .catch(error => {
           log.error(`${serviceName}[${addIssuerCredential.name}] -----> ${error}`)

@@ -19,6 +19,32 @@ produces:
   - text/plain
   - text/html
 paths:
+  /credential:
+    x-swagger-router-controller: user.controller
+    get:
+      description: Get available credentials catalog from an issuer
+      operationId: getCredentialCatalog
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/credentialCatalogList"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "503":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /login:
     x-swagger-router-controller: user.controller
     get:
@@ -175,6 +201,38 @@ paths:
           description: Success
           schema:
             $ref: "#/definitions/userAuthenticated"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "503":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /user/credential/{identityDID}:
+    x-swagger-router-controller: user.controller
+    get:
+      description: Get available credentials catalog from an issuer
+      operationId: getCredentialIdentityCatalog
+      parameters:
+        - name: identityDID
+          in: path
+          type: string
+          description: Identity to find the credential catalog
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/credentialCatalogList"
         "400":
           description: Bad Request
           schema:

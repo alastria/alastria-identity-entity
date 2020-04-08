@@ -30,6 +30,7 @@ module.exports = {
   getEntity,
   addIssuer,
   isIssuer,
+  createCredential,
   getPresentationStatus,
   updateReceiverPresentationStatus,
   getCredentialStatus,
@@ -221,6 +222,41 @@ function isIssuer(req, res) {
       log.info(`${controller_name}[${isIssuer.name}] -----> Successfully getted Issuer`)
       let status = issuer
       res.status(200).send(status)
+function createCredential(req, res) {
+  log.info(`${controller_name}[${createCredential.name}] -----> IN ...`)
+  let credentials = req.swagger.params.credential.value
+  let identityDID = req.swagger.params.identityDID.value
+  log.debug(`${controller_name}[${createCredential.name}] -----> Sending params: ${JSON.stringify(credentials)}, ${identityDID}`)
+  entityService.createCredential(identityDID, credentials)
+  .then(credential => {
+    log.info(`${controller_name}[${createCredential.name}] -----> Credentials created: ${credential}`)
+    let credentialToken = {
+      verifiableCredential: credential
+    }
+    res.status(200).send(credentialToken)
+  })
+  .catch(error => {
+    log.error(`${controller_name}[${createCredential.name}] -----> ${error}`)
+    Errmsg.message = error
+    res.status(404).send(Errmsg)
+  })
+}
+
+function getSubjectCredentialList(req, res) {
+  log.info(`${controller_name}[${getSubjectCredentialList.name}] -----> IN ...`)
+  let subjectDID = req.swagger.params.identityDID.value
+  log.debug(`${controller_name}[${getSubjectCredentialList.name}] -----> Sending params: ${subjectDID}`)
+  entityService.getSubjectCredentialList(subjectDID)
+  .then(credentialsList => {
+    log.info(`${controller_name}[${getSubjectCredentialList.name}] -----> Successfully obtained Credential List`)
+    res.status(200).send(credentialsList)
+  })
+  .catch(error => {
+    log.error(`${controller_name}[${getSubjectCredentialList.name}] -----> ${error}`)
+    Errmsg.message = error
+    res.status(404).send(Errmsg)
+  })
+}
     })
   }
   catch(error) {
