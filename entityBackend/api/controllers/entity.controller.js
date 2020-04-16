@@ -36,10 +36,7 @@ module.exports = {
   updateIssuerCredentialStatus,
   getIssuerCredentialStatus,
   createPresentationRequest,
-  addReceiverPresentation,
-  // getPresentationStatus,
-  // updateReceiverPresentationStatus,
-  // recivePresentationData
+  getSubjectPresentationListFromIssuer,
 }
 
 /////////////////////////////////////////////////////////
@@ -117,7 +114,7 @@ function getCurrentPublicKey(req, res) {
     if (publickey[0].length > 0) {
       log.info(`${controller_name}[${getCurrentPublicKey.name}] -----> Successfully obtained Public Key`)
       let result = {
-        publicKey: publickey[0]
+        publicKey: publickey
       }
       res.status(200).send(result)
     }
@@ -341,38 +338,20 @@ function createPresentationRequest(req, res) {
   })
 }
 
-function getCurrentPublicKey(req, res) {
-  try {
-    log.info(`${controller_name}[${getCurrentPublicKey.name}] -----> IN ...`)
-    let alastriaId = req.swagger.params.alastriaDID.value
-    log.debug(`${controller_name}[${getCurrentPublicKey.name}] -----> Sending params: ${JSON.stringify(alastriaId)}`)
-    entityService.getCurrentPublicKey(alastriaId)
-    .then(publickey => {
-      if (publickey[0].length > 0) {
-        log.info(`${controller_name}[${getCurrentPublicKey.name}] -----> Successfully obtained Public Key`)
-        let result = {
-          publicKey: publickey[0]
-        }
-        res.status(200).send(result)
-      }
-      else {
-        log.info(`${controller_name}[${getCurrentPublicKey.name}] -----> Error getting publicKey`)
-        let msg = {
-          message: 'Error getting Public Key'
-        }
-        res.status(404).send(msg)
-      }
-    })
-    .catch(error => {
-      let msg = {
-        message: `Insternal Server Error: ${error}`
-      }
-      res.status(503).send(msg)
-    })
-  }
-  catch(error) {
-    log.error(`${controller_name}[${getCurrentPublicKey.name}] -----> ${error}`)
-   }
+function getSubjectPresentationListFromIssuer(req, res) {
+  log.info(`${controller_name}[${getSubjectPresentationListFromIssuer.name}] -----> IN ...`)
+  let subjectDID = req.swagger.params.subjectDID.value
+  log.debug(`${controller_name}[${getSubjectPresentationListFromIssuer.name}] -----> Sending params: ${subjectDID}`)
+  entityService.getSubjectPresentationList(subjectDID)
+  .then(presentationList => {
+    log.info(`${controller_name}[${getSubjectPresentationListFromIssuer.name}] -----> Successfully obtained presentation list`)
+    res.status(200).send(presentationList)
+  })
+  .catch(error => {
+    log.error(`${controller_name}[${getSubjectPresentationListFromIssuer.name}] -----> ${error}`)
+    Errmsg.message = error
+    res.status(404).send(Errmsg)
+  })
 }
 
 function getPresentationStatus(req, res){

@@ -25,11 +25,11 @@ log.level = myConfig.Log.level
 async function sendSigned(transactionSigned) {
   log.info(`${serviceName}[${sendSigned.name}] -----> IN ...`)
   let result = await web3.eth.sendSignedTransaction(transactionSigned)
+  .catch(error => {
+    log.debug(`${serviceName}[${sendSigned.name}] -----> ${error}`)
+    throw error
+  })
   log.info(`${serviceName}[${sendSigned.name}] -----> Transaction Sended`)
-    .catch(error => {
-      log.debug(`${serviceName}[${sendSigned.name}] -----> ${error}`)
-      throw error
-    })
   return result
 }
 
@@ -91,11 +91,7 @@ module.exports = {
   getIssuerCredentialStatus,
   getSubjectCredentialStatus,
   createPresentationRequest,
-  addReceiverPresentation
-  // getPresentationStatus,
-  // updateReceiverPresentationStatus,
-  // getCredentialStatus,
-  // getPresentationData
+  getSubjectPresentationList,
 }
 
 /////////////////////////////////////////////////////////
@@ -110,7 +106,7 @@ async function createAlastriaToken() {
     let alastriaTokenData = {
       iss: myConfig.entityDID,
       gwu: myConfig.nodeUrl.alastria,
-      cbu: `${myConfig.callbackUrl}alastria/alastriaToken`,
+      cbu: `${myConfig.callbackUrl}alastria/did`,
       exp: expDate,
       ani: myConfig.netID,
       nbf: currentDate,
@@ -158,7 +154,6 @@ async function verifyAlastriaSession(alastriaSession) {
 
  async function createAlastriaID(params) {
   try {
-    console.log(params)
     log.info(`${serviceName}[${createAlastriaID.name}] -----> IN ...`)
     let decodedAIC = tokenHelper.decodeJWT(params)
     let subjectAddress = getAddressFromPubKey(decodedAIC.payload.publicKey)
@@ -191,7 +186,7 @@ async function getCurrentPublicKey(subject) {
     let result = await web3.eth.call(currentPubKey)
     log.info(`${serviceName}[${getCurrentPublicKey.name}] -----> Public Key Success`)
     let identityPubKey = web3.eth.abi.decodeParameters(['string'], result) 
-    return identityPubKey
+    return identityPubKey[0]
   }
   catch(error) {
     log.error(`${serviceName}[${getCurrentPublicKey.name}] -----> ${error}`)
@@ -220,7 +215,6 @@ async function getCurrentPublicKeyList(subject) {
 async function addEntity(entityData) {
   try {
     log.info(`${serviceName}[${addEntity.name}] -----> IN ...`)
-    console.log(entityData)
     let entity = await getEntity(entityData.didEntity)
     if(entity) {
       throw "This AlastriaDID is already an Entity"

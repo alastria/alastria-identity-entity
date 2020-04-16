@@ -3,7 +3,6 @@
     "level": "info"
   },
   "nodeUrl": {
-    "local": "http://localhost:8545",
     "alastria": "http://63.33.206.111/rpc"
   },
   "mongo": {

@@ -37,10 +37,6 @@ paths:
           description: Address not found
           schema:
             $ref: "#/definitions/ErrorResponse"
-        "503":
-          description: Internal Server Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
         default:
           description: Error
           schema:
@@ -76,10 +72,6 @@ paths:
           description: User not found
           schema:
             $ref: "#/definitions/ErrorResponse"
-        "503":
-          description: Internal Server Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
         default:
           description: Error
           schema:
@@ -106,10 +98,6 @@ paths:
         # responses may fall through to errors
         "400":
           description: Bad Request
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "503":
-          description: Internal Server Error
           schema:
             $ref: "#/definitions/ErrorResponse"
         default:
@@ -147,10 +135,6 @@ paths:
           description: User not found
           schema:
             $ref: "#/definitions/ErrorResponse"
-        "503":
-          description: Internal Server Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
         default:
           description: Error
           schema:
@@ -175,10 +159,6 @@ paths:
             $ref: "#/definitions/ErrorResponse"
         "404":
           description: Address not found
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "503":
-          description: Internal Server Error
           schema:
             $ref: "#/definitions/ErrorResponse"
         default:
@@ -209,10 +189,6 @@ paths:
           description: Address not found
           schema:
             $ref: "#/definitions/ErrorResponse"
-        "503":
-          description: Internal Server Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
         default:
           description: Error
           schema:
@@ -241,10 +217,6 @@ paths:
           description: Address not found
           schema:
             $ref: "#/definitions/ErrorResponse"
-        "503":
-          description: Internal Server Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
         default:
           description: Error
           schema:
@@ -261,10 +233,6 @@ paths:
             $ref: "#/definitions/alastriaTokenResponse"
         "400":
           description: Bad Request
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "503":
-          description: Internal Server Error
           schema:
             $ref: "#/definitions/ErrorResponse"
         default:
@@ -296,10 +264,6 @@ paths:
           description: Address not found
           schema:
             $ref: "#/definitions/ErrorResponse"
-        "503":
-          description: Internal Server Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
         default:
           description: Error
           schema:
@@ -327,10 +291,6 @@ paths:
             $ref: "#/definitions/ErrorResponse"
         "404":
           description: Address not found
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "503":
-          description: Internal Server Error
           schema:
             $ref: "#/definitions/ErrorResponse"
         default:
@@ -361,10 +321,6 @@ paths:
           description: Address not found
           schema:
             $ref: "#/definitions/ErrorResponse"
-        "503":
-          description: Internal Server Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
         default:
           description: Error
           schema:
@@ -391,10 +347,6 @@ paths:
             $ref: "#/definitions/ErrorResponse"
         "404":
           description: Address not found
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "503":
-          description: Internal Server Error
           schema:
             $ref: "#/definitions/ErrorResponse"
         default:
@@ -426,10 +378,6 @@ paths:
           description: Address not found
           schema:
             $ref: "#/definitions/ErrorResponse"
-        "503":
-          description: Internal Server Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
         default:
           description: Error
           schema:
@@ -448,10 +396,6 @@ paths:
             $ref: "#/definitions/ErrorResponse"
         "404":
           description: Address not found
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "503":
-          description: Internal Server Error
           schema:
             $ref: "#/definitions/ErrorResponse"
         default:
@@ -480,10 +424,6 @@ paths:
             $ref: "#/definitions/ErrorResponse"
         "404":
           description: Address not found
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "503":
-          description: Internal Server Error
           schema:
             $ref: "#/definitions/ErrorResponse"
         default:
@@ -515,10 +455,6 @@ paths:
           description: Address not found
           schema:
             $ref: "#/definitions/ErrorResponse"
-        "503":
-          description: Internal Server Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
         default:
           description: Error
           schema:
@@ -547,22 +483,18 @@ paths:
           description: Address not found
           schema:
             $ref: "#/definitions/ErrorResponse"
-        "503":
-          description: Internal Server Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
         default:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /alastria/credential/{identityDID}:
+  /alastria/credential:
     x-swagger-router-controller: entity.controller
     post:
       description: Create and Registry Credential by the issuer
       operationId: createCredential
       parameters:
         - name: identityDID
-          in: path
+          in: query
           type: string
           description: Identity DID of who is going to create the credential
           required: true
@@ -585,14 +517,12 @@ paths:
           description: Address not found
           schema:
             $ref: "#/definitions/ErrorResponse"
-        "503":
-          description: Internal Server Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
         default:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /alastria/credential/{identityDID}:
+    x-swagger-router-controller: entity.controller
     get:
       description: Get all the credentials available for the Subject (IdentityDID) with the status {available, valid, expired}
       operationId: getSubjectCredentialList
@@ -613,10 +543,6 @@ paths:
             $ref: "#/definitions/ErrorResponse"
         "404":
           description: Address not found
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "503":
-          description: Internal Server Error
           schema:
             $ref: "#/definitions/ErrorResponse"
         default:
@@ -652,10 +578,6 @@ paths:
           description: Address not found
           schema:
             $ref: "#/definitions/ErrorResponse"
-        "503":
-          description: Internal Server Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
         default:
           description: Error
           schema:
@@ -683,10 +605,6 @@ paths:
             $ref: "#/definitions/ErrorResponse"
         "404":
           description: Credential not found
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "503":
-          description: Internal Server Error
           schema:
             $ref: "#/definitions/ErrorResponse"
         default:
@@ -720,10 +638,6 @@ paths:
           description: Address not found
           schema:
             $ref: "#/definitions/ErrorResponse"
-        "503":
-          description: Internal Server Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
         default:
           description: Error
           schema:
@@ -753,10 +667,6 @@ paths:
           description: Address not found
           schema:
             $ref: "#/definitions/ErrorResponse"
-        "503":
-          description: Internal Server Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
         default:
           description: Error
           schema:
@@ -765,7 +675,7 @@ paths:
     x-swagger-router-controller: entity.controller
     post:
       description: Receive the presentation from wallet
-      operationId: addReceiverPresentation
+      operationId: recivePresentationData
       parameters:
         - name: presentation
           in: body
@@ -791,10 +701,6 @@ paths:
           description: Address not found
           schema:
             $ref: "#/definitions/ErrorResponse"
-        "503":
-          description: Internal Server Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
         default:
           description: Error
           schema:
@@ -803,7 +709,7 @@ paths:
     get:
       x-swagger-router-controller: entity.controller
       description: Get all the presentations available for the user with the status {Valid, Received, AskDeletion, DeletionConfirmation}
-      operationId: getSubjectpresentationListFromIssuer
+      operationId: getSubjectPresentationListFromIssuer
       parameters:
         - name: subjectDID
           in: path
@@ -821,10 +727,6 @@ paths:
             $ref: "#/definitions/ErrorResponse"
         "404":
           description: Address not found
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "503":
-          description: Internal Server Error
           schema:
             $ref: "#/definitions/ErrorResponse"
         default:
@@ -858,10 +760,6 @@ paths:
             $ref: "#/definitions/ErrorResponse"
         "404":
           description: Address not found
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "503":
-          description: Internal Server Error
           schema:
             $ref: "#/definitions/ErrorResponse"
         default:
@@ -899,10 +797,6 @@ paths:
           description: presentation not found
           schema:
             $ref: "#/definitions/ErrorResponse"
-        "503":
-          description: Internal Server Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
         default:
           description: Error
           schema:
@@ -932,10 +826,6 @@ paths:
             $ref: "#/definitions/ErrorResponse"
         "404":
           description: Address not found
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "503":
-          description: Internal Server Error
           schema:
             $ref: "#/definitions/ErrorResponse"
         default:
@@ -1066,7 +956,9 @@ definitions:
   presentationList:
     properties:
       list:
-        type: object
+        type: array
+        items:
+          type: string
   updatePresentationData:
     properties:
       newStatus:
