@@ -92,6 +92,7 @@ module.exports = {
   getSubjectCredentialStatus,
   createPresentationRequest,
   getSubjectPresentationList,
+  getSubjectPresentationStatus,
 }
 
 /////////////////////////////////////////////////////////
@@ -336,13 +337,14 @@ async function createCredential(identityDID, credentials) {
     let credentialsTXSigned = []
     let sendCredentialTX = []
     credentials.map(async credential => {
+      let credentialSubject = {}
       const currentDate = Math.floor(Date.now() / 1000);
       const expDate = currentDate + 600;
       let jti = Math.random().toString(36).substring(2)
-      let credentialSubject = {
-        field_name: user.userData[credential.field_name],
-        credentialFormat: typeof user.userData[credential.field_name]
-      }
+      credentialSubject.field_name = credential.field_name
+      credentialSubject[credential.field_name] = (credential.field_name === 'name') ? `${user.userData[credential.field_name]} ${user.userData.surname}` : user.userData[credential.field_name]
+      credentialSubject.credentialFormat = typeof user.userData[credential.field_name]
+      credentialSubject.levelOfAssurance = 'High'
       let credentialObject = tokenHelper.createCredential(myConfig.entityDID, myConfig.entityDID, identityDID,
                                                                 myConfig.context, credentialSubject, expDate, currentDate, jti)
       let credentialSigned = tokenHelper.signJWT(credentialObject, myConfig.entityPrivateKey)
@@ -376,7 +378,6 @@ async function getSubjectCredentialStatus(subjectDID, subjectPSMHash) {
     let statusObject = await web3.eth.call(credentialStatusCall)
     let resultStatus = await web3.eth.abi.decodeParameters(['bool', 'uint8'], statusObject)
     if(!resultStatus[0]) {
-      log.error(`${serviceName}[${getSubjectCredentialStatus.name}] -----> Credential not exist`)
       throw "Credential not exist"
     }
     log.info(`${serviceName}[${getSubjectCredentialStatus.name}] -----> Obtained status`)
@@ -391,13 +392,9 @@ async function getSubjectCredentialStatus(subjectDID, subjectPSMHash) {
 async function updateIssuerCredentialStatus(updateData) {
   try {
     log.info(`${serviceName}[${createPresentationRequest.name}] -----> IN ...`)
-    console.log('updateData -----> ', updateData)
     let updateTX = transactionFactory.credentialRegistry.updateCredentialStatus(web3, updateData.credentialHash, updateData.status)
-    console.log('updateTX -----> ', updateTX)
     let updateTXSigned = await issuerGetKnownTransaction(updateTX)
-    console.log('updateTXSigned -----> ', updateTXSigned)
     let sendUpdateTX = await sendSigned(updateTXSigned)
-    console.log('Send update TX', sendUpdateTX)
     let issuerCredentialUpdated = await getIssuerCredentialStatus(myConfig.entityDID, updateData.credentialHash)
     let updatedStatus = issuerCredentialUpdated
     log.info(`${serviceName}[${createPresentationRequest.name}] -----> Credential status updated`)
@@ -432,7 +429,7 @@ async function createPresentationRequest(requestData) {
     const expDate = currentDate + 600;
     let jti = Math.random().toString(36).substring(2)
     let objectRequest = tokenHelper.createPresentationRequest(myConfig.entityDID, myConfig.entityDID, myConfig.context,
-                                                                   `${myConfig.callbackUrl}alastria/presentationRequest`, myConfig.procHash, requestData,
+                                                                   `${myConfig.callbackUrl}alastria/presentation`, myConfig.procHash, requestData,
                                                                     expDate, currentDate, jti)
     let presentationRequest = tokenHelper.signJWT(objectRequest, myConfig.entityPrivateKey)
     return presentationRequest
@@ -443,70 +440,39 @@ async function createPresentationRequest(requestData) {
   }
 }
 
-function addIssuerCredential(params) {
-  return new Promise((resolve, reject) => {
-    log.info(`${serviceName}[${addIssuerCredential.name}] -----> IN ...`)
-    log.debug(`${serviceName}[${addIssuerCredential.name}] -----> Calling addIssuer credential With params: ${JSON.stringify(params)}`)
-    let issuerCredential = transactionFactory.credentialRegistry.addIssuerCredential(web3, params.issuerCredentialHash)
-    issuerGetKnownTransaction(issuerCredential)
-    .then(issuerCredentialSigned => {
-      sendSigned(issuerCredentialSigned)
-      .then(receipt => {
-        let issuerCredentialTransaction = transactionFactory.credentialRegistry.getIssuerCredentialStatus(web3, params.issuer, params.issuerCredentialHash)
-        web3.eth.call(issuerCredentialTransaction)
-        .then(IssuerCredentialStatus => {
-          let result = web3.eth.abi.decodeParameters(["bool", "uint8"], IssuerCredentialStatus)
-          let credentialStatus = {
-            "exists": result[0],
-            "status": result[1]
-          }
-          log.info(`${serviceName}[${addIssuerCredential.name}] -----> Success`)
-          resolve(credentialStatus)
-
-        })
-        .catch(error => {
-          log.error(`${serviceName}[${addIssuerCredential.name}] -----> ${error}`)
-          reject(error)
-        })
-      })
-      .catch(error => {
-        log.error(`${serviceName}[${addIssuerCredential.name}] -----> ${error}`)
-        reject(error)
-      })
-    })
-    .catch(error => {
-      log.error(`${serviceName}[${addIssuerCredential.name}] -----> ${error}`)
-      reject(error)
-    })
-  })
+async function getSubjectPresentationList(subjectDID) {
+  try {
+    log.info(`${serviceName}[${getSubjectPresentationList.name}] -----> IN ...`)
+    let listTX = transactionFactory.presentationRegistry.getSubjectPresentationList(web3, subjectDID.split(':')[4])
+    let listCall = await web3.eth.call(listTX)
+    let listDecoded = web3.eth.abi.decodeParameters(['uint256', 'bytes32[]'], listCall)
+    let presentationList = listDecoded[1]
+    log.info(`${serviceName}[${getSubjectPresentationList.name}] -----> Obtained presentation list`)
+    return presentationList
+  }
+  catch(error) {
+    log.error(`${serviceName}[${createPresentationRequest.name}] -----> ${error}`)
+    throw error
+  }
 }
 
-function getPresentationStatus(subject, issuer, presentationHash) {
-  return new Promise((resolve, reject) => {
-    log.info(`${serviceName}[${getPresentationStatus.name}] -----> IN ...`)
-    let presentationStatus = null;
-    if (issuer != null) {
-      presentationStatus = transactionFactory.presentationRegistry.getReceiverPresentationStatus(web3, issuer.split(':')[4], presentationHash);
-    } else if (subject != null) {
-      presentationStatus = transactionFactory.presentationRegistry.getSubjectPresentationStatus(web3, subject.split(':')[4], presentationHash);
+async function getSubjectPresentationStatus(subjectDID, subejectPresentationHash) {
+  try {
+    log.info(`${serviceName}[${getSubjectPresentationStatus.name}] -----> IN ...`)
+    let statusTX = transactionFactory.presentationRegistry.getSubjectPresentationStatus(web3, subjectDID.split(':')[4], subejectPresentationHash)
+    let statusCall = await web3.eth.call(statusTX)
+    let statusDecoded = web3.eth.abi.decodeParameters(['bool', 'uint8'], statusCall)
+    console.log(statusDecoded)
+    if(!statusDecoded[0]) {
+      throw 'Presentation not registered'
     }
-    if (presentationStatus != null) {
-      web3.eth.call(presentationStatus)
-      .then(result => {
-        let resultStatus = web3.eth.abi.decodeParameters(["bool", "uint8"], result)
-        let resultStatusJson = {
-          exist: resultStatus[0],
-          status: resultStatus[1]
-        }
-        log.info(`${serviceName}[${getPresentationStatus.name}] -----> Presentation Status Success`)
-        resolve(resultStatusJson);
-      })
-      .catch(error => {
-        log.error(`${serviceName}[${getPresentationStatus.name}] -----> ${error}`)
-        reject(error)
-      })
-    }
-  });
+    log.info(`${serviceName}[${getSubjectPresentationStatus.name}] -----> Presentation status getted`)
+    return statusDecoded[1]
+  }
+  catch(error) {
+    log.error(`${serviceName}[${getSubjectPresentationStatus.name}] -----> ${error}`)
+    throw error
+  }
 }
 
 function updateReceiverPresentationStatus(presentationHash, newStatus) {

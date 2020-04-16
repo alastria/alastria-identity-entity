@@ -354,41 +354,24 @@ function getSubjectPresentationListFromIssuer(req, res) {
   })
 }
 
-function getPresentationStatus(req, res){
-  try {
-    log.info(`${controller_name}[${getPresentationStatus.name}] -----> IN ...`);
-    let presentationHash = req.swagger.params.presentationHash.value;
-    log.debug(`${controller_name}[${getPresentationStatus.name}] -----> Sending params: ${JSON.stringify(presentationHash)}`)
-    let issuer = req.swagger.params.serviceProvider.value;
-    let subject = req.swagger.params.subject.value;
-    entityService.getPresentationStatus(presentationHash,issuer,subject)
-    .then(presentationStatus => { 
-      if (presentationStatus != null){
-        log.info(`${controller_name}[${getPresentationStatus.name}] -----> Successfully obtained presentation status`);
-        res.status(200).send(presentationStatus);
-      }
-      else {
-        log.error(`${controller_name}[${getPresentationStatus.name}] -----> Error: Error getting presentation status`);
-        let msg = {
-          message: 'Error getting presentation status'
-        }
-        res.status(404).send(msg)
-      }        
-    })
-    .catch(error => {
-      log.error(`${controller_name}[${getPresentationStatus.name}] -----> ${error}`);
-      let msg = {
-        message: `${error}`
-      }
-      res.status(400).send(msg)
-    })         
-  } catch (error) {
-    log.error(`${controller_name}[${getPresentationStatus.name}] -----> ${error}`)
-    let msg = {
-      message: `Insternal Server Error: ${error}`
+function getSubjectPresentationStatus(req, res) {
+  log.info(`${controller_name}[${getSubjectPresentationStatus.name}] -----> IN ...`)
+  let subjectPresentationHash = req.swagger.params.subjectPresentationHash.value
+  let subjectDID = req.swagger.params.subjectDID.value
+  log.debug(`${controller_name}[${getSubjectPresentationStatus.name}] -----> Sending params: ${subjectPresentationHash}, ${subjectDID}`)
+  entityService.getSubjectPresentationStatus(subjectDID, subjectPresentationHash)
+  .then(status => {
+    log.info(`${controller_name}[${getSubjectPresentationStatus.name}] -----> Successfully obtained subject presentation status`)
+    let gettedStatus = {
+      presentationStatus: status
     }
-    res.status(503).send(msg)
-  }
+    res.status(200).send(gettedStatus)
+  })
+  .catch(error => {
+    log.error(`${controller_name}[${getSubjectPresentationStatus.name}] -----> ${error}`)
+    Errmsg.message = error
+    res.status(404).send(Errmsg)
+  })
 }
 
 function updateReceiverPresentationStatus(req, res){
