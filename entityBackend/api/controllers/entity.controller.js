@@ -38,6 +38,8 @@ module.exports = {
   createPresentationRequest,
   getSubjectPresentationListFromIssuer,
   getSubjectPresentationStatus,
+  updateReceiverPresentationStatus,
+  getIssuerPresentationStatus,
 }
 
 /////////////////////////////////////////////////////////
@@ -395,37 +397,24 @@ function updateReceiverPresentationStatus(req, res){
   }) 
 }
 
-function getCredentialStatus(req, res){
-  try {
-    log.info(`${controller_name}[${getCredentialStatus.name}] -----> IN ...`);
-    let credentialHash = req.swagger.params.credentialHash.value;
-    let issuer = req.swagger.params.issuer.value;
-    let subject = req.swagger.params.subject.value;
-    log.debug(`${controller_name}[${getCredentialStatus.name}] -----> Sending params: ${JSON.stringify(credentialHash, issuer, subject)}`)
-    entityService.getCredentialStatus(credentialHash, issuer, subject)
-    .then(credentialStatus => { 
-      log.info(`${controller_name}[${getCredentialStatus.name}] -----> Successfully saved the credential`)
-      io.emit('fillYourProfile', {status: 200,
-                                  message: 'Guardada correctamente las credenciales.'})
-      res.status(200).send(credentialStatus);
-      
-    })
-    .catch(error => {
-      log.error(`${controller_name}[${getCredentialStatus.name}] -----> ${JSON.stringify(error.message)}`)
-      let msg = {
-        message: 'Error getting presentation status'
-      }
-      io.emit('error', {status: 404,
-                        message: 'No se ha guardado correctamente la credencial. Vuelva a intentarlo.'})
-      res.status(404).send(msg)
-    })         
-  } catch (error) {
-    log.error(`${controller_name}[${getCredentialStatus.name}] -----> ${error}`)
-    let msg = {
-      message: `Insternal Server Error: ${error}`
+function getIssuerPresentationStatus(req, res) {
+  log.info(`${controller_name}[${getIssuerPresentationStatus.name}] -----> IN ...`)
+  let presentationHash = req.swagger.params.issuerPresentationHash.value
+  let issuerDID = req.swagger.params.issuerDID.value
+  log.debug(`${controller_name}[${getIssuerPresentationStatus.name}] -----> Sending params: ${presentationHash}, ${issuerDID}`)
+  entityService.getIssuerPresentationStatus(issuerDID, presentationHash)
+  .then(status => {
+    console.log(status)
+    let gettedStatus = {
+      presentationStatus: status
     }
-    res.status(503).send(msg)
-  }
+    res.status(200).send(gettedStatus);
+  })
+  .catch(error => {
+    log.error(`${controller_name}[${getIssuerPresentationStatus.name}] -----> ${error}`);
+    Errmsg.message = error
+    res.status(404).send(Errmsg)
+  })
 }
 
 function recivePresentationData(req, res) {

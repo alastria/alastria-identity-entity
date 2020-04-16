@@ -93,6 +93,8 @@ module.exports = {
   createPresentationRequest,
   getSubjectPresentationList,
   getSubjectPresentationStatus,
+  updateReceiverPresentationStatus,
+  getIssuerPresentationStatus,
 }
 
 /////////////////////////////////////////////////////////
@@ -491,39 +493,23 @@ async function updateReceiverPresentationStatus(presentationHash, newStatus) {
   }
 }
 
-function getCredentialStatus(credentialHash, issuer, subject) {
-  return new Promise((resolve, reject) => {
-    log.info(`${serviceName}[${getCredentialStatus.name}] -----> IN ...`)
-    let credentialStatus = null;
-    if (issuer != null) {
-      let didIssuer = issuer.split(':')[4]
-      credentialStatus = transactionFactory.credentialRegistry.getIssuerCredentialStatus(web3, didIssuer, credentialHash);
-    } else if (subject != null) {
-      let didSubject = subject.split(':')[4]
-      credentialStatus = transactionFactory.credentialRegistry.getSubjectCredentialStatus(web3, didSubject, credentialHash);
+async function getIssuerPresentationStatus(issuerDID, presentationHash) {
+  try {
+    log.info(`${serviceName}[${getIssuerPresentationStatus.name}] -----> IN ...`)
+    let statusTX = transactionFactory.presentationRegistry.getReceiverPresentationStatus(web3, issuerDID.split(':')[4], presentationHash)
+    let statusCall = await web3.eth.call(statusTX)
+    let statusDecoded = web3.eth.abi.decodeParameters(['bool', 'uint8'], statusCall)
+    console.log(statusDecoded)
+    if(!statusDecoded[0]) {
+      throw 'Presentation not registered'
     }
-    if (credentialStatus.exists == true) {
-      web3.eth.call(credentialStatus)
-      .then(result => {
-        let resultStatus = web3.eth.abi.decodeParameters(["bool", "uint8"], result)
-        let resultStatusJson = {
-          exist: resultStatus[0],
-          status: resultStatus[1]
-        }
-        log.info(`${serviceName}[${getCredentialStatus.name}] -----> Credential Status Success`)
-        resolve(resultStatusJson);
-      })
-      .catch(error => {
-        log.error(`${serviceName}[${getCredentialStatus.name}] -----> ${error}`)
-        reject(error)
-      })
-    } else {
-      let msg = {
-        message: "Credential not saved"
-      }
-      reject(msg)
-    }
-  })
+    log.info(`${serviceName}[${getIssuerPresentationStatus.name}] -----> Presentation status getted`)
+    return statusDecoded[1]
+  }
+  catch(error) {
+    log.error(`${serviceName}[${getIssuerPresentationStatus.name}] -----> ${error}`)
+    throw error
+  }
 }
 
 function getPresentationData(data) { 
