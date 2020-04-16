@@ -475,27 +475,20 @@ async function getSubjectPresentationStatus(subjectDID, subejectPresentationHash
   }
 }
 
-function updateReceiverPresentationStatus(presentationHash, newStatus) {
-  return new Promise((resolve, reject) => {
+async function updateReceiverPresentationStatus(presentationHash, newStatus) {
+  try {
     log.info(`${serviceName}[${updateReceiverPresentationStatus.name}] -----> IN ...`)
-    let updatepresentationStatus = transactionFactory.presentationRegistry.updateReceiverPresentation(web3, presentationHash, newStatus.newStatus);
-    issuerGetKnownTransaction(updatepresentationStatus)
-    .then(updatepresentationStatusSigned => {
-      sendSigned(updatepresentationStatusSigned)
-      .then(receipt => {
-        log.info(`${serviceName}[${updateReceiverPresentationStatus.name}] -----> Success`)
-        resolve();
-      })
-      .catch(error => {
-        log.error(`${serviceName}[${updateReceiverPresentationStatus.name}] -----> ${error}`)
-        reject(error)
-      })
-    })
-    .catch(error => {
-      log.error(`${serviceName}[${updateReceiverPresentationStatus.name}] -----> ${error}`)
-      reject(error)
-    })
-  })
+    let updatePresentatioTX = transactionFactory.presentationRegistry.updateReceiverPresentation(web3, presentationHash, newStatus)
+    let updatedPresentationTXSigned = await issuerGetKnownTransaction(updatePresentatioTX)
+    let updateSendedTX = await sendSigned(updatedPresentationTXSigned)
+    log.info(`${serviceName}[${updateReceiverPresentationStatus.name}] -----> Presentation updated`)
+    let updatedPresentationStatus = await getIssuerPresentationStatus(myConfig.entityDID, presentationHash)
+    return updatedPresentationStatus
+  }
+  catch(error) {
+    log.error(`${serviceName}[${updateReceiverPresentationStatus.name}] -----> ${error}`)
+    throw error
+  }
 }
 
 function getCredentialStatus(credentialHash, issuer, subject) {

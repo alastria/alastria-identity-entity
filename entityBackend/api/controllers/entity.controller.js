@@ -37,6 +37,7 @@ module.exports = {
   getIssuerCredentialStatus,
   createPresentationRequest,
   getSubjectPresentationListFromIssuer,
+  getSubjectPresentationStatus,
 }
 
 /////////////////////////////////////////////////////////
@@ -375,30 +376,23 @@ function getSubjectPresentationStatus(req, res) {
 }
 
 function updateReceiverPresentationStatus(req, res){
-  try {
-    log.info(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> IN ...`);
-    let presentationHash = req.swagger.params.presentationHash.value;
-    log.debug(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> Sending params: ${JSON.stringify(presentationHash)}`)
-    let newStatus = req.swagger.params.body.value;    
-    entityService.updateReceiverPresentationStatus(presentationHash,newStatus)
-    .then(() => { 
-      log.info(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> Successfully updated status presentation`);
-      res.status(200).send();
-    })
-    .catch(error => {
-      log.error(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> ${error}`);
-      let msg = {
-        message: `${error}`
-      }
-      res.status(404).send(msg)
-    })         
-  } catch (error) {
-    log.error(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> ${error}`)
-    let msg = {
-      message: `${error}`
+  log.info(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> IN ...`);
+  let presentationHash = req.swagger.params.presentationHash.value;
+  let newStatus = req.swagger.params.status.value.newStatus;
+  log.debug(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> Sending params: ${presentationHash}, ${newStatus}`)
+  entityService.updateReceiverPresentationStatus(presentationHash, newStatus)
+  .then(status => { 
+    log.info(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> Successfully updated status presentation`);
+    let gettedStatus = {
+      presentationStatus: status
     }
-    res.status(503).send(msg)
-  }
+    res.status(200).send(gettedStatus);
+  })
+  .catch(error => {
+    log.error(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> ${error}`);
+    Errmsg.message = error
+    res.status(404).send(Errmsg)
+  }) 
 }
 
 function getCredentialStatus(req, res){
