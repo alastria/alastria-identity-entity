@@ -95,6 +95,7 @@ module.exports = {
   getSubjectPresentationStatus,
   updateReceiverPresentationStatus,
   getIssuerPresentationStatus,
+  getPresentationData
 }
 
 /////////////////////////////////////////////////////////
@@ -512,49 +513,32 @@ async function getIssuerPresentationStatus(issuerDID, presentationHash) {
   }
 }
 
-function getPresentationData(data) { 
-  return new Promise((resolve, reject) => {
-    log.info(`${serviceName}[${getPresentationData.name}] -----> IN ...`) 
-    let presentationSigned = data
-    let subjectDID = presentationSigned.header.kid
-    let subjectPSMHash = presentationSigned.payload.vp.procHash
-    getPresentationStatus(subjectDID, null, subjectPSMHash)
-    .then(status => {
-      log.debug(`${serviceName}[${getPresentationData.name}] -----> STATUS: ${JSON.stringify(status)}`)
-      if (status.exist) {
-        getCurrentPublicKey(subjectDID)
-        .then(subjectPublicKey => {
-          let publicKey = subjectPublicKey[0]
-          let credentials = []
-          let verifiableCredential = presentationSigned.payload.vp.verifiableCredential
-          verifiableCredential.map( item => {
-            let verifyCredential = tokenHelper.verifyJWT(item, `04${publicKey}`)
-            if(verifyCredential == true) {
-              let credential = tokenHelper.decodeJWT(item)
-              credentials.push(JSON.parse(credential.payload).vc.credentialSubject)
-            } else {
-              log.error(`${serviceName}[${getPresentationData.name}] -----> Error verifying Credential JWT`)
-              reject(verifyCredential)
-            }
-          })
-          log.info(`${serviceName}[${getPresentationData.name}] -----> Credential obtained Success`)
-          resolve(credentials)
-        })
-        .catch(error => {
-          log.error(`${serviceName}[${getPresentationData.name}] -----> ${error}`)
-          reject(error)
-        })
-      } else {
-        let msg = {
-          message: 'Presentation not registered'
-        }
-        log.error(`${serviceName}[${getPresentationData.name}] -----> ${msg.message}`)
-        reject(msg)
+async function getPresentationData(presentationData, presentationPSMHash) {
+  try {
+    log.info(`${serviceName}[${getPresentationData.name}] -----> IN ...`)
+    let credentials = []
+    let presentationDecoded = tokenHelper.decodeJWT(presentationData)
+    let subjectPublicKey = await getCurrentPublicKey(presentationDecoded.header.kid)
+    let presentationVerified = tokenHelper.verifyJWT(presentationData, subjectPublicKey)
+    if(!presentationVerified) {
+      throw 'Presentation not verified'
+    }
+    let issuerPresentationPSMHash = tokenHelper.psmHash(web3, presentationData, myConfig.entityDID)
+    let subjectPresentationStatus = await getSubjectPresentationStatus(presentationDecoded.header.kid, presentationPSMHash)
+    let updatePresentationStatus = await updateReceiverPresentationStatus(issuerPresentationPSMHash, 2)
+    let verifiableCredential = presentationDecoded.payload.vp.verifiableCredential
+    verifiableCredential.map(item => {
+      let verifyCredential = tokenHelper.verifyJWT(item, subjectPublicKey)
+      if(!verifyCredential) {
+        throw 'Error verifying Credential JWT'
       }
+      let credential = tokenHelper.decodeJWT(item)
+      credentials.push(credential.payload.vc.credentialSubject)
     })
-    .catch(error => {
-      log.error(`${serviceName}[${getPresentationData.name}] -----> ${error}`)
-      reject(error)
-    })
-  }) 
+    return credentials
+  }
+  catch(error) {
+    log.error(`${serviceName}[${getPresentationData.name}] -----> ${error}`)
+    throw error
+  }
 }

@@ -40,6 +40,7 @@ module.exports = {
   getSubjectPresentationStatus,
   updateReceiverPresentationStatus,
   getIssuerPresentationStatus,
+  recivePresentationData
 }
 
 /////////////////////////////////////////////////////////
@@ -418,65 +419,24 @@ function getIssuerPresentationStatus(req, res) {
 }
 
 function recivePresentationData(req, res) {
-  try {
-    log.info(`${controller_name}[${recivePresentationData.name}] -----> IN ...`);
-    let presentationSigned = req.swagger.params.presentation.value
-    log.debug(`${controller_name}[${recivePresentationData.name}] -----> Sending params: ${JSON.stringify(req.swagger.params.presentation.value)}`)
-    entityService.getPresentationData(presentationSigned)
-    .then(subjectData => {
-      log.info(`${controller_name}[${recivePresentationData.name}] -----> Successfully obtained presentation data`);
-      io.emit('getPresentationData', {status: 200,
-                                      message: subjectData})
-      res.status(200).send(subjectData)
-    })
-    .catch(error => {
-      let message = (error == false) ? 'Clave pública no válida' : 'Error obteniendo los datos de la presentación'
-      let msg = {
-        message: `${error}`
-      }
-      log.error(`${controller_name}[${recivePresentationData.name}] -----> Error: ${message}`);
-      io.emit('error', {status: 400,
-                        message: msg.message})
-      res.status(400).send(msg)
-    })
-  }
-  catch(error) {
-    log.error(`${controller_name}[${recivePresentationData.name}] -----> Error: ${error}`);
-    let msg = {
-      message: 'Internal server error'
-    }
-    io.emit('error', {status: 503,
-                      message: msg.message})
-    res.status(503).send(msg)
-  }
+  log.info(`${controller_name}[${recivePresentationData.name}] -----> IN ...`);
+  console.log(req.swagger.params.presentation.value)
+  let presentationSigned = req.swagger.params.presentation.value
+  let presentationHash = req.swagger.params.presentationRequestHash.value
+  log.debug(`${controller_name}[${recivePresentationData.name}] -----> Sending params: ${presentationSigned}, ${presentationHash}`)
+  entityService.getPresentationData(presentationSigned, presentationHash)
+  .then(subjectData => {
+    log.info(`${controller_name}[${recivePresentationData.name}] -----> Successfully obtained presentation data`);
+    io.emit('getPresentationData', {status: 200,
+                                    message: subjectData})
+    res.status(200).send(subjectData)
+  })
+  .catch(error => {
+    Errmsg.message = (error == false) ? 'Clave pública no válida' : 'Error obteniendo los datos de la presentación'
+    log.error(`${controller_name}[${recivePresentationData.name}] -----> ${Errmsg.message}`);
+    io.emit('error', {status: 400,
+                      message: Errmsg.message})
+    res.status(400).send(Errmsg)
+  })
 }
 
-function verifyAlastriaSession(req, res) {
-  try {
-    log.info(`${controller_name}[${verifyAlastriaSession.name}] -----> IN ...`)
-    let alastriaSession = req.swagger.params.alastriaSession.value
-    log.debug(`${controller_name}[${verifyAlastriaSession.name}] -----> Sending params: ${JSON.stringify(alastriaSession)}`)
-    entityService.verifyAlastriaSession(alastriaSession)
-    .then(verified => {
-      log.info(`${controller_name}[${verifyAlastriaSession.name}] -----> Alastria Sesion verified successfuly`)
-      io.emit('session', verified)
-      res.status(200).send(verified)
-    })
-    .catch(error => {
-      log.error(`${controller_name}[${verifyAlastriaSession.name}] -----> Error: ${error}`)
-    let msg = {
-      message: `${error}`
-    }
-    io.emit('error', {status: 401,
-                      message: msg.message})
-    res.status(401).send(msg)
-    })
-  }
-  catch(error) {
-    log.error(`${controller_name}[${verifyAlastriaSession.name}] -----> Error: ${error}`)
-    let msg = {
-      message: `${error}`
-    }
-    res.status(503).send(msg)
-  }
-}
