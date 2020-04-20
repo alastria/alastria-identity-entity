@@ -344,10 +344,8 @@ async function createCredential(identityDID, credentials) {
       const currentDate = Math.floor(Date.now() / 1000);
       const expDate = currentDate + 600;
       let jti = Math.random().toString(36).substring(2)
+      credentialSubject.levelOfAssurance = 2
       credentialSubject[credential.field_name] = (credential.field_name === 'name') ? `${user.userData[credential.field_name]} ${user.userData.surname}` : user.userData[credential.field_name]
-      credentialSubject.levelOfAssurance = 'High'
-      credentialSubject.credentialFormat = typeof user.userData[credential.field_name]
-      credentialSubject.field_name = credential.field_name
       let credentialObject = tokenHelper.createCredential(myConfig.entityDID, myConfig.entityDID, identityDID,
                                                                 myConfig.context, credentialSubject, expDate, currentDate, jti)
       let credentialSigned = tokenHelper.signJWT(credentialObject, myConfig.entityPrivateKey)
