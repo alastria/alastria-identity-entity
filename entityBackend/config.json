@@ -45,5 +45,7 @@
   "callbackUrl": "http://localhost:10010/v1/entity/",
   "entityEthAddress": "0xa9728125c573924b2b1ad6a8a8cd9bf6858ced49",
   "entityPrivateKey": "0d50e021f2a91af45e10ae26b77340f876e7ad06d17c00aa0ba899760b5ebded", 
-  "entityPublicKey": "356e3fce435d8729062e52d263c0c705b3c5e201a9a9608cdb070764e6b8df30ae8423b439a7af2bcc3529778341ab06c1e44411352f217b68ce44a673a1df63"
+  "entityPublicKey": "356e3fce435d8729062e52d263c0c705b3c5e201a9a9608cdb070764e6b8df30ae8423b439a7af2bcc3529778341ab06c1e44411352f217b68ce44a673a1df63",
+  "authKeyToken": "qwertyuiopasdfghjklzxcvbnm123456",
+  "keyManagerUrl": ""
 }

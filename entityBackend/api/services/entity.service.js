@@ -21,7 +21,7 @@ log.level = myConfig.Log.level
 /////////////////////////////////////////////////////////
 ///////             PRIVATE FUNCTIONS             ///////
 /////////////////////////////////////////////////////////
-        
+     
 async function sendSigned(transactionSigned) {
   log.info(`${serviceName}[${sendSigned.name}] -----> IN ...`)
   let result = await web3.eth.sendSignedTransaction(transactionSigned)
@@ -344,10 +344,10 @@ async function createCredential(identityDID, credentials) {
       const currentDate = Math.floor(Date.now() / 1000);
       const expDate = currentDate + 600;
       let jti = Math.random().toString(36).substring(2)
-      credentialSubject.field_name = credential.field_name
       credentialSubject[credential.field_name] = (credential.field_name === 'name') ? `${user.userData[credential.field_name]} ${user.userData.surname}` : user.userData[credential.field_name]
-      credentialSubject.credentialFormat = typeof user.userData[credential.field_name]
       credentialSubject.levelOfAssurance = 'High'
+      credentialSubject.credentialFormat = typeof user.userData[credential.field_name]
+      credentialSubject.field_name = credential.field_name
       let credentialObject = tokenHelper.createCredential(myConfig.entityDID, myConfig.entityDID, identityDID,
                                                                 myConfig.context, credentialSubject, expDate, currentDate, jti)
       let credentialSigned = tokenHelper.signJWT(credentialObject, myConfig.entityPrivateKey)
@@ -394,17 +394,17 @@ async function getSubjectCredentialStatus(subjectDID, subjectPSMHash) {
 
 async function updateIssuerCredentialStatus(updateData) {
   try {
-    log.info(`${serviceName}[${createPresentationRequest.name}] -----> IN ...`)
+    log.info(`${serviceName}[${updateIssuerCredentialStatus.name}] -----> IN ...`)
     let updateTX = transactionFactory.credentialRegistry.updateCredentialStatus(web3, updateData.credentialHash, updateData.status)
     let updateTXSigned = await issuerGetKnownTransaction(updateTX)
     let sendUpdateTX = await sendSigned(updateTXSigned)
     let issuerCredentialUpdated = await getIssuerCredentialStatus(myConfig.entityDID, updateData.credentialHash)
     let updatedStatus = issuerCredentialUpdated
-    log.info(`${serviceName}[${createPresentationRequest.name}] -----> Credential status updated`)
+    log.info(`${serviceName}[${updateIssuerCredentialStatus.name}] -----> Credential status updated`)
     return updatedStatus
   }
   catch(error) {
-    log.error(`${serviceName}[${createPresentationRequest.name}] -----> ${error}`)
+    log.error(`${serviceName}[${updateIssuerCredentialStatus.name}] -----> ${error}`)
     throw error
   }
 }
@@ -500,7 +500,6 @@ async function getIssuerPresentationStatus(issuerDID, presentationHash) {
     let statusTX = transactionFactory.presentationRegistry.getReceiverPresentationStatus(web3, issuerDID.split(':')[4], presentationHash)
     let statusCall = await web3.eth.call(statusTX)
     let statusDecoded = web3.eth.abi.decodeParameters(['bool', 'uint8'], statusCall)
-    console.log(statusDecoded)
     if(!statusDecoded[0]) {
       throw 'Presentation not registered'
     }

@@ -6,6 +6,7 @@
 
 const web3Helper = require('./api/helpers/web3.helper')
 const configHelper = require('./api/helpers/config.helper')
+const wsHelper = require('./api/helpers/ws.helper')
 const SwaggerExpress = require('swagger-express-mw');
 const app = require('express')();
 const Log = require('log4js')
@@ -14,14 +15,16 @@ const cors = require('cors')
 const io = require('socket.io')()
 const pathFile = 'config.json'
 const log = Log.getLogger()
-const wsHelper = require('./api/helpers/ws.helper')
+
+const configHost = process.env.CONFIG_HOST
+const configPath = process.env.CONFIG_PATH
 
 /////////////////////////////////////////////////////////
 ///////              PUBLIC FUNCTIONS             ///////
 /////////////////////////////////////////////////////////
 
 let myConfig = {}
-let nodeurl = ''
+let nodeurl, keyManagerUrl
 
 // module.exports = app; // for testing
 
@@ -31,15 +34,10 @@ loadJsonFile(pathFile)
   configHelper.setConfig(config)
   myConfig = configHelper.getConfig()
   log.level = myConfig.Log.level
+  const utils = require('./api/helpers/utils.helper')
   log.debug(`[App] -----> Congif getted ${JSON.stringify(myConfig)}`)
-  
-  if(!process.env.NODE_ENDPOINT) {
-    nodeurl = myConfig.nodeUrl.alastria // change to local or alastria when yo are developing (swagger project start)
-  } else if(process.env.NODE_ENDPOINT == 'localEndpoint') {
-    nodeurl = myConfig.nodeUrl.local
-  } else if(process.env.NODE_ENDPOINT == 'alastria') {
-    nodeurl = myConfig.nodeUrl.alastria
-  }
+ 
+  nodeurl = myConfig.nodeUrl.alastria
   log.info(`[App] -----> Connected via RPC to ${nodeurl}`)
   
   web3Helper.instanceWeb3(nodeurl)
@@ -48,9 +46,6 @@ loadJsonFile(pathFile)
     const server = myConfig.socketPort
     io.attach(server)
 
-    // io.on('connect', (socket) => {
-    //   log.info(`[App] -----> Websocket ${socket.id} attached`)
-    // })
     const CLIENTS = []
 
     io.on('connect', ws => {
@@ -78,17 +73,36 @@ loadJsonFile(pathFile)
     SwaggerExpress.create(config, function(err, swaggerExpress) {
       if (err) { throw err; }
     
-      // install middleware
-      swaggerExpress.register(app);
-    
+      
       var port = process.env.PORT || 10010;
       app.listen(port, function(){
         log.info(`[App] -----> Server started in http://localhost:${port}`)
       });
-  
+      
       // Enable CORS
       app.use(cors());
-  
+      
+      // Auth
+      app.all('*', (req, res, next) => {
+        let tokenJWT = req.headers['authorization']
+        if(!tokenJWT) {
+          log.error(`[App] -----> It is necessary to provide an authentication token`)
+          res.status(401).send('Error: It is necessary to provide an authentication token')
+        } else {
+          let keymanager = myConfig.keyManagerUrl
+          utils.getKeyManager(keymanager)
+          .then(publicKey => {
+            utils.verifyJWT(tokenJWT, publicKey)
+            .then(validated => {
+              log.info(`[App] -----> Server started in http://localhost:${port}`)
+              next()
+            })
+          })
+        }
+      })
+      
+      // install middleware
+      swaggerExpress.register(app);
     });
   })
 })
