@@ -33,19 +33,15 @@ async function getKeyManager(keymanager) {
     let httpAgent = new http.Agent({
       rejectUnauthorized: false
     })
-    if(!keymanager) { // quitar este IF cuando este funcionando el key manager
-     return 'qwertyuiopasdfghjklzxcvbnm123456' 
-    } else {
-      let myKey = await axios.get(keymanager, { httpAgent })
-      if(!myKey) {
-        let error = 'Cannot get Key'
-        log.error(`${helper_name}[${getKeyManager.name}] -----> ${error}`)
-        throw error
-      }
-      let publicKey = ['-----BEGIN PUBLIC KEY-----', myKey.data.key, '-----END PUBLIC KEY-----'].join('\n')
-      log.info(`${helper_name}[${getKeyManager.name}] -----> Public Key Getted`)
-      return publicKey
+    let myKey = await axios.get(keymanager, { httpAgent })
+    if(!myKey) {
+      let error = 'Cannot get Key'
+      log.error(`${helper_name}[${getKeyManager.name}] -----> ${error}`)
+      throw error
     }
+    let publicKey = ['-----BEGIN PUBLIC KEY-----', myKey.data.key, '-----END PUBLIC KEY-----'].join('\n')
+    log.info(`${helper_name}[${getKeyManager.name}] -----> Public Key Getted`)
+    return publicKey
   }
   catch(error) {
     log.error(`${helper_name}[${getKeyManager.name}] -----> ${error}`)

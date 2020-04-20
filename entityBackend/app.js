@@ -85,20 +85,28 @@ loadJsonFile(pathFile)
       // Auth
       app.all('*', (req, res, next) => {
         let tokenJWT = req.headers['authorization']
+        keyManagerUrl = myConfig.keyManagerUrl
         if(!tokenJWT) {
-          log.error(`[App] -----> It is necessary to provide an authentication token`)
-          res.status(401).send('Error: It is necessary to provide an authentication token')
+          let error = 'It is necessary to provide an authentication token'
+          log.error(`[App] -----> ${error}`)
+          res.status(401).send(`Error: ${error}`)
         } else {
-          let keymanager = myConfig.keyManagerUrl
-          utils.getKeyManager(keymanager)
-          .then(publicKey => {
-            utils.verifyJWT(tokenJWT, publicKey)
-            .then(validated => {
-              log.info(`[App] -----> Server started in http://localhost:${port}`)
-              next()
-            })
-          })
-        }
+          // if(keyManagerUrl == '') {
+          //   let error = 'It is necessary to provide a key manager URL'
+          //   log.error(`[App] -----> ${error}`)
+          //   res.status(404).send(`Error: ${error}`)
+          // } else {
+            // utils.getKeyManager(keyManagerUrl)
+            // .then(publicKey => {
+              let publicKey = myConfig.authKeyToken   // Remove when keymanager works
+              utils.verifyJWT(tokenJWT, publicKey)
+              .then(validated => {
+                log.info(`[App] -----> Server started in http://localhost:${port}`)
+                next()
+              })
+            // })
+          }
+        // }
       })
       
       // install middleware
