@@ -12,6 +12,7 @@ import { UserFormComponent } from 'src/app/components/common/user-form/user-form
 import { UserService } from 'src/app/services/user/user.service';
 import { SocketService } from 'src/app/services/socket/socket.service';
 import { AlastriaLibService } from 'src/app/services/alastria-lib/alastria-lib.service';
+import { EntityService } from 'src/app/services/entity/entity.service'
 
 // MODELS
 import { User } from 'src/app/models/user/user.model';
@@ -127,7 +128,8 @@ export class ProfileComponent implements OnInit {
               private alastriaLibService: AlastriaLibService,
               private http: HttpClient,
               private changeDetector: ChangeDetectorRef,
-              private deviceDetectorService: DeviceDetectorService) {
+              private deviceDetectorService: DeviceDetectorService,
+              private entityService: EntityService) {
     this.isDesktop = this.deviceDetectorService.isDesktop();
   }
 
@@ -286,21 +288,8 @@ export class ProfileComponent implements OnInit {
   }
 
   private async createAlastriaToken(): Promise<string> {
-    const currentDate = Math.floor(Date.now() / 1000);
-    const expDate = currentDate + 600;
-    const alastriaLibJson: any = await this.http.get(alastriaLibJsonUrl).toPromise();
-    const config = {
-      did: alastriaLibJson.header.kid,
-      providerUrl: alastriaLibJson.openAccess,
-      callbackUrl: `${environment.callbackUrl}/entity/alastria/identity`,
-      alastriaNetId: 'redT',
-      tokenExpTime: expDate,
-      tokenActivationDate: currentDate,
-      jsonTokenId: Math.random().toString(36).substring(2)
-    };
-    const alastriaToken = this.alastriaLibService.createAlastriaToken(config);
-
-    return this.alastriaLibService.signJWT(alastriaToken, alastriaLibJson.privateKey);
+    let alastriaToken = await this.entityService.createAlastriaToken();
+    return alastriaToken;
   }
 
   private async createCredentials(fields: Array<string>) {

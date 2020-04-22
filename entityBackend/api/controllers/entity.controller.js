@@ -53,7 +53,10 @@ function createAlastriaToken(req, res) {
   entityService.createAlastriaToken()
   .then(AT => {
     log.info(`${controller_name}[${createAlastriaToken.name}] -----> Created Alastria Token`)
-    res.status(200).send(AT)
+    let token = {
+      AT
+    }
+    res.status(200).send(token)
   })
   .catch(error => {
     log.error(`${controller_name}[${createAlastriaToken.name}] -----> ${error}`)

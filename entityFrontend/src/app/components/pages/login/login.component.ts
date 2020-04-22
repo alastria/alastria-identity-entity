@@ -5,7 +5,6 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { environment } from 'src/environments/environment';
 
 // SERVICES
 import { UserService } from 'src/app/services/user/user.service';
@@ -14,6 +13,7 @@ import { AlastriaLibService } from 'src/app/services/alastria-lib/alastria-lib.s
 // MODELS
 import { User } from 'src/app/models/user/user.model';
 import { Event } from 'src/app/models/enums/enums.model';
+import { EntityService } from 'src/app/services/entity/entity.service';
 
 declare var $: any;
 const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
@@ -56,6 +56,7 @@ const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
               private userService: UserService,
               private socketService: SocketService,
               private alastriaLibService: AlastriaLibService,
+              private entityService: EntityService,
               private http: HttpClient) { }
 
   ngOnInit() {
@@ -137,21 +138,8 @@ const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
   }
 
   private async createAlastriaToken(): Promise<string> {
-    const currentDate = Math.floor(Date.now() / 1000);
-    const expDate = currentDate + 600;
-    const alastriaLibJson: any = await this.http.get(alastriaLibJsonUrl).toPromise();
-    const config = {
-      did: alastriaLibJson.header.kid,
-      providerUrl: alastriaLibJson.openAccess,
-      callbackUrl: `${environment.callbackUrl}/entity/alastriaToken`,
-      alastriaNetId: 'redT',
-      tokenExpTime: expDate,
-      tokenActivationDate: currentDate,
-      jsonTokenId: Math.random().toString(36).substring(2)
-    };
-    const alastriaToken = this.alastriaLibService.createAlastriaToken(config);
-
-    return this.alastriaLibService.signJWT(alastriaToken, alastriaLibJson.privateKey);
+    let alastriaToken = await this.entityService.createAlastriaToken();
+    return alastriaToken;
   }
 
   /**

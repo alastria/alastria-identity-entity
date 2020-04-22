@@ -4,6 +4,7 @@ import { environment } from 'src/environments/environment';
 
 // SERVICES
 import { AlastriaLibService } from 'src/app/services/alastria-lib/alastria-lib.service';
+import { EntityService } from 'src/app/services/entity/entity.service'
 
 const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
 
@@ -42,7 +43,9 @@ export class CreateAlastriaIdComponent implements OnInit {
   qrAlastriaId: string;
 
   constructor(private http: HttpClient,
-              private alastriaLibService: AlastriaLibService) { }
+              private alastriaLibService: AlastriaLibService,
+              private entityService: EntityService){ }
+              
 
   ngOnInit() {
   }
@@ -90,21 +93,7 @@ export class CreateAlastriaIdComponent implements OnInit {
   }
 
   private async createAlastriaToken(): Promise<string> {
-    const currentDate = Math.floor(Date.now() / 1000);
-    const expDate = currentDate + 600;
-    const alastriaLibJson: any = await this.http.get(alastriaLibJsonUrl).toPromise();
-    const config = {
-      did: alastriaLibJson.header.kid,
-      providerUrl: alastriaLibJson.openAccess,
-      callbackUrl: (this.type === 'C') ? `${environment.callbackUrl}/entity/alastria/identity`
-        : `${environment.callbackUrl}/entity/alastriaToken`,
-      alastriaNetId: 'redT',
-      tokenExpTime: expDate,
-      tokenActivationDate: currentDate,
-      jsonTokenId: Math.random().toString(36).substring(2)
-    };
-    const alastriaToken = this.alastriaLibService.createAlastriaToken(config);
-
-    return this.alastriaLibService.signJWT(alastriaToken, alastriaLibJson.privateKey);
+    let alastriaToken = await this.entityService.createAlastriaToken();
+    return alastriaToken;
   }
 }

@@ -1,23 +1,40 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { HttpHeaders } from '@angular/common/http'
 
 // Models
 import { Identity } from 'src/app/models/identity/identity.model';
 
 import { environment } from '../../../environments/environment';
 
-
 @Injectable({
   providedIn: 'root'
 })
 export class EntityService {
 
+  auth = environment.authToken
   apiUrl = environment.apiUrl;
-  path = 'entity/alastria';
+  path = 'entity';
 
   constructor(private http: HttpClient) { }
 
   /**
+   * Function for create Alastria Token from service
+   * @returns {*}
+   */
+  createAlastriaToken(): any {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json',
+        'Authorization': this.auth
+      })
+    };
+    return this.http.post(`${this.apiUrl}/${this.path}/alastria/alastriaToken`, null, httpOptions).toPromise()
+      .then((res: any) => res.AT)
+      .catch((error: any) => {
+        throw error;
+      });
+  }
    * Function for create identity calling at the server
    * @param identity - data of identity for create a new identity
    * @returns {*}
