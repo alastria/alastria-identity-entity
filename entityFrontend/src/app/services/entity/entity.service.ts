@@ -35,6 +35,26 @@ export class EntityService {
         throw error;
       });
   }
+
+  /**
+  * Function for create Alastria Presentation Requet from service
+  * @returns {*}
+  */
+  createPresentationRequest(presentationRequest: any): any {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json',
+        'Authorization': this.auth
+      })
+    };
+    return this.http.post(`${this.apiUrl}/${this.path}/alastria/presentationRequest`, presentationRequest, httpOptions).toPromise()
+      .then((res: any) => res.jwt)
+      .catch((error: any) => {
+        throw error;
+      });
+  }
+
+  /**
    * Function for create identity calling at the server
    * @param identity - data of identity for create a new identity
    * @returns {*}
@@ -43,12 +63,7 @@ export class EntityService {
     return this.http.post(`${this.apiUrl}/${this.path}/identity`, identity).toPromise()
       .then((res) => res)
       .catch((error: any) => {
-        // throw error;
-        // MOCK
-        return {
-          proxyAddress: '0x374bfe163e60d348ddcdfe90e80c81393bc84df1',
-          did: 'did:ala:quor:redT:374bfe163e60d348ddcdfe90e80c81393bc84df1'
-        };
+        throw error;
       });
   }
 

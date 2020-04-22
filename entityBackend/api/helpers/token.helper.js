@@ -80,7 +80,7 @@ function createAlastriaToken(tokenData) {
 
  function createCredential(kid, iss, sub, contect, credentialSubject, exp, nbf, jti) {
   try {
-    let credential =  tokensFactory.tokens.createCredential(kid, iss, sub, contect, credentialSubject, exp, nbf, jti)
+    let credential =  tokensFactory.tokens.createCredential(`${kid}#keys-1`, iss, sub, contect, credentialSubject, exp, nbf, jti)
     log.info(`${helper_name}[${createCredential.name}] -----> Created Credential`)
     return credential
   }
@@ -92,7 +92,7 @@ function createAlastriaToken(tokenData) {
 
 function createPresentationRequest(kid, iss, context, procUrl, procHash, data, exp, nbf, jti) {
   try {
-    let credential = tokensFactory.tokens.createPresentationRequest(kid, iss, context, procUrl, procHash, data, exp, nbf, jti)
+    let credential = tokensFactory.tokens.createPresentationRequest(`${kid}#keys-1`, iss, context, procUrl, procHash, data, exp, nbf, jti)
     log.info(`${helper_name}[${createPresentationRequest.name}] -----> Created Presentation Reques`)
     return credential
   }

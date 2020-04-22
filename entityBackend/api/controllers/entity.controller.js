@@ -335,7 +335,9 @@ function createPresentationRequest(req, res) {
   entityService.createPresentationRequest(requestData)
   .then(jwt => {
     log.info(`${controller_name}[${createPresentationRequest.name}] -----> Successfully generated Presentation Request`)
-    let presentationRequest = jwt
+    let presentationRequest = {
+      jwt
+    }
     res.status(200).send(presentationRequest)
   })
   .catch(error => {
