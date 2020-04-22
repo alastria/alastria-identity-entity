@@ -36,6 +36,25 @@ export class EntityService {
       });
   }
 
+    /**
+   * Function for create Alastria Credentials from service
+   * @returns {*}
+   */
+  createCredentialsToken(credentials, subjectDID): any {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json',
+        'Authorization': this.auth
+      })
+    };
+    console.log(credentials)
+    return this.http.post(`${this.apiUrl}/${this.path}/alastria/credential?identityDID=${subjectDID}`, credentials, httpOptions).toPromise()
+      .then((res: any) => res)
+      .catch((error: any) => {
+        throw error;
+      });
+  }
+
   /**
   * Function for create Alastria Presentation Requet from service
   * @returns {*}

@@ -271,9 +271,7 @@ export class ProfileComponent implements OnInit {
     this.qrDataFillProfile = JSON.stringify(profileFields);
     this.initIoConnection();
     const credentials = await this.createCredentials(profileFields);
-    this.qrDataFillProfile = JSON.stringify({
-      verifiableCredential: credentials
-    });
+    this.qrDataFillProfile = JSON.stringify(credentials);
     $('#simpleModal').modal('show');
   }
 
@@ -293,22 +291,18 @@ export class ProfileComponent implements OnInit {
   }
 
   private async createCredentials(fields: Array<string>) {
-    const url = '../../../assets/alastria-lib.json';
-    const alastriaLibJson: any = await this.http.get(url).toPromise();
     try {
       const credentials = [];
+      let subjectDID = this.user.did
       fields.map((field: string)  => {
-        alastriaLibJson.payload.credentialSubject = {
-          levelOfAssurance : 'High'
+        let credential = {
+          levelOfAssurance : 3,
+          field_name: field
         };
-        alastriaLibJson.payload.credentialSubject[field] = (field === 'fullname') ? `${this.user.name} ${this.user.surname}`
-          : this.user[field];
-        alastriaLibJson.payload.sub = this.user.did;
-        const credential =  this.alastriaLibService.createCredential(alastriaLibJson.header, alastriaLibJson.payload);
-        credentials.push(this.alastriaLibService.signJWT(credential.payload, alastriaLibJson.privateKey));
+        credentials.push(credential)
       });
-
-      return credentials;
+      let credential = this.entityService.createCredentialsToken(credentials, subjectDID)
+      return credential;
     } catch(error) {
       console.error(error);
     }
