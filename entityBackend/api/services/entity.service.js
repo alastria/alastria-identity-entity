@@ -102,7 +102,7 @@ module.exports = {
 ///////              PUBLIC FUNCTIONS             ///////
 /////////////////////////////////////////////////////////
 
-async function createAlastriaToken() {
+async function createAlastriaToken(functionCall) {
   try {
     log.info(`${serviceName}[${createAlastriaToken.name}] -----> IN ...`)
     const currentDate = Math.floor(Date.now() / 1000);
@@ -110,7 +110,7 @@ async function createAlastriaToken() {
     let alastriaTokenData = {
       iss: myConfig.entityDID,
       gwu: myConfig.nodeUrl.alastria,
-      cbu: `${myConfig.callbackUrl}alastria/did`,
+      cbu: (functionCall == 'CreateAlastriaID') ? `${myConfig.callbackUrl}alastria/did` : `${myConfig.callbackUrl}alastria/alastriaSession`,
       exp: expDate,
       ani: myConfig.netID,
       nbf: currentDate,
@@ -133,9 +133,8 @@ async function verifyAlastriaSession(alastriaSession) {
     let didSubject = decodeAS.payload.pku.id
     log.info(`${serviceName}[${verifyAlastriaSession.name}] -----> Obtained correctly the Subject DID`)
     let subjectPublicKey = await getCurrentPublicKey(didSubject)
-    let publicKey = subjectPublicKey[0]
     log.info(`${serviceName}[${verifyAlastriaSession.name}] -----> Obtained correctly the Subject PublicKey`)
-    let verifiedAlastraSession = tokenHelper.verifyJWT(alastriaSession, `04${publicKey}`)
+    let verifiedAlastraSession = tokenHelper.verifyJWT(alastriaSession, subjectPublicKey)
     if(verifiedAlastraSession == true) {
       let user = await userModel.getUser(didSubject)
       let msg = {

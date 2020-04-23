@@ -49,8 +49,9 @@ module.exports = {
 
 function createAlastriaToken(req, res) {
   log.info(`${controller_name}[${createAlastriaToken.name}] -----> IN ...`)
+  let functionCall = req.headers.functioncall
   log.debug(`${controller_name}[${verifyAlastriaSession.name}] -----> Calleing Entity Service`)
-  entityService.createAlastriaToken()
+  entityService.createAlastriaToken(functionCall)
   .then(AT => {
     log.info(`${controller_name}[${createAlastriaToken.name}] -----> Created Alastria Token`)
     let token = {

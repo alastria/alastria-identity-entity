@@ -55,9 +55,7 @@ const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
               private fb: FormBuilder,
               private userService: UserService,
               private socketService: SocketService,
-              private alastriaLibService: AlastriaLibService,
-              private entityService: EntityService,
-              private http: HttpClient) { }
+              private entityService: EntityService) { }
 
   ngOnInit() {
     sessionStorage.clear();
@@ -138,7 +136,8 @@ const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
   }
 
   private async createAlastriaToken(): Promise<string> {
-    let alastriaToken = await this.entityService.createAlastriaToken();
+    let functionCall = 'AlastriaToken'
+    let alastriaToken = await this.entityService.createAlastriaToken(functionCall);
     return alastriaToken;
   }
 

@@ -22,11 +22,12 @@ export class EntityService {
    * Function for create Alastria Token from service
    * @returns {*}
    */
-  createAlastriaToken(): any {
+  createAlastriaToken(functionCall): any {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type':  'application/json',
-        'Authorization': this.auth
+        'Authorization': this.auth,
+        'functionCall': functionCall
       })
     };
     return this.http.post(`${this.apiUrl}/${this.path}/alastria/alastriaToken`, null, httpOptions).toPromise()
