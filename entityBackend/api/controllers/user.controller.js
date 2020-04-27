@@ -81,10 +81,9 @@ function addUser(req, res) {
 
 function updateUser(req, res) {
   log.info(`${controller_name}[${updateUser.name}] -----> IN ...`)
-  let id = req.swagger.params.id.value
   let params = req.swagger.params.body.value
   log.debug(`${controller_name}[${updateUser.name}] -----> Sending params: ${JSON.stringify(params)}`)
-  userModel.updateUser(id, params)
+  userModel.updateUser(params)
   .then(updated => {
     let modifieds = updated.updated
     if(modifieds == 0){

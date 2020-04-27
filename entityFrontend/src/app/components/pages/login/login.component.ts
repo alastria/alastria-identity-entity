@@ -8,12 +8,11 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 // SERVICES
 import { UserService } from 'src/app/services/user/user.service';
-import { AlastriaLibService } from 'src/app/services/alastria-lib/alastria-lib.service';
+import { EntityService } from 'src/app/services/entity/entity.service';
 
 // MODELS
 import { User } from 'src/app/models/user/user.model';
 import { Event } from 'src/app/models/enums/enums.model';
-import { EntityService } from 'src/app/services/entity/entity.service';
 
 declare var $: any;
 const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';

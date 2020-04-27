@@ -79,9 +79,9 @@ function verifyAlastriaSession(req, res) {
   .catch(error => {
     log.error(`${controller_name}[${verifyAlastriaSession.name}] -----> ${error}`)
     Errmsg.message = JSON.stringify(error)
-  io.emit('error', {status: 401,
-                    message: Errmsg.message})
-  res.status(401).send(Errmsg)
+    io.emit('error', {status: 401,
+                      message: Errmsg.message})
+    res.status(401).send(Errmsg)
   })
 }
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { HttpHeaders } from '@angular/common/http'
+import { HttpHeaders } from '@angular/common/http';
 
 // Models
 import { Identity } from 'src/app/models/identity/identity.model';
@@ -48,7 +48,6 @@ export class EntityService {
         'Authorization': this.auth
       })
     };
-    console.log(credentials)
     return this.http.post(`${this.apiUrl}/${this.path}/alastria/credential?identityDID=${subjectDID}`, credentials, httpOptions).toPromise()
       .then((res: any) => res)
       .catch((error: any) => {
@@ -80,7 +79,13 @@ export class EntityService {
    * @returns {*}
    */
   createIdentity(identity: Identity): any {
-    return this.http.post(`${this.apiUrl}/${this.path}/identity`, identity).toPromise()
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json',
+        'Authorization': this.auth
+      })
+    };
+    return this.http.post(`${this.apiUrl}/${this.path}/identity`, identity, httpOptions).toPromise()
       .then((res) => res)
       .catch((error: any) => {
         throw error;
@@ -93,11 +98,16 @@ export class EntityService {
    * @returns {*}
    */
   createSubjectCredential(signedTX: string): any {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json',
+        'Authorization': this.auth
+      })
+    };
     const body = {
       signedTX
     };
-
-    return this.http.post(`${this.apiUrl}/${this.path}/credential`, body).toPromise()
+    return this.http.post(`${this.apiUrl}/${this.path}/credential`, body, httpOptions).toPromise()
       .then((res) => res)
       .catch((error: any) => {
         throw error;
@@ -109,7 +119,13 @@ export class EntityService {
    * @returns {*}
    */
   getPublicKey(alastriaId: string): any {
-    return this.http.get(`${this.apiUrl}/${this.path}/identity/${alastriaId}`).toPromise()
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json',
+        'Authorization': this.auth
+      })
+    };
+    return this.http.get(`${this.apiUrl}/${this.path}/identity/${alastriaId}`, httpOptions).toPromise()
       .then((res) => {
         console.log('res --> ', res);
         return res;

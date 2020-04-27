@@ -144,7 +144,6 @@ export class LinkUserComponent implements OnInit {
       const userVinculate = this.userService.getUserVinculate();
       if (userVinculate) {
         userRegister.did = userVinculate.did;
-        userRegister.proxyAddress = userVinculate.proxyAddress;
         userRegister.vinculated = true;
       }
     // TODO: llamada al servidor para vincular el usuario

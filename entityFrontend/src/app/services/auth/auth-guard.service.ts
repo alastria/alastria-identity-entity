@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Router, ActivatedRouteSnapshot, RouterStateSnapshot, CanActivate } from '@angular/router';
+import { Router } from '@angular/router';
+import { HttpHeaders } from '@angular/common/http';
 
 // SERVICES
 import { UserService } from 'src/app/services/user/user.service';
@@ -9,6 +10,7 @@ import { environment } from '../../../environments/environment';
 
 @Injectable()
 export class AuthGuardService {
+  auth = environment.authToken;
   apiUrl = environment.apiUrl;
   path = 'entity';
 
@@ -25,7 +27,13 @@ export class AuthGuardService {
     const user = this.userService.getUserLoggedIn();
     const authToken = (user && user.authToken) ? user.authToken : 'dfdsf';
     try {
-      const result: any = await this.http.get(`${this.apiUrl}/${this.path}/user/checkAuth?authToken=${authToken}`).toPromise();
+      const httpOptions = {
+        headers: new HttpHeaders({
+          'Content-Type':  'application/json',
+          'Authorization': this.auth
+        })
+      };
+      const result: any = await this.http.get(`${this.apiUrl}/${this.path}/user/checkAuth?authToken=${authToken}`, httpOptions).toPromise();
       if (result.status) {
         return true;
       } else {
