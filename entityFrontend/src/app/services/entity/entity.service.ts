@@ -59,14 +59,14 @@ export class EntityService {
   * Function for create Alastria Presentation Requet from service
   * @returns {*}
   */
-  createPresentationRequest(presentationRequest: any): any {
+  createPresentationRequest(requestData): any {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type':  'application/json',
         'Authorization': this.auth
       })
     };
-    return this.http.post(`${this.apiUrl}/${this.path}/alastria/presentationRequest`, presentationRequest, httpOptions).toPromise()
+    return this.http.post(`${this.apiUrl}/${this.path}/alastria/presentationRequest`, requestData, httpOptions).toPromise()
       .then((res: any) => res.jwt)
       .catch((error: any) => {
         throw error;

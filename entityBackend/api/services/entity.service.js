@@ -345,7 +345,6 @@ async function createCredential(identityDID, credentials) {
       let jti = Math.random().toString(36).substring(2)
       credentialSubject.levelOfAssurance = credential.levelOfAssurance
       credentialSubject[credential.field_name] = (credential.field_name == 'fullname') ? `${user.userData.name} ${user.userData.surname}` : user.userData[credential.field_name]
-      console.log(credentialSubject)
 
       let credentialObject = tokenHelper.createCredential(myConfig.entityDID, myConfig.entityDID, identityDID,
                                                                 myConfig.context, credentialSubject, expDate, currentDate, jti)
@@ -464,7 +463,6 @@ async function getSubjectPresentationStatus(subjectDID, subejectPresentationHash
     let statusTX = transactionFactory.presentationRegistry.getSubjectPresentationStatus(web3, subjectDID.split(':')[4], subejectPresentationHash)
     let statusCall = await web3.eth.call(statusTX)
     let statusDecoded = web3.eth.abi.decodeParameters(['bool', 'uint8'], statusCall)
-    console.log(statusDecoded)
     if(!statusDecoded[0]) {
       throw 'Presentation not registered'
     }
@@ -499,11 +497,15 @@ async function getIssuerPresentationStatus(issuerDID, presentationHash) {
     let statusTX = transactionFactory.presentationRegistry.getReceiverPresentationStatus(web3, issuerDID.split(':')[4], presentationHash)
     let statusCall = await web3.eth.call(statusTX)
     let statusDecoded = web3.eth.abi.decodeParameters(['bool', 'uint8'], statusCall)
-    if(!statusDecoded[0]) {
-      throw 'Presentation not registered'
+    // if(!statusDecoded[0]) {
+    //   throw 'Presentation not registered'
+    // }
+    let status = {
+      exists: statusDecoded[0],
+      status: statusDecoded[1]
     }
     log.info(`${serviceName}[${getIssuerPresentationStatus.name}] -----> Presentation status getted`)
-    return statusDecoded[1]
+    return status
   }
   catch(error) {
     log.error(`${serviceName}[${getIssuerPresentationStatus.name}] -----> ${error}`)

@@ -190,8 +190,6 @@ export class LinkUserComponent implements OnInit {
 
   private async createPresentationRequest() {
     try {
-      const url = '../../../assets/alastria-lib.json';
-      const alastriaLibJson: any = await this.http.get(url).toPromise();
       let presentationRequestInfo = [
         {
             '@context': 'JWT',

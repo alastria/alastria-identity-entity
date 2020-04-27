@@ -736,7 +736,7 @@ paths:
   /alastria/presentation/status/subject:
     x-swagger-router-controller: entity.controller
     get:
-      description: get current Subject or Service Provider (Receiver) status for the given presentation
+      description: get current Subject status for the given presentation
       operationId: getSubjectPresentationStatus
       parameters:
         - name: subjectPresentationHash
@@ -766,10 +766,9 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /alastria/presentation/status:
+  /alastria/presentation/status/receiver:
     x-swagger-router-controller: entity.controller
     post:
-      x-swagger-router-controller: entity.controller
       description: Update a serviceProvider presentation status if posible
       operationId: updateReceiverPresentationStatus
       parameters:
@@ -802,7 +801,7 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
     get:
-      description: get current Subject or Service Provider (Receiver) status for the given presentation
+      description: get current Service Provider (Receiver) status for the given presentation
       operationId: getIssuerPresentationStatus
       parameters:
         - name: issuerPresentationHash

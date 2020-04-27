@@ -1,10 +1,9 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 // SERVICES
 import { SocketService } from 'src/app/services/socket/socket.service';
-import { AlastriaLibService } from 'src/app/services/alastria-lib/alastria-lib.service';
+import { EntityService } from 'src/app/services/entity/entity.service'
 
 declare var $: any;
 
@@ -26,9 +25,8 @@ export class ServiceFormComponent implements OnInit {
   };
 
   constructor(private fb: FormBuilder,
-              private http: HttpClient,
               private socketService: SocketService,
-              private alastriaLibService: AlastriaLibService) { }
+              private entityService: EntityService) { }
 
   ngOnInit() {
     this.generateForm();
@@ -55,26 +53,23 @@ export class ServiceFormComponent implements OnInit {
 
   private async createPresentationRequest() {
     try {
-      const url = '../../../assets/alastria-lib.json';
-      const alastriaLibJson: any = await this.http.get(url).toPromise();
-      alastriaLibJson.payload.pr.data = [
+      let requestData = [
         {
             '@context': 'JWT',
-            levelOfAssurance: 'High',
+            levelOfAssurance: 3,
             required: true,
             field_name: 'fullname'
         },
         {
           '@context': 'JWT',
-          levelOfAssurance: 'High',
+          levelOfAssurance: 3,
           required: true,
           field_name: 'address'
         },
       ];
 
-      const presentationRequest = this.alastriaLibService.createPresentationRequest(alastriaLibJson.header, alastriaLibJson.payload);
-      const presentationRequestSigned = this.alastriaLibService.signJWT(presentationRequest.payload, alastriaLibJson.privateKey);
-      this.qrData = presentationRequestSigned;
+      const presentationRequest = await this.entityService.createPresentationRequest(requestData);
+      this.qrData = presentationRequest;
 
     } catch (error) {
       console.error(error);

@@ -426,7 +426,6 @@ function getIssuerPresentationStatus(req, res) {
 
 function recivePresentationData(req, res) {
   log.info(`${controller_name}[${recivePresentationData.name}] -----> IN ...`);
-  console.log(req.swagger.params.presentation.value)
   let presentationSigned = req.swagger.params.presentation.value
   let presentationHash = req.swagger.params.presentationRequestHash.value
   log.debug(`${controller_name}[${recivePresentationData.name}] -----> Sending params: ${presentationSigned}, ${presentationHash}`)
