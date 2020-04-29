@@ -148,7 +148,6 @@ const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
 
     this.subscription.add(this.socketService.onSession()
       .subscribe((result) => {
-        console.log('result ', result);
         let userStorage: User;
         if (result.userData && result.authToken) {
           userStorage = result.userData;

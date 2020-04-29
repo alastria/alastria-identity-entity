@@ -11,6 +11,10 @@
     "collection": "users",
     "interceptorElapse": 100
   },
+  "didFormat": {
+    "network": "quor",
+    "networkID": "redT"
+  },
   "socketPort": 8080,
   "issuerKeystore": {
     "address": "a9728125c573924b2b1ad6a8a8cd9bf6858ced49",

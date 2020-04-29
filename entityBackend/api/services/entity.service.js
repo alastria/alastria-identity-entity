@@ -130,7 +130,7 @@ async function verifyAlastriaSession(alastriaSession) {
   try {
     log.info(`${serviceName}[${verifyAlastriaSession.name}] -----> IN...`)
     let decodeAS = tokenHelper.decodeJWT(alastriaSession)
-    let didSubject = decodeAS.payload.pku.id
+    let didSubject = decodeAS.payload.iss
     log.info(`${serviceName}[${verifyAlastriaSession.name}] -----> Obtained correctly the Subject DID`)
     let subjectPublicKey = await getCurrentPublicKey(didSubject)
     log.info(`${serviceName}[${verifyAlastriaSession.name}] -----> Obtained correctly the Subject PublicKey`)
@@ -169,7 +169,7 @@ async function verifyAlastriaSession(alastriaSession) {
       to: config.alastriaIdentityManager,
       data: web3.eth.abi.encodeFunctionCall(config.contractsAbi['AlastriaIdentityManager']['identityKeys'], [subjectAddress.substr(2)])
     })
-    let alastriaDID = tokenHelper.createDID('quor', alastriaIdentity.slice(26));
+    let alastriaDID = tokenHelper.createDID(myConfig.didFormat.network, alastriaIdentity.slice(26), myConfig.didFormat.networkID);
     let msg = {
       message: "Successfuly created Alastria ID",
       did: alastriaDID
@@ -336,8 +336,8 @@ async function createCredential(identityDID, credentials) {
     log.info(`${serviceName}[${createCredential.name}] -----> IN ...`)
     let user = await userModel.getUser(identityDID)
     let credentialsJWT = []
-    let credentialsTXSigned = []
-    let sendCredentialTX = []
+    // let credentialsTXSigned = []
+    // let sendCredentialTX = []
     credentials.map(async credential => {
       let credentialSubject = {}
       const currentDate = Math.floor(Date.now() / 1000);
@@ -351,18 +351,18 @@ async function createCredential(identityDID, credentials) {
       let credentialSigned = tokenHelper.signJWT(credentialObject, myConfig.entityPrivateKey)
       let credentialPsmHash = tokenHelper.psmHash(web3, credentialSigned, myConfig.entityDID)
       let credentialTX = transactionFactory.credentialRegistry.addIssuerCredential(web3, credentialPsmHash)
-      credentialsTXSigned.push(credentialTX)
+      // credentialsTXSigned.push(credentialTX)
       credentialsJWT.push(credentialSigned)
     })
-    credentialsTXSigned.map(async (item) => {
-      let issuerTXSigned = await issuerGetKnownTransaction(item)
-      log.info(`${serviceName}[${createCredential.name}] -----> Preparing to send transaction`)
-      sendCredentialTX.push(issuerTXSigned)
-      sendCredentialTX.map(async TXToSend => {
-        log.info(`${serviceName}[${createCredential.name}] -----> Sending transaction`)
-        let sendSignedCredential = await sendSigned(TXToSend)
-      })
-    })
+    // credentialsTXSigned.map(async (item) => {
+    //   let issuerTXSigned = await issuerGetKnownTransaction(item)
+    //   log.info(`${serviceName}[${createCredential.name}] -----> Preparing to send transaction`)
+    //   sendCredentialTX.push(issuerTXSigned)
+    //   sendCredentialTX.map(async TXToSend => {
+    //     log.info(`${serviceName}[${createCredential.name}] -----> Sending transaction`)
+    //     let sendSignedCredential = await sendSigned(TXToSend)
+    //   })
+    // })
     log.info(`${serviceName}[${createCredential.name}] -----> Created Successfully`)
     return credentialsJWT
   }
@@ -430,8 +430,8 @@ async function createPresentationRequest(requestData) {
     const expDate = currentDate + 600;
     let jti = Math.random().toString(36).substring(2)
     let objectRequest = tokenHelper.createPresentationRequest(myConfig.entityDID, myConfig.entityDID, myConfig.context,
-                                                                   `${myConfig.callbackUrl}alastria/presentation`, myConfig.procHash, requestData,
-                                                                    expDate, currentDate, jti)
+                                                                   myConfig.context[0], myConfig.procHash, requestData,
+                                                                   `${myConfig.callbackUrl}alastria/presentation`,expDate, currentDate, jti)
     let presentationRequest = tokenHelper.signJWT(objectRequest, myConfig.entityPrivateKey)
     return presentationRequest
   }

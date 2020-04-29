@@ -90,9 +90,9 @@ function createAlastriaToken(tokenData) {
   }
 }
 
-function createPresentationRequest(kid, iss, context, procUrl, procHash, data, exp, nbf, jti) {
+function createPresentationRequest(kid, iss, context, procUrl, procHash, data, cbu, exp, nbf, jti) {
   try {
-    let credential = tokensFactory.tokens.createPresentationRequest(`${kid}#keys-1`, iss, context, procUrl, procHash, data, exp, nbf, jti)
+    let credential = tokensFactory.tokens.createPresentationRequest(`${kid}#keys-1`, iss, context, procUrl, procHash, data, cbu, exp, nbf, jti)
     log.info(`${helper_name}[${createPresentationRequest.name}] -----> Created Presentation Reques`)
     return credential
   }
@@ -114,9 +114,9 @@ function psmHash(web3, jwt, did) {
   }
 }
 
-function createDID(createAlastriaTX, alastriaToken, publicKey) {
+function createDID(network, proxyAddress, networkID) {
   try {
-    let did = tokensFactory.tokens.createDID(createAlastriaTX, alastriaToken, publicKey)
+    let did = tokensFactory.tokens.createDID(network, proxyAddress, networkID)
     log.info(`${helper_name}[${createDID.name}] -----> Created DID`)
     return did
   }

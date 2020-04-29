@@ -177,7 +177,6 @@ function getEntities(req, res) {
   entityService.getEntities()
   .then(entities => {
     log.info(`${controller_name}[${getEntities.name}] -----> Successfully getted all Entities`)
-    console.log(entities)
     res.status(200).send(entities)
   })
   .catch(error => {
@@ -411,7 +410,6 @@ function getIssuerPresentationStatus(req, res) {
   log.debug(`${controller_name}[${getIssuerPresentationStatus.name}] -----> Sending params: ${presentationHash}, ${issuerDID}`)
   entityService.getIssuerPresentationStatus(issuerDID, presentationHash)
   .then(status => {
-    console.log(status)
     let gettedStatus = {
       presentationStatus: status
     }

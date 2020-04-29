@@ -46,25 +46,14 @@ loadJsonFile(pathFile)
     const server = myConfig.socketPort
     io.attach(server)
 
-    io.on('connect', (socket) => {
-      log.info(`[App] -----> Websocket ${socket.id} attached`)
+    io.on('connect', socket => {
+      log.info(`[App] -----> Websocket attached!`)
+      socket.on('createIdentityWs', message => {
+        io.emit('createIdentityWs', message)
+	      log.info(`[App] -----> Message: ${JSON.stringify(message)}`)
+      })
     })
-
-    // const CLIENTS = []
-
-    // io.on('connect', ws => {
-    //   CLIENTS.push(ws)
-    //   ws.on('message', message => {
-    //     log.info(`[App] -----> Received %s ${message}`)
-    //   })
-    //   ws.on('createIdentityWs', message => {
-    //     io.emit('createIdentityWs', message)
-	  //     log.info(`[App] -----> Message: ${JSON.stringify(message)}`)
-    //   })
-    //   log.info(`[App] -----> Websocket attached!`)
-    //   ws.send('NEW USER JOINED')
-    // })
-
+    
     wsHelper.setWSObject(io)
 
     var config = {
@@ -93,8 +82,7 @@ loadJsonFile(pathFile)
         if(!tokenJWT) {
           let error = 'It is necessary to provide an authentication token'
           log.error(`[App] -----> ${error}`)
-          // res.status(401).send(`Error: ${error}`)
-          next()
+          res.status(401).send(`Error: ${error}`)
         } else {
           // if(keyManagerUrl == '') {
           //   let error = 'It is necessary to provide a key manager URL'
