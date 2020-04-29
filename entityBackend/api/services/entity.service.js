@@ -341,7 +341,7 @@ async function createCredential(identityDID, credentials) {
     credentials.map(async credential => {
       let credentialSubject = {}
       const currentDate = Math.floor(Date.now() / 1000);
-      const expDate = currentDate + 600;
+      const expDate = currentDate + 86400;
       let jti = Math.random().toString(36).substring(2)
       credentialSubject.levelOfAssurance = credential.levelOfAssurance
       credentialSubject[credential.field_name] = (credential.field_name == 'fullname') ? `${user.userData.name} ${user.userData.surname}` : user.userData[credential.field_name]
