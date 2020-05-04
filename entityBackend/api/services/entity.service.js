@@ -497,9 +497,9 @@ async function getIssuerPresentationStatus(issuerDID, presentationHash) {
     let statusTX = transactionFactory.presentationRegistry.getReceiverPresentationStatus(web3, issuerDID, presentationHash)
     let statusCall = await web3.eth.call(statusTX)
     let statusDecoded = web3.eth.abi.decodeParameters(['bool', 'uint8'], statusCall)
-    if(!statusDecoded[0]) {
-      throw 'Presentation not registered'
-    }
+    // if(!statusDecoded[0]) {
+    //   throw 'Presentation not registered'
+    // }
     let status = {
       exists: statusDecoded[0],
       status: statusDecoded[1]
