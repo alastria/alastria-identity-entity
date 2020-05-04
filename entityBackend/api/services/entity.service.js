@@ -185,7 +185,7 @@ async function verifyAlastriaSession(alastriaSession) {
 async function getCurrentPublicKey(subject) {
   try {
     log.info(`${serviceName}[${getCurrentPublicKey.name}] -----> IN ...`)
-    let currentPubKey = await transactionFactory.publicKeyRegistry.getCurrentPublicKey(web3, subject.split(':')[4]) // Remove split when the library accepts the DID and not the proxyAddress
+    let currentPubKey = await transactionFactory.publicKeyRegistry.getCurrentPublicKey(web3, subject)
     let result = await web3.eth.call(currentPubKey)
     log.info(`${serviceName}[${getCurrentPublicKey.name}] -----> Public Key Success`)
     let identityPubKey = web3.eth.abi.decodeParameters(['string'], result) 
@@ -201,11 +201,11 @@ async function getCurrentPublicKeyList(subject) {
   try {
     log.info(`${serviceName}[${getCurrentPublicKeyList.name}] -----> IN ...`)
     let publicKeyList = []
-    let currentPubKey = await transactionFactory.publicKeyRegistry.getCurrentPublicKey(web3, subject.split(':')[4])
+    let currentPubKey = await transactionFactory.publicKeyRegistry.getCurrentPublicKey(web3, subject)
     let result = await web3.eth.call(currentPubKey)
     log.info(`${serviceName}[${getCurrentPublicKey.name}] -----> Public Key Success`)
     let identityPubKey = web3.eth.abi.decodeParameters(['string'], result)
-    let publicKeyStatus = await transactionFactory.publicKeyRegistry.getPublicKeyStatus(web3, subject.split(':')[4], identityPubKey[0])
+    let publicKeyStatus = await transactionFactory.publicKeyRegistry.getPublicKeyStatus(web3, subject, identityPubKey[0])
     publicKeyList.push(publicKeyStatus)
     return publicKeyList
   }
@@ -222,7 +222,7 @@ async function addEntity(entityData) {
     if(entity) {
       throw "This AlastriaDID is already an Entity"
     }
-    let entityTX = await transactionFactory.identityManager.addEntity(web3, entityData.didEntity.split(':')[4], entityData.name, entityData.cif,
+    let entityTX = await transactionFactory.identityManager.addEntity(web3, entityData.didEntity, entityData.name, entityData.cif,
                                                                         entityData.logoURL, entityData.createAlastriaIdentityURL, entityData.alastriaOpenAccessURL,
                                                                         entityData.active)
     let entitySignedTX = await issuerGetKnownTransaction(entityTX)
@@ -255,7 +255,7 @@ async function getEntities() {
 async function getEntity(entityDID) {
   try {
     log.info(`${serviceName}[${getEntity.name}] -----> IN ...`)
-    let entityTX = await transactionFactory.identityManager.getEntity(web3, entityDID.split(':')[4])
+    let entityTX = await transactionFactory.identityManager.getEntity(web3, entityDID)
     let result = await web3.eth.call(entityTX)
     let entityDecode = web3.eth.abi.decodeParameters(["string", "string", "string", "string", "string", "bool"], result)
     let entity = {
@@ -285,7 +285,7 @@ async function addIssuer(issuerData) {
     if(issuer) {
       throw " This EntityDID is already an Issuer"
     }
-    let addIssuerTX = await transactionFactory.identityManager.addIdentityIssuer(web3, issuerData.didEntity.split(':')[4], issuerData.eidasLevel)
+    let addIssuerTX = await transactionFactory.identityManager.addIdentityIssuer(web3, issuerData.didEntity, issuerData.eidasLevel)
     let issuerSignedTX = await issuerGetKnownTransaction(addIssuerTX)
     let sendSignedTX = await sendSigned(issuerSignedTX)
     log.info(`${serviceName}[${addIssuer.name}] -----> Added New Issuer`)
@@ -301,7 +301,7 @@ async function addIssuer(issuerData) {
 async function isIssuer(issuerDID) {
   try {
     log.info(`${serviceName}[${isIssuer.name}] -----> IN ...`)
-    let issuer = await transactionFactory.identityManager.isIdentityIssuer(web3, issuerDID.split(':')[4])
+    let issuer = await transactionFactory.identityManager.isIdentityIssuer(web3, issuerDID)
     let isIssuerStatus = await web3.eth.call(issuer)
     let result = web3.eth.abi.decodeParameter("bool", isIssuerStatus)
     log.info(`${serviceName}[${isIssuer.name}] -----> Getted Issuer status`)
@@ -316,7 +316,7 @@ async function isIssuer(issuerDID) {
 async function getSubjectCredentialList(identityDID){
   try {
     log.info(`${serviceName}[${getSubjectCredentialList.name}] -----> IN ...`)
-    let listTX = await transactionFactory.credentialRegistry.getSubjectCredentialList(web3, identityDID.split(':')[4])
+    let listTX = await transactionFactory.credentialRegistry.getSubjectCredentialList(web3, identityDID)
     let credentialCall = await web3.eth.call(listTX)
     let listDecoded = web3.eth.abi.decodeParameters(["uint256", "bytes32[]"], credentialCall)
     let list = {
@@ -375,7 +375,7 @@ async function createCredential(identityDID, credentials) {
 async function getSubjectCredentialStatus(subjectDID, subjectPSMHash) {
   try {
     log.info(`${serviceName}[${getSubjectCredentialStatus.name}] -----> IN ...`)
-    let credentialStatusCall = await transactionFactory.credentialRegistry.getSubjectCredentialStatus(web3, subjectDID.split(':')[4], subjectPSMHash)
+    let credentialStatusCall = await transactionFactory.credentialRegistry.getSubjectCredentialStatus(web3, subjectDID, subjectPSMHash)
     let statusObject = await web3.eth.call(credentialStatusCall)
     let resultStatus = await web3.eth.abi.decodeParameters(['bool', 'uint8'], statusObject)
     if(!resultStatus[0]) {
@@ -410,7 +410,7 @@ async function updateIssuerCredentialStatus(updateData) {
 async function getIssuerCredentialStatus(identityDID, credentialHash) {
   try {
     log.info(`${serviceName}[${getIssuerCredentialStatus.name}] -----> IN ...`)
-    let issuerCredential = await transactionFactory.credentialRegistry.getIssuerCredentialStatus(web3, identityDID.split(':')[4], credentialHash)
+    let issuerCredential = await transactionFactory.credentialRegistry.getIssuerCredentialStatus(web3, identityDID, credentialHash)
     let issuerCredentialCall = await web3.eth.call(issuerCredential)
     let result = web3.eth.abi.decodeParameters(["bool", "uint8"], issuerCredentialCall)
     let status = result[1]
@@ -444,7 +444,7 @@ async function createPresentationRequest(requestData) {
 async function getSubjectPresentationList(subjectDID) {
   try {
     log.info(`${serviceName}[${getSubjectPresentationList.name}] -----> IN ...`)
-    let listTX = transactionFactory.presentationRegistry.getSubjectPresentationList(web3, subjectDID.split(':')[4])
+    let listTX = transactionFactory.presentationRegistry.getSubjectPresentationList(web3, subjectDID)
     let listCall = await web3.eth.call(listTX)
     let listDecoded = web3.eth.abi.decodeParameters(['uint256', 'bytes32[]'], listCall)
     let presentationList = listDecoded[1]
@@ -460,7 +460,7 @@ async function getSubjectPresentationList(subjectDID) {
 async function getSubjectPresentationStatus(subjectDID, subejectPresentationHash) {
   try {
     log.info(`${serviceName}[${getSubjectPresentationStatus.name}] -----> IN ...`)
-    let statusTX = transactionFactory.presentationRegistry.getSubjectPresentationStatus(web3, subjectDID.split(':')[4], subejectPresentationHash)
+    let statusTX = transactionFactory.presentationRegistry.getSubjectPresentationStatus(web3, subjectDID, subejectPresentationHash)
     let statusCall = await web3.eth.call(statusTX)
     let statusDecoded = web3.eth.abi.decodeParameters(['bool', 'uint8'], statusCall)
     if(!statusDecoded[0]) {
@@ -494,12 +494,12 @@ async function updateReceiverPresentationStatus(presentationHash, newStatus) {
 async function getIssuerPresentationStatus(issuerDID, presentationHash) {
   try {
     log.info(`${serviceName}[${getIssuerPresentationStatus.name}] -----> IN ...`)
-    let statusTX = transactionFactory.presentationRegistry.getReceiverPresentationStatus(web3, issuerDID.split(':')[4], presentationHash)
+    let statusTX = transactionFactory.presentationRegistry.getReceiverPresentationStatus(web3, issuerDID, presentationHash)
     let statusCall = await web3.eth.call(statusTX)
     let statusDecoded = web3.eth.abi.decodeParameters(['bool', 'uint8'], statusCall)
-    // if(!statusDecoded[0]) {
-    //   throw 'Presentation not registered'
-    // }
+    if(!statusDecoded[0]) {
+      throw 'Presentation not registered'
+    }
     let status = {
       exists: statusDecoded[0],
       status: statusDecoded[1]
@@ -518,13 +518,14 @@ async function getPresentationData(presentationData, presentationPSMHash) {
     log.info(`${serviceName}[${getPresentationData.name}] -----> IN ...`)
     let credentials = []
     let presentationDecoded = tokenHelper.decodeJWT(presentationData)
-    let subjectPublicKey = await getCurrentPublicKey(presentationDecoded.header.kid)
+    let subjectDID = presentationDecoded.payload.iss
+    let subjectPublicKey = await getCurrentPublicKey(subjectDID)
     let presentationVerified = tokenHelper.verifyJWT(presentationData, subjectPublicKey)
     if(!presentationVerified) {
       throw 'Presentation not verified'
     }
     let issuerPresentationPSMHash = tokenHelper.psmHash(web3, presentationData, myConfig.entityDID)
-    let subjectPresentationStatus = await getSubjectPresentationStatus(presentationDecoded.header.kid, presentationPSMHash)
+    let subjectPresentationStatus = await getSubjectPresentationStatus(subjectDID, presentationPSMHash)
     let updatePresentationStatus = await updateReceiverPresentationStatus(issuerPresentationPSMHash, 2)
     let verifiableCredential = presentationDecoded.payload.vp.verifiableCredential
     verifiableCredential.map(item => {
