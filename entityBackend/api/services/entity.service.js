@@ -105,8 +105,8 @@ module.exports = {
 async function createAlastriaToken(functionCall) {
   try {
     log.info(`${serviceName}[${createAlastriaToken.name}] -----> IN ...`)
-    const currentDate = Math.floor(Date.now() / 1000);
-    const expDate = currentDate + 600;
+    const currentDate = Math.floor(Date.now());
+    const expDate = currentDate + 86400000;
     let alastriaTokenData = {
       iss: myConfig.entityDID,
       gwu: myConfig.nodeUrl.alastria,
@@ -426,8 +426,8 @@ async function getIssuerCredentialStatus(identityDID, credentialHash) {
 async function createPresentationRequest(requestData) {
   try {
     log.info(`${serviceName}[${createPresentationRequest.name}] -----> IN ...`)
-    const currentDate = Math.floor(Date.now() / 1000);
-    const expDate = currentDate + 600;
+    const currentDate = Math.floor(Date.now());
+    const expDate = currentDate + 86400000;
     let jti = Math.random().toString(36).substring(2)
     let objectRequest = tokenHelper.createPresentationRequest(myConfig.entityDID, myConfig.entityDID, myConfig.context,
                                                                    myConfig.context[0], myConfig.procHash, requestData,
