@@ -683,11 +683,6 @@ paths:
           required: true
           schema: 
             $ref: "#/definitions/subjectPresentationData"
-        - name: presentationRequestHash
-          in: query
-          description: Reference of the presentation request
-          required: false
-          type: string
       responses:
         "200":
           description: Success

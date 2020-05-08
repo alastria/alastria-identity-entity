@@ -425,8 +425,7 @@ function getIssuerPresentationStatus(req, res) {
 function recivePresentationData(req, res) {
   log.info(`${controller_name}[${recivePresentationData.name}] -----> IN ...`);
   let presentationSigned = req.swagger.params.presentation.value
-  let presentationHash = req.swagger.params.presentationRequestHash.value
-  log.debug(`${controller_name}[${recivePresentationData.name}] -----> Sending params: ${presentationSigned}, ${presentationHash}`)
+  log.debug(`${controller_name}[${recivePresentationData.name}] -----> Sending params: ${presentationSigned}`)
   entityService.getPresentationData(presentationSigned, presentationHash)
   .then(subjectData => {
     log.info(`${controller_name}[${recivePresentationData.name}] -----> Successfully obtained presentation data`);

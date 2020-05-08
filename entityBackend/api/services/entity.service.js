@@ -513,7 +513,7 @@ async function getIssuerPresentationStatus(issuerDID, presentationHash) {
   }
 }
 
-async function getPresentationData(presentationData, presentationPSMHash) {
+async function getPresentationData(presentationData) {
   try {
     log.info(`${serviceName}[${getPresentationData.name}] -----> IN ...`)
     let credentials = []
@@ -524,8 +524,8 @@ async function getPresentationData(presentationData, presentationPSMHash) {
     if(!presentationVerified) {
       throw 'Presentation not verified'
     }
-    let issuerPresentationPSMHash = tokenHelper.psmHash(web3, presentationData, myConfig.entityDID)
-    let subjectPresentationStatus = await getSubjectPresentationStatus(subjectDID, presentationPSMHash)
+    let subjectPresentationPSMHash = tokenHelper.psmHash(web3, presentationData, subjectDID)
+    let subjectPresentationStatus = await getSubjectPresentationStatus(subjectDID, subjectPresentationPSMHash)
     let updatePresentationStatus = await updateReceiverPresentationStatus(issuerPresentationPSMHash, 2)
     let verifiableCredential = presentationDecoded.payload.vp.verifiableCredential
     verifiableCredential.map(item => {
