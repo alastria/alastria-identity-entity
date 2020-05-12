@@ -82,7 +82,8 @@ loadJsonFile(pathFile)
         if(!tokenJWT) {
           let error = 'It is necessary to provide an authentication token'
           log.error(`[App] -----> ${error}`)
-          res.status(401).send(`Error: ${error}`)
+          // res.status(401).send(`Error: ${error}`)
+          next()
         } else {
           // if(keyManagerUrl == '') {
           //   let error = 'It is necessary to provide a key manager URL'
@@ -93,7 +94,7 @@ loadJsonFile(pathFile)
             // .then(publicKey => {
               let publicKey = myConfig.authKeyToken   // Remove when keymanager works
               utils.verifyJWT(tokenJWT, publicKey)
-              .then(validated => {
+              .then(() => {
                 log.info(`[App] -----> Server started in http://localhost:${port}`)
                 next()
               })
