@@ -63,7 +63,7 @@ export class ServiceFormComponent implements OnInit {
         {
           '@context': 'JWT',
           levelOfAssurance: 3,
-          required: true,
+          required: false,
           field_name: 'address'
         },
       ];

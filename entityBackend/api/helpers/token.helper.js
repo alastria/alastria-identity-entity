@@ -44,6 +44,9 @@ function verifyJWT(tokenJWT, publicKey) {
   try {
     let verify = tokensFactory.tokens.verifyJWT(tokenJWT, `04${publicKey}`)
     log.info(`${helper_name}[${verifyJWT.name}] -----> Token Verified`)
+    if (!verify) {
+      throw 'Error verifying Credential JWT'
+    }
     return verify
   }
   catch (error) {

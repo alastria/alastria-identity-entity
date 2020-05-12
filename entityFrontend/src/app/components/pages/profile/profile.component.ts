@@ -323,7 +323,6 @@ export class ProfileComponent implements OnInit {
 
     this.subscription.add(this.socketService.onCreateIdentity()
       .subscribe((response: any) => {
-        console.log('response ', response); 
         this.socketService.sendDisconnect();
         let user = this.userService.getUserLoggedIn();
         if (response.userData) {

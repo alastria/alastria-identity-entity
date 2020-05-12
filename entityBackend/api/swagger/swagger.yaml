@@ -687,7 +687,7 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: "#/definitions/presentationResponse"
+            $ref: "#/definitions/presentatioRequestResponse"
         "400":
           description: Bad Request
           schema:
@@ -1005,6 +1005,8 @@ definitions:
     properties:
       status:
         type: integer
+  presentatioRequestResponse:
+    type: string
   ErrorResponse:
     required:
       - message

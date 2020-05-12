@@ -426,12 +426,16 @@ function recivePresentationData(req, res) {
   log.info(`${controller_name}[${recivePresentationData.name}] -----> IN ...`);
   let presentationSigned = req.swagger.params.presentation.value
   log.debug(`${controller_name}[${recivePresentationData.name}] -----> Sending params: ${presentationSigned}`)
-  entityService.getPresentationData(presentationSigned, presentationHash)
+  entityService.getPresentationData(presentationSigned)
   .then(subjectData => {
     log.info(`${controller_name}[${recivePresentationData.name}] -----> Successfully obtained presentation data`);
     io.emit('getPresentationData', {status: 200,
                                     message: subjectData})
-    res.status(200).send(subjectData)
+
+    let response = {
+      message: 'ok',
+    }
+    res.status(200).send(response)
   })
   .catch(error => {
     Errmsg.message = (error == false) ? 'Clave pública no válida' : 'Error obteniendo los datos de la presentación'

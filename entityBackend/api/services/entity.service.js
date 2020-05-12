@@ -135,7 +135,7 @@ async function verifyAlastriaSession(alastriaSession) {
     let subjectPublicKey = await getCurrentPublicKey(didSubject)
     log.info(`${serviceName}[${verifyAlastriaSession.name}] -----> Obtained correctly the Subject PublicKey`)
     let verifiedAlastraSession = tokenHelper.verifyJWT(alastriaSession, subjectPublicKey)
-    if(verifiedAlastraSession == true) {
+    if(verifiedAlastraSession) {
       let user = await userModel.getUser(didSubject)
       let msg = {
         message: "User not found, Unauthorized",
@@ -163,8 +163,8 @@ async function verifyAlastriaSession(alastriaSession) {
     let signedCreateTransaction = decodedAIC.payload.createAlastriaTX
     let preparedId = preparedAlastriaId(subjectAddress)
     let signedPreparedTransaction = await issuerGetKnownTransaction(preparedId)
-    let prepareSendSigned = await sendSigned(signedPreparedTransaction)
-    let createSendSigned = await sendSigned(signedCreateTransaction)
+    await sendSigned(signedPreparedTransaction)
+    await sendSigned(signedCreateTransaction)
     let alastriaIdentity = await web3.eth.call({
       to: config.alastriaIdentityManager,
       data: web3.eth.abi.encodeFunctionCall(config.contractsAbi['AlastriaIdentityManager']['identityKeys'], [subjectAddress.substr(2)])
@@ -226,7 +226,7 @@ async function addEntity(entityData) {
                                                                         entityData.logoURL, entityData.createAlastriaIdentityURL, entityData.alastriaOpenAccessURL,
                                                                         entityData.active)
     let entitySignedTX = await issuerGetKnownTransaction(entityTX)
-    let sendSignedTX = await sendSigned(entitySignedTX)
+    await sendSigned(entitySignedTX)
     log.info(`${serviceName}[${addEntity.name}] -----> Added New Entity`)
     entity = await getEntity(entityData.didEntity)
     return entity
@@ -287,7 +287,7 @@ async function addIssuer(issuerData) {
     }
     let addIssuerTX = await transactionFactory.identityManager.addIdentityIssuer(web3, issuerData.didEntity, issuerData.eidasLevel)
     let issuerSignedTX = await issuerGetKnownTransaction(addIssuerTX)
-    let sendSignedTX = await sendSigned(issuerSignedTX)
+    await sendSigned(issuerSignedTX)
     log.info(`${serviceName}[${addIssuer.name}] -----> Added New Issuer`)
     issuer = await isIssuer(issuerData.didEntity)
     return issuer
@@ -336,8 +336,8 @@ async function createCredential(identityDID, credentials) {
     log.info(`${serviceName}[${createCredential.name}] -----> IN ...`)
     let user = await userModel.getUser(identityDID)
     let credentialsJWT = []
-    // let credentialsTXSigned = []
-    // let sendCredentialTX = []
+    let credentialsTXSigned = []
+    let sendCredentialTX = []
     credentials.map(async credential => {
       let credentialSubject = {}
       const currentDate = Math.floor(Date.now());
@@ -351,18 +351,18 @@ async function createCredential(identityDID, credentials) {
       let credentialSigned = tokenHelper.signJWT(credentialObject, myConfig.entityPrivateKey)
       let credentialPsmHash = tokenHelper.psmHash(web3, credentialSigned, myConfig.entityDID)
       let credentialTX = transactionFactory.credentialRegistry.addIssuerCredential(web3, credentialPsmHash)
-      // credentialsTXSigned.push(credentialTX)
+      credentialsTXSigned.push(credentialTX)
       credentialsJWT.push(credentialSigned)
     })
-    // credentialsTXSigned.map(async (item) => {
-    //   let issuerTXSigned = await issuerGetKnownTransaction(item)
-    //   log.info(`${serviceName}[${createCredential.name}] -----> Preparing to send transaction`)
-    //   sendCredentialTX.push(issuerTXSigned)
-    //   sendCredentialTX.map(async TXToSend => {
-    //     log.info(`${serviceName}[${createCredential.name}] -----> Sending transaction`)
-    //     let sendSignedCredential = await sendSigned(TXToSend)
-    //   })
-    // })
+    credentialsTXSigned.map(async (item) => {
+      let issuerTXSigned = await issuerGetKnownTransaction(item)
+      log.info(`${serviceName}[${createCredential.name}] -----> Preparing to send transaction`)
+      sendCredentialTX.push(issuerTXSigned)
+      sendCredentialTX.map(async TXToSend => {
+        log.info(`${serviceName}[${createCredential.name}] -----> Sending transaction`)
+        await sendSigned(TXToSend)
+      })
+    })
     log.info(`${serviceName}[${createCredential.name}] -----> Created Successfully`)
     return credentialsJWT
   }
@@ -378,9 +378,9 @@ async function getSubjectCredentialStatus(subjectDID, subjectPSMHash) {
     let credentialStatusCall = await transactionFactory.credentialRegistry.getSubjectCredentialStatus(web3, subjectDID, subjectPSMHash)
     let statusObject = await web3.eth.call(credentialStatusCall)
     let resultStatus = await web3.eth.abi.decodeParameters(['bool', 'uint8'], statusObject)
-    if(!resultStatus[0]) {
-      throw "Credential not exist"
-    }
+    // if(!resultStatus[0]) {
+    //   throw "Credential not exist"
+    // }
     log.info(`${serviceName}[${getSubjectCredentialStatus.name}] -----> Obtained status`)
     return resultStatus[1]
   }
@@ -395,7 +395,7 @@ async function updateIssuerCredentialStatus(updateData) {
     log.info(`${serviceName}[${updateIssuerCredentialStatus.name}] -----> IN ...`)
     let updateTX = transactionFactory.credentialRegistry.updateCredentialStatus(web3, updateData.credentialHash, updateData.status)
     let updateTXSigned = await issuerGetKnownTransaction(updateTX)
-    let sendUpdateTX = await sendSigned(updateTXSigned)
+    await sendSigned(updateTXSigned)
     let issuerCredentialUpdated = await getIssuerCredentialStatus(myConfig.entityDID, updateData.credentialHash)
     let updatedStatus = issuerCredentialUpdated
     log.info(`${serviceName}[${updateIssuerCredentialStatus.name}] -----> Credential status updated`)
@@ -463,9 +463,9 @@ async function getSubjectPresentationStatus(subjectDID, subejectPresentationHash
     let statusTX = transactionFactory.presentationRegistry.getSubjectPresentationStatus(web3, subjectDID, subejectPresentationHash)
     let statusCall = await web3.eth.call(statusTX)
     let statusDecoded = web3.eth.abi.decodeParameters(['bool', 'uint8'], statusCall)
-    if(!statusDecoded[0]) {
-      throw 'Presentation not registered'
-    }
+    // if(!statusDecoded[0]) {
+    //   throw 'Presentation not registered'
+    // }
     log.info(`${serviceName}[${getSubjectPresentationStatus.name}] -----> Presentation status getted`)
     return statusDecoded[1]
   }
@@ -480,7 +480,7 @@ async function updateReceiverPresentationStatus(presentationHash, newStatus) {
     log.info(`${serviceName}[${updateReceiverPresentationStatus.name}] -----> IN ...`)
     let updatePresentatioTX = transactionFactory.presentationRegistry.updateReceiverPresentation(web3, presentationHash, newStatus)
     let updatedPresentationTXSigned = await issuerGetKnownTransaction(updatePresentatioTX)
-    let updateSendedTX = await sendSigned(updatedPresentationTXSigned)
+    await sendSigned(updatedPresentationTXSigned)
     log.info(`${serviceName}[${updateReceiverPresentationStatus.name}] -----> Presentation updated`)
     let updatedPresentationStatus = await getIssuerPresentationStatus(myConfig.entityDID, presentationHash)
     return updatedPresentationStatus
@@ -519,22 +519,23 @@ async function getPresentationData(presentationData) {
     let credentials = []
     let presentationDecoded = tokenHelper.decodeJWT(presentationData)
     let subjectDID = presentationDecoded.payload.iss
+    let credentialEmiterDID = presentationDecoded.payload.aud
     let subjectPublicKey = await getCurrentPublicKey(subjectDID)
-    let presentationVerified = tokenHelper.verifyJWT(presentationData, subjectPublicKey)
-    if(!presentationVerified) {
-      throw 'Presentation not verified'
-    }
+    let issuerPublicKey = await getCurrentPublicKey(credentialEmiterDID)
+    tokenHelper.verifyJWT(presentationData, subjectPublicKey)
+
     let subjectPresentationPSMHash = tokenHelper.psmHash(web3, presentationData, subjectDID)
-    let subjectPresentationStatus = await getSubjectPresentationStatus(subjectDID, subjectPresentationPSMHash)
-    let updatePresentationStatus = await updateReceiverPresentationStatus(issuerPresentationPSMHash, 2)
+    await getSubjectPresentationStatus(subjectDID, subjectPresentationPSMHash)
+    await updateReceiverPresentationStatus(subjectPresentationPSMHash, 2)
     let verifiableCredential = presentationDecoded.payload.vp.verifiableCredential
     verifiableCredential.map(item => {
-      let verifyCredential = tokenHelper.verifyJWT(item, subjectPublicKey)
-      if(!verifyCredential) {
-        throw 'Error verifying Credential JWT'
+      tokenHelper.verifyJWT(item, issuerPublicKey)
+      let credentialPSMHASH = tokenHelper.psmHash(web3, item, credentialEmiterDID)
+      let credentialStatus = getSubjectCredentialStatus(credentialEmiterDID, credentialPSMHASH)
+      if(credentialStatus) {
+        let credential = tokenHelper.decodeJWT(item)
+        credentials.push(credential.payload.vc.credentialSubject)
       }
-      let credential = tokenHelper.decodeJWT(item)
-      credentials.push(credential.payload.vc.credentialSubject)
     })
     return credentials
   }
