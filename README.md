@@ -38,6 +38,14 @@ docker-compose up -d mongo-express
 
 You need to install [`npm`](https://www.npmjs.com/get-npm), [`docker`](https://docs.docker.com/v17.09/engine/installation/) and [`docker-compose`](https://docs.docker.com/compose/install/).
 
+### Replacements
+
+In the file `node_modules/@angular-devkit/build-angular/src/angular-cli-files/models/webpack-configs/browser.js`
+
+replace in the last line `node: false`
+
+with `node: { crypto: true, stream: true, buffer: true }`
+
 ### Install entityFrontend
 
 First of all, you need to install some packages for the Frontend to work. In order to do that, move to the frontend directory `cd entityFrontend`, then:
