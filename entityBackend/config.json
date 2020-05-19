@@ -17,7 +17,7 @@
   },
   "socketPort": 8080,
   "addressPassword": "Passw0rd",
-  "entityDID": "did:ala:quor:redT:226bd6560a98307f73b470039656f90faef30358",
+  "entityDID": "did:ala:quor:redT:8f440049cbbe5c6bc9eff46369f9091f1d81333c",
   "title": "Experto Legal en Blockchain",
   "netID": "redT",
   "context": [
@@ -26,9 +26,9 @@
   ],
   "procHash": "H398sjHd...kldjUYn475n",
   "callbackUrl": "http://34.244.47.233/:10010/v1/entity/",
-  "entityEthAddress": "0xa9728125c573924b2b1ad6a8a8cd9bf6858ced49",
-  "entityPrivateKey": "0d50e021f2a91af45e10ae26b77340f876e7ad06d17c00aa0ba899760b5ebded", 
-  "entityPublicKey": "356e3fce435d8729062e52d263c0c705b3c5e201a9a9608cdb070764e6b8df30ae8423b439a7af2bcc3529778341ab06c1e44411352f217b68ce44a673a1df63",
+  "entityEthAddress": "0x6e62c66dee0604cf35440fc2868f726a2cf1e47c",
+  "entityPrivateKey": "a6ad807cab657b88bee4e13a9c784c01e3f26a9c4f10aa5a16684afc973599de", 
+  "entityPublicKey": "0xe1e3fee6d907bd93e313fd8d9a1e6787d042634df7136c67126d9e639d18a6b944b0eba7f61b2239a1f98e6cf1c026952bc9a7875ca62857fb3091bdab6f0643",
   "authKeyToken": "qwertyuiopasdfghjklzxcvbnm123456",
   "keyManagerUrl": ""
 }

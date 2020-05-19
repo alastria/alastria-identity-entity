@@ -273,7 +273,7 @@ export class ProfileComponent implements OnInit {
   }
 
   private async createAlastriaToken(): Promise<string> {
-    let functionCall = 'AlastriaToken'
+    let functionCall = 'CreateAlastriaID'
     let alastriaToken = await this.entityService.createAlastriaToken(functionCall);
     return alastriaToken;
   }

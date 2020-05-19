@@ -26,7 +26,7 @@ async function sendSigned(transactionSigned) {
   log.info(`${serviceName}[${sendSigned.name}] -----> IN ...`)
   let result = await web3.eth.sendSignedTransaction(transactionSigned)
   .catch(error => {
-    log.debug(`${serviceName}[${sendSigned.name}] -----> ${error}`)
+    log.error(`${serviceName}[${sendSigned.name}] -----> ${error}`)
     throw error
   })
   log.info(`${serviceName}[${sendSigned.name}] -----> Transaction Sended`)
@@ -159,7 +159,7 @@ async function verifyAlastriaSession(alastriaSession) {
   try {
     log.info(`${serviceName}[${createAlastriaID.name}] -----> IN ...`)
     let decodedAIC = tokenHelper.decodeJWT(params)
-    let subjectAddress = getAddressFromPubKey(decodedAIC.payload.publicKey)
+    let subjectAddress = getAddressFromPubKey(decodedAIC.payload.publicKey.substr(2))
     let signedCreateTransaction = decodedAIC.payload.createAlastriaTX
     let preparedId = preparedAlastriaId(subjectAddress)
     let signedPreparedTransaction = await issuerGetKnownTransaction(preparedId)
@@ -430,7 +430,7 @@ async function createPresentationRequest(requestData) {
     const expDate = currentDate + 86400000;
     let jti = Math.random().toString(36).substring(2)
     let objectRequest = tokenHelper.createPresentationRequest(myConfig.entityDID, myConfig.entityDID, myConfig.context,
-                                                                   myConfig.context[0], myConfig.procHash, requestData,
+                                                                   myConfig.context[0], `0x${myConfig.procHash}`, requestData,
                                                                    `${myConfig.callbackUrl}alastria/presentation`,expDate, currentDate, jti)
     let presentationRequest = tokenHelper.signJWT(objectRequest, myConfig.entityPrivateKey)
     return presentationRequest

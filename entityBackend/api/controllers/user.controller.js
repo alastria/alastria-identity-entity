@@ -81,7 +81,10 @@ function addUser(req, res) {
 
 function updateUser(req, res) {
   log.info(`${controller_name}[${updateUser.name}] -----> IN ...`)
-  let params = req.swagger.params.body.value
+  let body = req.swagger.params.body.value
+  let id = req.swagger.params.id.value
+  let params = body
+  params.id = id
   log.debug(`${controller_name}[${updateUser.name}] -----> Sending params: ${JSON.stringify(params)}`)
   userModel.updateUser(params)
   .then(updated => {

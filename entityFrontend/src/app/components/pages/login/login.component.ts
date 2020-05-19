@@ -135,7 +135,7 @@ const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
   }
 
   private async createAlastriaToken(): Promise<string> {
-    let functionCall = 'AlastriaToken'
+    let functionCall = 'AlastriaSession'
     let alastriaToken = await this.entityService.createAlastriaToken(functionCall);
     return alastriaToken;
   }

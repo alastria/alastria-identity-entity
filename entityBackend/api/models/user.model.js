@@ -124,7 +124,7 @@ async function updateUser(params) {
   try {
     log.info(`${moduleName}[${updateUser.name}] -----> IN...`)
     let connected = await mongoHelper.connect(myConfig.mongo)
-    let id = params._id
+    let id = (params._id) ? params._id : params.id
     let user = await getUser(id)
     let update = {
       username: ((params.username == null) || (params.username == undefined)) ? user.userData.username : params.username,
