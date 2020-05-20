@@ -72,7 +72,7 @@ export class ServiceDetailComponent implements OnInit {
         if (data && data.length) {
           formNewValues = {
             fullname: (data[0].fullname) ? data[0].fullname : (data[1].fullname) ? data[1].fullname : '',
-            address: (data[1].address) ? data[1].address : (data[0].address) ? data[0].address : ''
+            address: (!data[1]) ? '' : (data[1].address) ? data[1].address : ''
           };
         }
         this.serviceFormComponent.setValuesForm(formNewValues);

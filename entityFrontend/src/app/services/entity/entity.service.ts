@@ -1,21 +1,77 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { HttpHeaders } from '@angular/common/http';
 
 // Models
 import { Identity } from 'src/app/models/identity/identity.model';
 
 import { environment } from '../../../environments/environment';
 
-
 @Injectable({
   providedIn: 'root'
 })
 export class EntityService {
 
+  auth = environment.authToken
   apiUrl = environment.apiUrl;
-  path = 'entity/alastria';
+  path = 'entity';
 
   constructor(private http: HttpClient) { }
+
+  /**
+   * Function for create Alastria Token from service
+   * @returns {*}
+   */
+  createAlastriaToken(functionCall): any {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json',
+        'Authorization': this.auth,
+        'functionCall': functionCall
+      })
+    };
+    return this.http.post(`${this.apiUrl}/${this.path}/alastria/alastriaToken`, null, httpOptions).toPromise()
+      .then((res: any) => res.AT)
+      .catch((error: any) => {
+        throw error;
+      });
+  }
+
+    /**
+   * Function for create Alastria Credentials from service
+   * @returns {*}
+   */
+  createCredentialsToken(credentials, subjectDID): any {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json',
+        'Authorization': this.auth
+      })
+    };
+    return this.http.post(`${this.apiUrl}/${this.path}/alastria/credential?identityDID=${subjectDID}`, credentials, httpOptions).toPromise()
+      .then((res: any) => res)
+      .catch((error: any) => {
+        throw error;
+      });
+  }
+
+  /**
+  * Function for create Alastria Presentation Requet from service
+  * @returns {*}
+  */
+  createPresentationRequest(requestData): any {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json',
+        'Authorization': this.auth
+      })
+    };
+    return this.http.post(`${this.apiUrl}/${this.path}/alastria/presentationRequest`, requestData, httpOptions).toPromise()
+      .then((res: any) => res.jwt)
+      .catch((error: any) => {
+        throw error;
+      });
+  }
 
   /**
    * Function for create identity calling at the server
@@ -23,15 +79,16 @@ export class EntityService {
    * @returns {*}
    */
   createIdentity(identity: Identity): any {
-    return this.http.post(`${this.apiUrl}/${this.path}/identity`, identity).toPromise()
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json',
+        'Authorization': this.auth
+      })
+    };
+    return this.http.post(`${this.apiUrl}/${this.path}/identity`, identity, httpOptions).toPromise()
       .then((res) => res)
       .catch((error: any) => {
-        // throw error;
-        // MOCK
-        return {
-          proxyAddress: '0x374bfe163e60d348ddcdfe90e80c81393bc84df1',
-          did: 'did:ala:quor:redT:374bfe163e60d348ddcdfe90e80c81393bc84df1'
-        };
+        throw error;
       });
   }
 
@@ -41,11 +98,16 @@ export class EntityService {
    * @returns {*}
    */
   createSubjectCredential(signedTX: string): any {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json',
+        'Authorization': this.auth
+      })
+    };
     const body = {
       signedTX
     };
-
-    return this.http.post(`${this.apiUrl}/${this.path}/credential`, body).toPromise()
+    return this.http.post(`${this.apiUrl}/${this.path}/credential`, body, httpOptions).toPromise()
       .then((res) => res)
       .catch((error: any) => {
         throw error;
@@ -57,7 +119,13 @@ export class EntityService {
    * @returns {*}
    */
   getPublicKey(alastriaId: string): any {
-    return this.http.get(`${this.apiUrl}/${this.path}/identity/${alastriaId}`).toPromise()
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json',
+        'Authorization': this.auth
+      })
+    };
+    return this.http.get(`${this.apiUrl}/${this.path}/identity/${alastriaId}`, httpOptions).toPromise()
       .then((res) => {
         console.log('res --> ', res);
         return res;

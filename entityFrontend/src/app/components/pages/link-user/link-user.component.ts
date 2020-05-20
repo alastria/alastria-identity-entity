@@ -16,6 +16,7 @@ import { ResultModal } from './../../../models/result-modal/result-modal';
 
 // COMPONENTS
 import { UserFormComponent } from '../../common/user-form/user-form.component';
+import { EntityService } from 'src/app/services/entity/entity.service';
 
 declare var $: any;
 
@@ -118,7 +119,8 @@ export class LinkUserComponent implements OnInit {
                private socketService: SocketService,
                private alastriaLibService: AlastriaLibService,
                private deviceDetector: DeviceDetectorService,
-               private http: HttpClient) {
+               private http: HttpClient,
+               private entityService: EntityService) {
 
     this.isDesktop = this.deviceDetector.isDesktop();
   }
@@ -142,7 +144,6 @@ export class LinkUserComponent implements OnInit {
       const userVinculate = this.userService.getUserVinculate();
       if (userVinculate) {
         userRegister.did = userVinculate.did;
-        userRegister.proxyAddress = userVinculate.proxyAddress;
         userRegister.vinculated = true;
       }
     // TODO: llamada al servidor para vincular el usuario
@@ -189,26 +190,22 @@ export class LinkUserComponent implements OnInit {
 
   private async createPresentationRequest() {
     try {
-      const url = '../../../assets/alastria-lib.json';
-      const alastriaLibJson: any = await this.http.get(url).toPromise();
-      alastriaLibJson.payload.pr.data = [
+      let presentationRequestInfo = [
         {
             '@context': 'JWT',
-            levelOfAssurance: 'High',
+            levelOfAssurance: 3,
             required: true,
             field_name: 'fullname'
         },
         {
           '@context': 'JWT',
-          levelOfAssurance: 'High',
+          levelOfAssurance: 3,
           required: true,
           field_name: 'email'
         },
       ];
-
-      const presentationRequest = this.alastriaLibService.createPresentationRequest(alastriaLibJson.header, alastriaLibJson.payload);
-      const presentationRequestSigned = this.alastriaLibService.signJWT(presentationRequest.payload, alastriaLibJson.privateKey);
-      this.qrData = presentationRequestSigned;
+      const presentationRequest = await this.entityService.createPresentationRequest(presentationRequestInfo);
+      this.qrData = presentationRequest;
     } catch (error) {
       console.error(error);
     }

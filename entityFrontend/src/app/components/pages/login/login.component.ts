@@ -5,11 +5,10 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { environment } from 'src/environments/environment';
 
 // SERVICES
 import { UserService } from 'src/app/services/user/user.service';
-import { AlastriaLibService } from 'src/app/services/alastria-lib/alastria-lib.service';
+import { EntityService } from 'src/app/services/entity/entity.service';
 
 // MODELS
 import { User } from 'src/app/models/user/user.model';
@@ -55,8 +54,7 @@ const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
               private fb: FormBuilder,
               private userService: UserService,
               private socketService: SocketService,
-              private alastriaLibService: AlastriaLibService,
-              private http: HttpClient) { }
+              private entityService: EntityService) { }
 
   ngOnInit() {
     sessionStorage.clear();
@@ -137,21 +135,9 @@ const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
   }
 
   private async createAlastriaToken(): Promise<string> {
-    const currentDate = Math.floor(Date.now() / 1000);
-    const expDate = currentDate + 600;
-    const alastriaLibJson: any = await this.http.get(alastriaLibJsonUrl).toPromise();
-    const config = {
-      did: alastriaLibJson.header.kid,
-      providerUrl: alastriaLibJson.openAccess,
-      callbackUrl: `${environment.callbackUrl}/entity/alastriaToken`,
-      alastriaNetId: 'redT',
-      tokenExpTime: expDate,
-      tokenActivationDate: currentDate,
-      jsonTokenId: Math.random().toString(36).substring(2)
-    };
-    const alastriaToken = this.alastriaLibService.createAlastriaToken(config);
-
-    return this.alastriaLibService.signJWT(alastriaToken, alastriaLibJson.privateKey);
+    let functionCall = 'AlastriaSession'
+    let alastriaToken = await this.entityService.createAlastriaToken(functionCall);
+    return alastriaToken;
   }
 
   /**
@@ -162,7 +148,6 @@ const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
 
     this.subscription.add(this.socketService.onSession()
       .subscribe((result) => {
-        console.log('result ', result);
         let userStorage: User;
         if (result.userData && result.authToken) {
           userStorage = result.userData;

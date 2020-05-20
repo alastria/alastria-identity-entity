@@ -6,9 +6,8 @@ services:
     restart: on-failure:5
     build: entityBackend
     image: entityback
-    environment: 
-      #- NODE_ENDPOINT=localEndpoint
-      - NODE_ENDPOINT=alastria
+    # environment: 
+    #   - NODE_ENDPOINT=http://63.33.206.111/rpc
     links:
     #   - ganache:ganache  // if you are using local endpoint uncomment this two lines
       - mongo-express:mongo-express

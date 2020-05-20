@@ -12,6 +12,7 @@ import { UserFormComponent } from 'src/app/components/common/user-form/user-form
 import { UserService } from 'src/app/services/user/user.service';
 import { SocketService } from 'src/app/services/socket/socket.service';
 import { AlastriaLibService } from 'src/app/services/alastria-lib/alastria-lib.service';
+import { EntityService } from 'src/app/services/entity/entity.service'
 
 // MODELS
 import { User } from 'src/app/models/user/user.model';
@@ -124,10 +125,9 @@ export class ProfileComponent implements OnInit {
 
   constructor(private userService: UserService,
               private socketService: SocketService,
-              private alastriaLibService: AlastriaLibService,
-              private http: HttpClient,
               private changeDetector: ChangeDetectorRef,
-              private deviceDetectorService: DeviceDetectorService) {
+              private deviceDetectorService: DeviceDetectorService,
+              private entityService: EntityService) {
     this.isDesktop = this.deviceDetectorService.isDesktop();
   }
 
@@ -194,17 +194,6 @@ export class ProfileComponent implements OnInit {
    */
   handleGenerateQr(event: string): void {
     this.qrAlastriaId = event;
-
-    // MOCK - WEBSOCKET
-    if (this.qrAlastriaId) {
-      setTimeout(() => {
-        if (this.parametersForCreateAlastriaId.type === 'C') {
-          this.socketService.sendCreate('0xf9016781a980830927c094812c27bb1f50bcb4a2fea015bd89c3691cd759a580b901046d69d99a000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000a450382c1a00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000042303366646435376164656333643433386561323337666534366233336565316530313665646136623538356333653237656136363638366332656135333538343739000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001ca0cdf15464981e07eea36867ee40d24091a20a1c0750dc2db5b4a4136d1e4e4d80a03679a4efecffd8122ddba7391feaefb1a0a4623a224701bb8f97c6763e915f55');
-        } else {
-          this.socketService.sendSetUp();
-        }
-      }, 5000);
-    }
   }
 
   /**
@@ -269,9 +258,7 @@ export class ProfileComponent implements OnInit {
     this.qrDataFillProfile = JSON.stringify(profileFields);
     this.initIoConnection();
     const credentials = await this.createCredentials(profileFields);
-    this.qrDataFillProfile = JSON.stringify({
-      verifiableCredential: credentials
-    });
+    this.qrDataFillProfile = JSON.stringify(credentials);
     $('#simpleModal').modal('show');
   }
 
@@ -286,40 +273,24 @@ export class ProfileComponent implements OnInit {
   }
 
   private async createAlastriaToken(): Promise<string> {
-    const currentDate = Math.floor(Date.now() / 1000);
-    const expDate = currentDate + 600;
-    const alastriaLibJson: any = await this.http.get(alastriaLibJsonUrl).toPromise();
-    const config = {
-      did: alastriaLibJson.header.kid,
-      providerUrl: alastriaLibJson.openAccess,
-      callbackUrl: `${environment.callbackUrl}/entity/alastria/identity`,
-      alastriaNetId: 'redT',
-      tokenExpTime: expDate,
-      tokenActivationDate: currentDate,
-      jsonTokenId: Math.random().toString(36).substring(2)
-    };
-    const alastriaToken = this.alastriaLibService.createAlastriaToken(config);
-
-    return this.alastriaLibService.signJWT(alastriaToken, alastriaLibJson.privateKey);
+    let functionCall = 'CreateAlastriaID'
+    let alastriaToken = await this.entityService.createAlastriaToken(functionCall);
+    return alastriaToken;
   }
 
   private async createCredentials(fields: Array<string>) {
-    const url = '../../../assets/alastria-lib.json';
-    const alastriaLibJson: any = await this.http.get(url).toPromise();
     try {
       const credentials = [];
+      let subjectDID = this.user.did
       fields.map((field: string)  => {
-        alastriaLibJson.payload.credentialSubject = {
-          levelOfAssurance : 'High'
+        let credential = {
+          levelOfAssurance : 3,
+          field_name: field
         };
-        alastriaLibJson.payload.credentialSubject[field] = (field === 'fullname') ? `${this.user.name} ${this.user.surname}`
-          : this.user[field];
-        alastriaLibJson.payload.sub = this.user.did;
-        const credential =  this.alastriaLibService.createCredential(alastriaLibJson.header, alastriaLibJson.payload);
-        credentials.push(this.alastriaLibService.signJWT(credential.payload, alastriaLibJson.privateKey));
+        credentials.push(credential)
       });
-
-      return credentials;
+      let credential = this.entityService.createCredentialsToken(credentials, subjectDID)
+      return credential;
     } catch(error) {
       console.error(error);
     }

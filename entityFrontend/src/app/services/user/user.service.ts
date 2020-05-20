@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { HttpHeaders } from '@angular/common/http';
 
 // MODELS
 import { User } from 'src/app/models/user/user.model';
@@ -10,6 +11,7 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root'
 })
 export class UserService {
+  auth = environment.authToken;
   isAlastriaIdVerified: boolean;
   apiUrl = environment.apiUrl;
   path = 'entity';
@@ -24,7 +26,13 @@ export class UserService {
   async login(user: any): Promise<any> {
     const username = (user.email) ? user.email : user.username;
     try {
-      const result: any = await this.http.get(`${this.apiUrl}/${this.path}/login?username=${username}&password=${user.password}`).toPromise();
+      const httpOptions = {
+        headers: new HttpHeaders({
+          'Content-Type':  'application/json',
+          'Authorization': this.auth
+        })
+      };
+      const result: any = await this.http.get(`${this.apiUrl}/${this.path}/login?username=${username}&password=${user.password}`, httpOptions).toPromise();
       if (result.authToken) {
         const userStorage: User = result.userData;
         userStorage.authToken = result.authToken;
@@ -39,7 +47,13 @@ export class UserService {
 
 
   createUser(user: User): any {
-    return this.http.post(`${this.apiUrl}/${this.path}/user`, user).toPromise()
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json',
+        'Authorization': this.auth
+      })
+    };
+    return this.http.post(`${this.apiUrl}/${this.path}/user`, user, httpOptions).toPromise()
       .then((res) => res)
       .catch((error: any) => {
         throw error;
@@ -47,7 +61,13 @@ export class UserService {
   }
 
   updateUser(user: User): any {
-    return this.http.put(`${this.apiUrl}/${this.path}/user?id=${user.id}`, user).toPromise()
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json',
+        'Authorization': this.auth
+      })
+    };
+    return this.http.put(`${this.apiUrl}/${this.path}/user?id=${user.id}`, user, httpOptions).toPromise()
       .then((res) => res)
       .catch((error: any) => {
         throw error;
@@ -55,7 +75,13 @@ export class UserService {
   }
 
   updatePassword(user: any): any {
-    return this.http.put(`${this.apiUrl}/${this.path}/user?id=${user.id}`, user).toPromise()
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json',
+        'Authorization': this.auth
+      })
+    };
+    return this.http.put(`${this.apiUrl}/${this.path}/user?id=${user.id}`, user, httpOptions).toPromise()
       .then((res) => res)
       .catch((error: any) => {
         throw error;

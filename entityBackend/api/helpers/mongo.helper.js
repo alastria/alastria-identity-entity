@@ -17,7 +17,7 @@ module.exports = {
 function connect(connectionData){
   return new Promise((resolve, reject) => {
     let intervalObject = setInterval(function(){
-      MongoClient.connect(`${connectionData.url}/${connectionData.dbName}`, function(error, db) {
+      MongoClient.connect(`${connectionData.url}/${connectionData.dbName}`, { useUnifiedTopology: true }, function(error, db) {
         if(error) {
           log.error(`${helper_name}[${connect.name}] -----> Trying connect with MongoDB ...`);
           reject(error);
