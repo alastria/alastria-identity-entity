@@ -6,10 +6,7 @@ services:
     restart: on-failure:5
     build: entityBackend
     image: entityback
-    # environment: 
-    #   - NODE_ENDPOINT=http://63.33.206.111/rpc
     links:
-    #   - ganache:ganache  // if you are using local endpoint uncomment this two lines
       - mongo-express:mongo-express
     ports:
       - "10010:10010"
@@ -35,13 +32,6 @@ services:
       options:
         max-size: "1m"
         max-file: "3"
-
-  # ganache:
-  #   restart: on-failure:5
-  #   image: trufflesuite/ganache-cli
-  #   ports:
-  #     - "8545:8545"
-  
   mongo:
     restart: on-failure:5
     image: mongo
