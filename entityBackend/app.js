@@ -49,6 +49,7 @@ loadJsonFile(pathFile)
     io.on('connect', socket => {
       log.info(`[App] -----> Websocket attached!`)
       socket.on('createIdentityWs', message => {
+        console.log('MESSAGE ----->', message)
         io.emit('createIdentityWs', message)
 	      log.info(`[App] -----> Message: ${JSON.stringify(message)}`)
       })

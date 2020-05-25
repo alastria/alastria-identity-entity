@@ -214,6 +214,10 @@ export class LinkUserComponent implements OnInit {
   private async login(userRegister: any, isRegister: boolean) {
     try {
       const userLogin = await this.userService.login(userRegister);
+      console.log('USERLOGIN LINK ----->', userLogin)
+      userLogin.id = (userLogin._id) ? userLogin._id : userLogin.id
+      delete userLogin._id
+      console.log('USERLOGIN LINK deleted _id----->', userLogin)
       if (isRegister) {
         this.userService.setUserLoggedIn(userLogin);
       } else {

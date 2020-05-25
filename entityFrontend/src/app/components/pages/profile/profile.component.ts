@@ -264,6 +264,7 @@ export class ProfileComponent implements OnInit {
 
   private async sendAlastriaTokenToApp() {
     const alastriaToken = await this.createAlastriaToken();
+    console.log('user sendalastria ------>', this.user)
     const message = {
       alastriaToken,
       callbackUrl: `${environment.callbackUrl}/entity/user?id=${this.user.id}`
