@@ -78,7 +78,8 @@ const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
       };
 
       const userLogin = await this.userService.login(user);
-
+      userLogin.id = (userLogin._id) ? userLogin._id : userLogin.id
+      delete userLogin._id
       this.userService.setUserLoggedIn(userLogin);
       this.router.navigate(['/', 'profile']);
     } catch (error) {
@@ -152,6 +153,7 @@ const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
         if (result.userData && result.authToken) {
           userStorage = result.userData;
           userStorage.authToken = result.authToken;
+          userStorage.id = result.userData._id
           this.onLogin(userStorage);
         } else {
           $('#simpleModal').modal('hide');
