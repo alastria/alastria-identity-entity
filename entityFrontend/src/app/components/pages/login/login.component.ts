@@ -78,10 +78,8 @@ const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
       };
 
       const userLogin = await this.userService.login(user);
-      console.log('USERLOGIN login------>', userLogin)
       userLogin.id = (userLogin._id) ? userLogin._id : userLogin.id
       delete userLogin._id
-      console.log('USERLOGIN login post delete------>', userLogin)
       this.userService.setUserLoggedIn(userLogin);
       this.router.navigate(['/', 'profile']);
     } catch (error) {
@@ -121,7 +119,6 @@ const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
    */
   async onLogin(user: User): Promise<any> {
     try {
-      console.log('onLogin user ----->', user)
       this.userService.setUserLoggedIn(user);
       $('#simpleModal').modal('hide');
       this.router.navigate(['/', 'profile']);
@@ -153,12 +150,10 @@ const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
     this.subscription.add(this.socketService.onSession()
       .subscribe((result) => {
         let userStorage: User;
-        console.log('RESULT ------>', result)
         if (result.userData && result.authToken) {
           userStorage = result.userData;
           userStorage.authToken = result.authToken;
           userStorage.id = result.userData._id
-          console.log('userStorage ------>', userStorage)
           this.onLogin(userStorage);
         } else {
           $('#simpleModal').modal('hide');
