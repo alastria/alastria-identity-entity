@@ -1,7 +1,7 @@
 FROM nginx:1.9.15
 
 ### File Author / Maintainer
-MAINTAINER "El que lo lea"
+MAINTAINER "Daniel de la Sota (Santander)"
 
 #nginx configuration disable defaults
 RUN mv /etc/nginx/conf.d/default.conf default.conf.disabled
