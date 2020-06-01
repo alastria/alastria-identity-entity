@@ -1,0 +1,48 @@
+.container-button {
+    width: inherit;
+}
+
+#personal-data {
+    border-right: solid 1px;
+}
+
+#qr {
+    height: 200px;
+}
+
+#alastria-verified {
+    width: 20px;
+    margin-bottom: 10px;
+}
+
+#divide-line {
+    display: none;
+}
+
+h3, h4 {
+    position: relative;
+    float: left;
+}
+
+h3 {
+    color: #325B8E;
+}
+
+fa {
+    color: #00CAD6;
+}
+
+h4 {
+    margin-top: 20px;
+}
+
+@media only screen and (max-width: 767px) {
+    #personal-data {
+        border-right: none;
+        margin-bottom: 20px;
+    }
+
+    #divide-line {
+        display: block;
+    }
+}

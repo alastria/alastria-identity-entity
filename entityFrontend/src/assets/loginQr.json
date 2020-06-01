@@ -1,0 +1,17 @@
+{
+    "header": {
+        "typ": "JWT",
+        "alg": "ES256K",
+        "kid": "did:ala:quor:redt:QmeeasCZ9jLbX...ueBJ7d7csxhb#keys-1"
+    },
+    "payload":{
+        "jti": "https://www.metrovacesa.com/alastria/presentationrequest/7864",
+        "iss": "did:alastria:quorum:testnet1:QmeeasCZ9jLbX...ueBJ7d7csxhb",
+        "gwu": "https://regular.telsius.blockchainbyeveris.io:2000",
+        "cbu": "https://serviceprovider.alastria.blockchainbyeveris.io/api/login/",
+        "iat": 1580295512,
+        "nbf": 1580295512,
+        "exp": 1580296112
+    },
+    "signature": "6c58A0M8opj4hF0brHZxnjogSdbijXVUrBXFmyqBw9A"
+}

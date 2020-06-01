@@ -1,0 +1,49 @@
+<div>
+  <div class="row">
+    <div class="col-12">
+      <h3>
+        <fa name="home"></fa>
+        Home
+      </h3>
+    </div>
+  </div>
+  <div *ngIf="service">
+    <div class="row">
+      <div id="image-col" class="col-12">
+        <img [src]="detailImageUrl" [alt]="detailImageAlt">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12 col-sm-12 col-md-12 col-lg-6">
+        <div class="float-right">
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas sit amet augue ac nunc euismod luctus vel at elit. Donec commodo finibus nisi a bibendum. Nullam mollis ultricies urna a feugiat. Nam elementum eleifend turpis.
+          </p>
+          <p>
+            Donec faucibus tincidunt eros a fermentum. Duis ultricies elementum enim. Curabitur dui ex, accumsan in vestibulum ac, tempor sit amet dolor. Nam ac luctus ligula. Morbi ante orci, pulvinar a blandit sit amet, lobortis sed quam.
+          </p>
+          <p>
+            Please, fill in the form to continue
+          </p>
+        </div>
+      </div>
+      <div class="col-12 col-sm-12 col-md-12 col-lg-6" *ngIf="!isContractServiceSuccess">
+        <app-service-form
+        (handleSubmit)="handleSubmit()"
+        (handleInitConnection)="initIoConnection()">
+        </app-service-form>
+      </div>
+      <div class="col-12 col-sm-12 col-md-6 col-lg-6" *ngIf="isContractServiceSuccess">
+        <p><img id="success-icon" src="../../../../assets/images/success-icon.svg" alt="Success image"></p>
+        <p>Great! You have already contracted the service.</p>
+        <p>You will receive a confirmation mail in a few minutes.</p>
+      </div>
+    </div>
+  </div>
+  <app-modal-result
+    [type]="resultModal.type"
+    [title]="resultModal.title"
+    [description]="resultModal.description"
+    (handleOk)="handleResultModalOk()">
+  </app-modal-result>
+</div>

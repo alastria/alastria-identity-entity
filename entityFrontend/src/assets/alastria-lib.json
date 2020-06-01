@@ -1,0 +1,29 @@
+{
+    "header": {
+        "alg": "ES256K",
+        "typ": "JWT",
+        "kid": "did:ala:quor:redT:d4c7cdab939ea85b5cc1e757ee809b17fbc2ffe2"
+    },
+    "payload": {
+        "jti": "https://www.metrovacesa.com/alastria/presentationrequest/7864",
+        "iss": "did:ala:quor:redT:b238ce01fa350387cd33d7007709422c521a0126",
+        "iat": null,
+        "exp": null,
+        "nbf": 1525465044,
+        "pr": {
+            "@context": [
+                "https://www.w3.org/2018/credentials/v1",
+                "JWT"
+            ],
+            "type": ["VerifiablePresentationRequest"],
+            "procHash": "H398sjHd...kldjUYn475n",
+            "procUrl": "entity/presentation",
+            "data": [
+            ]
+        }
+    },
+    "tokenId": "ze298y42sba",
+    "openAccess": "http://63.33.206.111/rpc",
+    "publicKey": "356e3fce435d8729062e52d263c0c705b3c5e201a9a9608cdb070764e6b8df30ae8423b439a7af2bcc3529778341ab06c1e44411352f217b68ce44a673a1df63",
+    "privateKey": "0d50e021f2a91af45e10ae26b77340f876e7ad06d17c00aa0ba899760b5ebded"
+}

@@ -1,0 +1,29 @@
+<div *ngIf="id" class="modal" tabindex="-1" role="dialog" [id]="id">
+  <div class="modal-dialog" [ngClass]="{'modal-xl': size === 'xl', 'modal-lg': size === 'lg', 'modal-sm': size === 'sm'}" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Alastria Id</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="qr" *ngIf="type === 'qr'">
+          <app-generate-qr id="qr"
+            [qrData]="qrData"
+            [size]="qrSize">
+          </app-generate-qr>
+        </div>
+        <div id="htmlContent" *ngIf="type !== 'qr'" [innerHTML]="htmlContent">
+        </div>
+      </div>
+      <div *ngIf="type === 'info'" class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)=loginOk()>Ok!</button>
+      </div>
+      <div *ngIf="type !== 'info'" class="modal-footer">
+        <button *ngIf="type !== 'qr'" type="button" class="btn btn-primary" (click)=loginOk()>Ok!</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

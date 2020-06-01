@@ -1,0 +1,29 @@
+<form [formGroup]="userForm" [name]="buttonName">
+  <div class="row" [ngClass]="{'justify-content-center': buttonName.toLowerCase() !== 'save' && !isDisabled}" *ngFor="let input of inputsForm">
+    <div class="col-12 col-sm-12 col-md-8">
+      <div class="form-group">
+        <label [for]="input.name">{{ input.label }}</label>
+        <div class="input-group mb-2">
+          <div class="input-group-prepend">
+            <div class="input-group-text">
+              <fa [name]="input.icon"></fa> 
+            </div>
+          </div>
+          <input *ngIf="input.value.toLowerCase() !== 'fullname'" [type]="input.type" class="form-control" [id]="input.name" [formControlName]="input.name">
+          <input *ngIf="input.value.toLowerCase() === 'fullname'" [type]="input.type" class="form-control" [id]="input.name" [formControlName]="input.name">
+        </div>
+        <div *ngIf="userForm?.controls[input.name].errors?.required && userForm?.controls[input.name].touched" class="alert alert-danger">
+          Please enter a {{ input.label }}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="userForm?.controls['repeatPassword']?.errors?.mismatch" class="alert alert-danger">
+    Passwords don't match.
+  </div>
+  <div class="row" [ngClass]="{'justify-content-center': buttonName.toLowerCase() != 'save' && !isDisabled}" *ngIf="buttonName && !isDisabled">
+    <div class="col-12 col-sm-12 col-md-8">
+      <button type="button" class="btn btn-outline-primary" (click)="editProfile()">{{ buttonName }}</button>
+    </div>
+  </div>
+</form>

@@ -1,0 +1,69 @@
+.container {
+    background-color: white;
+    height: 100%;
+    margin: auto;
+    padding: 50px;
+    max-width: 1450px;
+}
+
+.content, .outer-outlet {
+    width: 100%;
+    height: 100%;
+}
+
+.alastria-background-general {
+    background-color: #325B8E;
+    background-image: linear-gradient(rgb(50, 91, 142, 0), rgb(0, 202, 214, 1));
+}
+
+#alastria-background-login {
+    background-color: #325B8E;
+    background-image: linear-gradient(rgb(50, 91, 142, 0), rgb(0, 202, 214, 1));
+    width: 50%;
+    height: 100%;
+    position: relative;
+    float: right;
+}
+
+#alastria-background-login > div {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.app {
+    position: relative;
+    float: left;
+    text-align:center;
+    height: 100%;
+}
+
+.app-login {
+    width: 50%;
+}
+
+.app-general {
+    width: 100%;
+    -webkit-transition: width 1s; /* Safari prior 6.1 */
+    transition: width 1s;
+}
+
+div > img{
+    display: block;
+    margin: auto;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    position: absolute;
+    width: 40%;
+}
+
+@media only screen and (max-width: 900px) {
+    #alastria-background-login {
+      display: none;
+    }
+
+    .app-login {
+        width: 100%;
+    }
+}

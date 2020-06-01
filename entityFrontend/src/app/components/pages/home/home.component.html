@@ -1,0 +1,18 @@
+<div>
+  <div class="row">
+    <div class="col-12">
+      <h3>
+        <fa name="home"></fa>
+        Home
+      </h3>
+    </div>
+  </div>
+  <div class="row justify-content-center">
+    <div class="col-12 col-xs-12 col-sm-12 col-md-12 col-lg-4" *ngFor="let service of services">
+      <app-menu-card
+      [service]="service"
+      (handleSelectCard)="selectService($event)">
+      </app-menu-card>
+    </div>
+  </div>
+</div>

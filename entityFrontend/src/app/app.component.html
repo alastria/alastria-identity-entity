@@ -1,0 +1,22 @@
+<app-header *ngIf="router.url !== '/login'"></app-header>
+<div class="content" [ngClass]="{'alastria-background-general': router.url !== '/login'}">
+  <div  class="app"  [ngClass]="{'app-login': router.url === '/login', 'app-general': router.url !== '/login'}">
+    <div class="outer-outlet container">
+      <div class="alert alert-info" style="text-align: left;">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        If you have not downloaded the new version of the wallet, download it here. (The wallet was updated on 21/05/2020)
+        <a href="https://github.com/alastria/alastria-wallet/raw/develop/alastria-debug-mvp1.5.apk" target="_blank">
+          <button style="margin-left: 3em;" type="button" class="btn btn-primary">Download</button>
+        </a>
+        
+      </div>
+      <router-outlet>
+      </router-outlet>
+    </div>
+  </div>
+  <div id="alastria-background-login" *ngIf="router.url === '/login'">
+    <div>
+      <img src="../assets/images/logobw.svg" alt="alastria-logo" />
+    </div>
+  </div>
+</div>

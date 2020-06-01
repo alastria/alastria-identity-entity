@@ -1,0 +1,1015 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: Issuer & Service Provider backend
+host: localhost:10010
+basePath: /v1/entity
+# 
+schemes:
+  - http
+  - https
+consumes:
+  - application/octet-stream
+  - application/json
+  - text/plain
+  - text/html
+produces:
+  - application/octet-stream
+  - application/json
+  - text/plain
+  - text/html
+paths:
+  /credential:
+    x-swagger-router-controller: user.controller
+    get:
+      description: Get available credentials catalog from an issuer
+      operationId: getCredentialCatalog
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/credentialCatalogList"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /login:
+    x-swagger-router-controller: user.controller
+    get:
+      description: check if user has account into the platform
+      operationId: login
+      parameters:
+        - name: username
+          in: query
+          type: string
+          description: username or email of the user
+          required: true
+        - name: password
+          in: query
+          type: string
+          description: password of the user
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/userTokenAccess"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "401":
+          description: User not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /user:
+    x-swagger-router-controller: user.controller
+    post:
+      description: Create a new User in the database
+      # used as the method name of the controller
+      operationId: addUser
+      parameters:
+        - name: body
+          in: body
+          description: Necessary data to create a new user in database
+          required: false
+          schema: 
+            $ref: "#/definitions/userData"
+      responses:
+        "200":
+          description: User creation success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/userCreatedSuccess"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    put:
+      description: Update use data in the database
+      # used as the method name of the controller
+      operationId: updateUser
+      parameters:
+        - name: id
+          in: query
+          description: Id of the user to update
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: Necessary data to update an user in database
+          required: false
+          schema: 
+            $ref: "#/definitions/userData"
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/userData"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: User not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    get:
+      description: Get data saved in the database
+      operationId: getUser
+      parameters:
+        - name: userID
+          in: query
+          type: string
+          description: Id of the user
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/userInfo"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /user/checkAuth:
+    x-swagger-router-controller: user.controller
+    get:
+      description: check if user is authenticated
+      operationId: checkUserAuth
+      parameters:
+        - name: authToken
+          in: query
+          type: string
+          description: tokoen to check
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/userAuthenticated"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /user/credential/{identityDID}:
+    x-swagger-router-controller: user.controller
+    get:
+      description: Get available credentials catalog from an issuer
+      operationId: getCredentialIdentityCatalog
+      parameters:
+        - name: identityDID
+          in: path
+          type: string
+          description: Identity to find the credential catalog
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/credentialCatalogList"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /alastria/alastriaToken:
+    x-swagger-router-controller: entity.controller
+    post:
+      description: Create a new Alastria token
+      operationId: createAlastriaToken
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/alastriaTokenResponse"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /alastria/alastriaSession:
+    x-swagger-router-controller: entity.controller
+    post:
+      description: Verify and process the Alastria Session created and signed by the Subject
+      operationId: verifyAlastriaSession
+      parameters:
+        - name: alastriaSession
+          in: body
+          description: Alastria Session
+          required: false
+          schema: 
+            $ref: "#/definitions/alastriaSessionToken"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/alastriaSessionResponse"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /alastria/did:
+    x-swagger-router-controller: entity.controller
+    post:
+      description: Create a new Alastria identity, sent to an entity acting as an issuer (or identity helper)
+      operationId: createAlastriaID
+      parameters:
+        - name: AIC
+          in: body
+          description: Necessary data to create a new Alastria ID
+          required: false
+          schema: 
+            $ref: "#/definitions/alastriaIdentityCreation"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/alastriaIdentityResponse"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /alastria/did/{alastriaDID}:
+    x-swagger-router-controller: entity.controller
+    get:
+      description: Get public key of a given Alastria DID
+      operationId: getCurrentPublicKey
+      parameters:
+        - name: alastriaDID
+          in: path
+          description: AlastriaId to find the publicKey
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/publickeyResponse"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /alastria/did/{alastriaDID}/list:
+    x-swagger-router-controller: entity.controller
+    get:
+      description: Get past & current public keys of a given Alastria Id
+      operationId: getCurrentPublicKeyList
+      parameters:
+        - name: alastriaDID
+          in: path
+          description: AlastriaId to find the publicKey
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/publicKeyListResponse"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /alastria/did/entity:
+    x-swagger-router-controller: entity.controller
+    post:
+      description: Add identity as Entity
+      operationId: addEntity
+      parameters:
+        - name: entityData
+          in: body
+          description: Data of the entity
+          required: true
+          schema:
+            $ref: '#/definitions/entityData'
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/entityData"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    get:
+      description: Get current public information for all entities
+      operationId: getEntities
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/entitiesListResponse"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /alastria/did/entity/{entityDID}:
+    x-swagger-router-controller: entity.controller
+    get:
+      description: Get current public information for one entity
+      operationId: getEntity
+      parameters:
+        - name: entityDID
+          in: path
+          type: string
+          description: Existing DID
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/entityData"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /alastria/did/issuer:
+    x-swagger-router-controller: entity.controller
+    post:
+      description: Add new identity as Issuer
+      operationId: addIssuer
+      parameters:
+        - name: issuerData
+          in: body
+          description: Existing DID
+          required: true
+          schema:
+            $ref: "#/definitions/issuerData"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/isIssuerResponse"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /alastria/did/issuer/{issuerDID}:
+    x-swagger-router-controller: entity.controller
+    get:
+      description: Get current public information for all issuers
+      operationId: isIssuer
+      parameters:
+        - name: issuerDID
+          in: path
+          type: string
+          description: Existing DID
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/isIssuerResponse"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /alastria/credential:
+    x-swagger-router-controller: entity.controller
+    post:
+      description: Create and Registry Credential by the issuer
+      operationId: createCredential
+      parameters:
+        - name: identityDID
+          in: query
+          type: string
+          description: Identity DID of who is going to create the credential
+          required: true
+        - name: credential
+          in: body
+          description: Necessary data to add a new subject credential
+          required: false
+          schema: 
+            $ref: "#/definitions/credentialData"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/createCredentialResponse"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /alastria/credential/{identityDID}:
+    x-swagger-router-controller: entity.controller
+    get:
+      description: Get all the credentials available for the Subject (IdentityDID) with the status {available, valid, expired}
+      operationId: getSubjectCredentialList
+      parameters:
+        - name: identityDID
+          in: path
+          type: string
+          description: subject DID
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/credentialCatalogList"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /alastria/credential/status/subject:
+    get:
+      x-swagger-router-controller: entity.controller
+      description: get current Subject status for the given credential
+      operationId: getSubjectCredentialStatus
+      parameters:
+        - name: subjectCredentialHash
+          in: query
+          type: string
+          description: subjectCredential hash
+          required: true
+        - name: subjectDID
+          in: query
+          type: string
+          description: subject did
+          required: false
+      responses: 
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/obtainedStatusResponse"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /alastria/credential/status/issuer:
+    x-swagger-router-controller: entity.controller
+    post:
+      description: Update an issuer credential status if posible
+      operationId: updateIssuerCredentialStatus
+      parameters:
+        - name: credentialStatusData
+          in: body
+          description: Credential new status and credential hash
+          required: true
+          schema:
+            $ref: "#/definitions/credentialStatusData"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/credentialStatusResponse"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Credential not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    get:
+      description: get current Issuer or Subject status for the given credential
+      operationId: getIssuerCredentialStatus
+      parameters:
+        - name: issuerCredentialHash
+          in: query
+          type: string
+          description: IssuerC redential hash
+          required: true
+        - name: issuerDID
+          in: query
+          type: string
+          description: issuer did
+          required: false
+      responses: 
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/credentialStatusResponse"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /alastria/presentationRequest:
+    x-swagger-router-controller: entity.controller
+    post:
+      description: Create presentation request
+      operationId: createPresentationRequest
+      parameters:
+        - name: presentationRequestInfo
+          in: body
+          description: Necessary data to add a new subject presentation
+          required: false
+          schema: 
+            $ref: "#/definitions/presentationRequestData"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/presentationRequestResponse"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /alastria/presentation:
+    x-swagger-router-controller: entity.controller
+    post:
+      description: Receive the presentation from wallet
+      operationId: recivePresentationData
+      parameters:
+        - name: presentation
+          in: body
+          description: Necessary data to add a new subject presentation
+          required: true
+          schema: 
+            $ref: "#/definitions/subjectPresentationData"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/presentatioRequestResponse"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /alastria/presentation/{subjectDID}:
+    get:
+      x-swagger-router-controller: entity.controller
+      description: Get all the presentations available for the user with the status {Valid, Received, AskDeletion, DeletionConfirmation}
+      operationId: getSubjectPresentationListFromIssuer
+      parameters:
+        - name: subjectDID
+          in: path
+          type: string
+          description: subject DID
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/presentationList"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /alastria/presentation/status/subject:
+    x-swagger-router-controller: entity.controller
+    get:
+      description: get current Subject status for the given presentation
+      operationId: getSubjectPresentationStatus
+      parameters:
+        - name: subjectPresentationHash
+          in: query
+          type: string
+          description: presentation hash
+          required: true
+        - name: subjectDID
+          in: query
+          type: string
+          description: subject did
+          required: false
+      responses: 
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/presentationResponse"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /alastria/presentation/status/receiver:
+    x-swagger-router-controller: entity.controller
+    post:
+      description: Update a serviceProvider presentation status if posible
+      operationId: updateReceiverPresentationStatus
+      parameters:
+        - name: presentationHash
+          in: query
+          type: string
+          description: presentation hash
+          required: true
+        - name: status
+          in: body
+          description: Necessary data to add change presentation status
+          required: true
+          schema: 
+            $ref: "#/definitions/updatePresentationData"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/presentationResponse"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: presentation not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    get:
+      description: get current Service Provider (Receiver) status for the given presentation
+      operationId: getIssuerPresentationStatus
+      parameters:
+        - name: issuerPresentationHash
+          in: query
+          type: string
+          description: presentation hash
+          required: true
+        - name: issuerDID
+          in: query
+          type: string
+          description: Issuer did
+          required: false
+      responses: 
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/presentationResponse"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /swagger:
+    x-swagger-pipe: swagger_raw
+definitions:
+# defeinitions for user
+  userAuthenticated:
+    properties:
+      status:
+        type: boolean
+  userTokenAccess:
+    properties:
+      authtoken:
+        type: object
+  userData:
+    properties:
+      username:
+        type: string
+      name:
+        type: string
+      surname:
+        type: string
+      email:
+        type: string
+      address:
+        type: string
+      password:
+        type: string
+      vinculated:
+        type: boolean
+      did:
+        type: string
+  userCreatedSuccess:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  userInfo:
+    properties:
+      data:
+        type: object
+# End definitions for user
+  alastriaTokenResponse:
+    description: Object definition in Alastria Wiki (https://github.com/alastria/alastria-identity/wiki/Actions-and-Objects-Definition)
+    type: string
+  alastriaIdentityCreation:
+    description: Object definition in Alastria Wiki (https://github.com/alastria/alastria-identity/wiki/Actions-and-Objects-Definition)
+    type: string
+  alastriaSessionToken:
+    description: Object definition in Alastria Wiki (https://github.com/alastria/alastria-identity/wiki/Actions-and-Objects-Definition)
+    type: string
+  entityData:
+    properties:
+      didEntity:
+        type: string
+      name:
+        type: string
+      cif:
+        type: string
+      logoURL:
+        type: string
+      createAlastriaIdentityURL:
+        type: string
+      alastriaOpenAccessURL:
+        type: string
+      active:
+        type: boolean
+  issuerData:
+    properties:
+      didEntity:
+        type: string
+      eidasLevel:
+        type: integer
+  isIssuerResponse:
+    properties:
+      status:
+        type: boolean
+  credentialData:
+    type: array
+    items:
+      type: object
+      properties:
+        field_name:
+          type: string
+        credentialFormat:
+          type: string
+  credentialCatalogList:
+    properties: 
+      list:
+        $ref: "#/definitions/credentialCatalog"
+  credentialCatalog:
+    properties:
+      credentialName:
+        type: string
+      credentialType:
+        type: string
+      credentialValue:
+        type: string
+      credentialFormat:
+        type: object
+  credentialStatusData:
+    type: object
+    properties:
+      status:
+        type: integer
+      credentialHash:
+        type: string
+  presentationRequestData:
+    type: array
+    items:
+      type: object
+      properties:
+        field_name:
+          type: string
+        credentialFormat:
+          type: string
+        required:
+          type: boolean
+        levelOfAssurance:
+          type: integer
+  subjectPresentationData:
+    type: string
+  presentationList:
+    properties:
+      list:
+        type: array
+        items:
+          type: string
+  updatePresentationData:
+    properties:
+      newStatus:
+        type: number
+  alastriaSessionResponse:
+    type: string
+  createCredentialResponse:
+    properties:
+      signedCredentials:
+        type: array
+        items:
+          type: string
+  credentialStatusResponse:
+    properties:
+      status:
+        type: integer
+  obtainedStatusResponse:
+    properties:
+      status:
+        type: integer
+  alastriaIdentityResponse:
+    properties:
+      alastriaDID:
+        type: string
+  publickeyResponse:
+    properties:
+      publicKey:
+        type: string
+  publicKeyListResponse:
+    type: array
+    items:
+      type: object
+      properties:
+        publicKey:
+          type: string
+        status:
+          type: integer
+        startDate:
+          type: string
+        endDate:
+          type: string
+  entitiesListResponse:
+    type: array
+    items:
+      $ref: "#/definitions/entityData"
+  presentationRequestResponse:
+    description: Presentation Request signed by entity
+    type: string
+  presentationResponse:
+    properties:
+      status:
+        type: integer
+  presentatioRequestResponse:
+    type: string
+  ErrorResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string

@@ -1,0 +1,47 @@
+version: "2.0"
+
+services:
+
+  entitybackend:
+    restart: on-failure:5
+    build: entityBackend
+    image: entityback
+    links:
+      - mongo-express:mongo-express
+    ports:
+      - "10010:10010"
+      - "10011:8080"
+    volumes:
+      - ./entityBackend/api:/app/api
+      - ./entityBackend/config.json:/app/config.json
+    command: npm run start
+
+  entityfrontend:
+    restart: on-failure:5
+    build: entityFrontend
+    image: entityfront
+    ports:
+      - "80:80"
+    volumes:
+     - ./entityFrontend/docker_conf/nginx.conf:/etc/nginx/nginx.conf
+     - ./entityFrontend/dist:/usr/share/nginx/html
+    links:
+      - entitybackend:entitybackend
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "3"
+  mongo:
+    restart: on-failure:5
+    image: mongo
+    ports:
+      - 27017:27017
+
+  mongo-express:
+    image: mongo-express
+    restart: on-failure:5
+    links:
+      - mongo
+    ports:
+      - 8081:8081

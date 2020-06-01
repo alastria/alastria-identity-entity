@@ -1,0 +1,33 @@
+// config.helper.js
+
+/////////////////////////////////////////////////////////
+///////                 CONSTANTS                 ///////
+/////////////////////////////////////////////////////////
+
+const Log = require('log4js')
+const helper_name = '[Config Helper]'
+const log = Log.getLogger()
+
+/////////////////////////////////////////////////////////
+///////              MODULE EXPORTS               ///////
+/////////////////////////////////////////////////////////
+
+module.exports = {
+  setConfig,
+  getConfig
+}
+
+/////////////////////////////////////////////////////////
+///////              PUBLIC FUNCTIONS             ///////
+/////////////////////////////////////////////////////////
+
+let myConfig = {}
+
+function setConfig(config) {
+  log.info(`${helper_name}[${setConfig.name}] -----> Setting obtained config ...`)
+  myConfig = config
+}
+
+function getConfig() {
+  return myConfig
+}

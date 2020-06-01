@@ -1,0 +1,51 @@
+<div class="container">
+  <div class="row  justify-content-center">
+    <app-button-login 
+        iconClass="fa fa-google" 
+        title="Click for show qr to fill"
+        socialName="alastriaId"
+        [style]="styleButtonAlastriaId"
+        imgUrl="../../../assets/images/alastria-icon.svg"
+        (handleLoginSocial)="showModalQr($event)">
+    </app-button-login>
+  </div>
+  <form [formGroup]="serviceForm" (ngSubmit)="onSubmit($event)" novalidate>
+    <div class="row">
+      <div class="col-1 hidden-sm"></div>
+      <div class="col-sm-12 col-md-12 col-lg-8">
+        <div class="form-group">
+          <label for="fullname">Full Name</label>
+          <input type="text" class="form-control" id="fullname" formControlName="fullname" class="form-control">
+        </div>
+        <div *ngIf="!serviceForm?.controls.fullname.valid && serviceForm?.controls.fullname.touched" class="alert alert-danger">
+          Please enter your fullname
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-1 hidden-sm"></div>
+      <div class="col-sm-12 col-md-12 col-lg-8">
+        <div class="form-group">
+          <label for="address">Address</label>
+          <input type="text" class="form-control" id="address" formControlName="address" class="form-control">
+        </div>
+        <div *ngIf="!serviceForm?.controls.address.valid && serviceForm?.controls.address.touched" class="alert alert-danger">
+          Please enter your address
+        </div>
+      </div>
+    </div>
+    <div class="col-12">
+      <div class="form-group text-center">
+        <button class="btn btn-outline-primary" type="submit" [disabled]="!serviceForm?.controls.fullname.valid  || !serviceForm?.controls.address.valid"> 
+          CONTRACT 
+        </button>
+      </div>
+    </div>
+  </form>
+  <app-simple-modal 
+    [qrSize]="qrSize"
+    [qrData]="qrData" 
+    type="qr"
+    (handleOk)="getServiceForm()">
+  </app-simple-modal>
+</div>

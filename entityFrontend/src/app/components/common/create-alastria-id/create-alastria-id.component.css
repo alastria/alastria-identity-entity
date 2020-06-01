@@ -1,0 +1,52 @@
+#text-info-downloads {
+    font-size: 10px;
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+#qr {
+    height: 180px;
+}
+
+#qr h3, #qr span, fa {
+    color: #325B8E;
+}
+
+#subtitle {
+    margin-bottom: 8px;
+}
+
+fa {
+    margin-left: 5px;
+    cursor: pointer;
+    font-size: x-large;
+}
+
+p {
+    text-align: justify;
+    width: 250px;
+    font-size: 10px;
+    font-weight: bold;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+img {
+    width: 200px;
+    cursor: pointer;
+    border: solid 1px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+@media only screen and (max-width: 991px) {
+    .download-qr {
+        margin-top: 10px;
+        margin-bottom: 20px;
+    }
+
+    fa {
+        font-size: large;
+    }
+}

@@ -1,0 +1,50 @@
+.card {
+    width: 345px;
+    text-align: justify;
+    height: 335px;
+    margin: auto;
+    margin-bottom: 25px;
+}
+
+img {
+    position: absolute;
+    height: 175px
+}
+
+.card-body {
+    position: relative;
+    top: 105px;
+}
+
+h3 {
+    color: white;
+    display: table-cell;
+    vertical-align: middle;
+    left: 20px;
+    position: relative;
+}
+
+.card-title {
+    background-color: rgba(196,196,196,0.5);
+    width: 345px;
+    position: relative;
+    right: 21px;
+    height: 50px;
+    display: table;
+}
+
+@media only screen and (max-width: 430px) {
+    .card {
+        height: 355px;
+    }
+
+    .card, .card-title {
+        width: 270px;
+    }
+}
+
+@media only screen and (min-width: 992px) and (max-width: 1135px) {
+    .card, .card-title {
+        width: 290px;
+    }
+}

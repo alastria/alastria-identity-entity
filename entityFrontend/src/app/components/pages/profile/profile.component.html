@@ -1,0 +1,82 @@
+<div>
+  <div class="row">
+    <div class="col-12">
+      <h3>
+        <fa name="user"></fa>
+        Your Profile
+      </h3>
+    </div>
+  </div>
+  <div class="row">
+    <div id="personal-data" class="col-md-6">
+      <div class="row">
+        <div class="col-sm-11">
+          <h4>
+            <img *ngIf="user.vinculated" id="alastria-verified" src="../../../../assets/images/alastria-icon.svg" alt="alastria-icon">
+            Personal Data
+          </h4>
+        </div>
+      </div>
+      <app-user-form 
+        [user]="user" 
+        [inputsForm]="inputsUserForm"
+        [isDisabled]=true
+        buttonName="Save"
+        (handleEditProfile)="handleEditProfile($event)">
+      </app-user-form>
+      <app-user-form 
+        *ngIf="optionsMenu && optionSelected === optionsMenu[1]"
+        [user]="user" 
+        [inputsForm]="inputsResetPassword"
+        [isDisabled]=false
+        buttonName="Save"
+        (handleEditProfile)="handleResetPassword($event)">
+      </app-user-form>
+    </div>
+    <div class="col-md-6">
+      <hr id="divide-line">
+      <div *ngIf="!qrAlastriaId || user.vinculated" id="actions-menu">
+          <div class="row">
+            <div class="col-12">
+              <h4>Actions</h4>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <app-menu [options]="optionsMenu" (handleSelectOption)="handleSelectOption($event)" [optionSelected]="optionSelected"></app-menu>
+            </div>
+          </div>
+      </div>
+      <div *ngIf="isCreateAlastriaId" id="create-alastria-id" class="row" >
+        <div class="col-12">
+          <app-create-alastria-id
+          [title]="parametersForCreateAlastriaId.title"
+          [subtitle]="parametersForCreateAlastriaId.subtitle"
+          [type]="parametersForCreateAlastriaId.type"
+          (handleGenerateQr)="handleGenerateQr($event)">
+        </app-create-alastria-id>
+        </div>
+      </div>
+    </div>
+  </div>
+  <app-modal-result
+    [type]="resultModal.type"
+    [title]="resultModal.title"
+    [description]="resultModal.description"
+    (handleOk)="handleResultModalOk()">
+  </app-modal-result>
+  <app-simple-modal *ngIf="user.vinculated"
+    (handleOk)="handleOkFillYourProfile()" 
+    [qrSize]="512"
+    size="xl"
+    type="qr"
+    [qrData]="qrDataFillProfile">
+  </app-simple-modal>
+  <app-modal-create-alastria-id
+  (handleCreateAlastriaId)="handleCreateAlastriaId()"
+  (handleSetUpAlastriaId)="handleSetUpAlastriaId()">
+  </app-modal-create-alastria-id>
+  <app-modal-fill-profile
+    (handleFillYourProfile)="handleFillYourProfile($event)">
+  </app-modal-fill-profile>
+</div>
