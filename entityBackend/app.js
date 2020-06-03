@@ -78,7 +78,7 @@ loadJsonFile(pathFile)
       
       // Auth
       app.all('*', (req, res, next) => {
-        let tokenJWT = req.headers['authorization']
+        let tokenJWT = (req.headers['authorization']) ? req.headers['authorization'] : req.query.authToken
         keyManagerUrl = myConfig.keyManagerUrl
         if(!tokenJWT) {
           let error = 'It is necessary to provide an authentication token'

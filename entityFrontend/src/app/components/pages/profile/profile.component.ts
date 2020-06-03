@@ -258,7 +258,7 @@ export class ProfileComponent implements OnInit {
     this.qrDataFillProfile = JSON.stringify(profileFields);
     this.initIoConnection();
     const credentials = await this.createCredentials(profileFields);
-    this.qrDataFillProfile = JSON.stringify(credentials);
+    this.qrDataFillProfile = JSON.stringify(credentials.url);
     $('#simpleModal').modal('show');
   }
 

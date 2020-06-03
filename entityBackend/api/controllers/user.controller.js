@@ -25,7 +25,8 @@ module.exports = {
   updateUser,
   getUser,
   getCredentialIdentityCatalog,
-  checkUserAuth
+  checkUserAuth,
+  getCredentialFromDB
 }
 
 /////////////////////////////////////////////////////////
@@ -119,19 +120,11 @@ function getUser(req, res) {
   log.debug(`${controller_name}[${getUser.name}] -----> Sending params: ${JSON.stringify(id)}`)
   userModel.getUser(id)
   .then(userData => {
-    if (userData == null) {
-      log.info(`${controller_name}[${getUser.name}] -----> User not found`)
-      let msg = {
-        message: `User not found`
-      }
-      res.status(404).send(msg)
-    } else {
-      log.info(`${controller_name}[${getUser.name}] -----> User found`)
-      let userInfo = {
-        user: userData
-      }
-      res.status(200).send(userInfo)
+    log.info(`${controller_name}[${getUser.name}] -----> User found`)
+    let userInfo = {
+      user: userData
     }
+    res.status(200).send(userInfo)
   })
   .catch(error => {
     llog.error(`${controller_name}[${getUser.name}] -----> ${error}`)
@@ -155,6 +148,24 @@ function getCredentialIdentityCatalog(req, res) {
     log.error(`${controller_name}[${getCredentialIdentityCatalog.name}] -----> ${error}`)
     Errmsg.message = error
     res.status(404).send(Errmsg)
+  })
+}
+
+function getCredentialFromDB(req, res) {
+  log.info(`${controller_name}[${getCredentialFromDB.name}] -----> IN ...`)
+  let authToken = req.swagger.params.authToken.value
+  log.debug(`${controller_name}[${getCredentialFromDB.name}] -----> Sending params: ${authToken}`)
+  userModel.getCredentialFromDB(authToken)
+  .then(credentials => {
+    log.info(`${controller_name}[${getCredentialFromDB.name}] -----> Getted credentials from DB`)
+    res.status(200).send(credentials)
+  })
+  .catch(error => {
+    Errmsg.message = error
+    log.error(`${controller_name}[${getCredentialFromDB.name}] -----> ${Errmsg.message}`)
+    io.emit('error', {status: 400,
+                      message: Errmsg.message})
+    res.status(400).send(Errmsg)
   })
 }
 

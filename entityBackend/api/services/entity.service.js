@@ -6,7 +6,9 @@
 
 const { transactionFactory, config } = require('alastria-identity-lib')
 const EthCrypto = require('eth-crypto')
+const fetch = require('node-fetch')
 const configHelper = require('../helpers/config.helper')
+const mongoModel = require('../models/user.model')
 const myConfig = configHelper.getConfig()
 const web3Helper = require('../helpers/web3.helper')
 const web3 = web3Helper.getWeb3()
@@ -364,7 +366,17 @@ async function createCredential(identityDID, credentials) {
       })
     })
     log.info(`${serviceName}[${createCredential.name}] -----> Created Successfully`)
-    return credentialsJWT
+    
+    let credentialObject = {
+      verifiableCredential: credentialsJWT
+    }
+
+    let responseToken = await mongoModel.saveTempCredential(credentialObject, identityDID)
+    let credentialTinyURL = {
+      url: `${myConfig.callbackUrl}credential/db?authToken=${responseToken}`
+    }
+
+    return credentialTinyURL
   }
   catch(error){
     log.error(`${serviceName}[${createCredential.name}] -----> ${error}`)

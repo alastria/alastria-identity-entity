@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 /////////////////////////////////////////////////////////
 ///////                 constants                 ///////
@@ -245,10 +245,7 @@ function createCredential(req, res) {
   entityService.createCredential(identityDID, credentials)
   .then(credential => {
     log.info(`${controller_name}[${createCredential.name}] -----> Credentials created`)
-    let credentialToken = {
-      verifiableCredential: credential
-    }
-    res.status(200).send(credentialToken)
+    res.status(200).send(credential)
   })
   .catch(error => {
     log.error(`${controller_name}[${createCredential.name}] -----> ${error}`)
@@ -384,20 +381,20 @@ function getSubjectPresentationStatus(req, res) {
 }
 
 function updateReceiverPresentationStatus(req, res){
-  log.info(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> IN ...`);
-  let presentationHash = req.swagger.params.presentationHash.value;
-  let newStatus = req.swagger.params.status.value.newStatus;
+  log.info(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> IN ...`)
+  let presentationHash = req.swagger.params.presentationHash.value
+  let newStatus = req.swagger.params.status.value.newStatus
   log.debug(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> Sending params: ${presentationHash}, ${newStatus}`)
   entityService.updateReceiverPresentationStatus(presentationHash, newStatus)
   .then(status => { 
-    log.info(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> Successfully updated status presentation`);
+    log.info(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> Successfully updated status presentation`)
     let gettedStatus = {
       presentationStatus: status
     }
-    res.status(200).send(gettedStatus);
+    res.status(200).send(gettedStatus)
   })
   .catch(error => {
-    log.error(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> ${error}`);
+    log.error(`${controller_name}[${updateReceiverPresentationStatus.name}] -----> ${error}`)
     Errmsg.message = error
     res.status(404).send(Errmsg)
   }) 
@@ -413,22 +410,22 @@ function getIssuerPresentationStatus(req, res) {
     let gettedStatus = {
       presentationStatus: status
     }
-    res.status(200).send(gettedStatus);
+    res.status(200).send(gettedStatus)
   })
   .catch(error => {
-    log.error(`${controller_name}[${getIssuerPresentationStatus.name}] -----> ${error}`);
+    log.error(`${controller_name}[${getIssuerPresentationStatus.name}] -----> ${error}`)
     Errmsg.message = error
     res.status(404).send(Errmsg)
   })
 }
 
 function recivePresentationData(req, res) {
-  log.info(`${controller_name}[${recivePresentationData.name}] -----> IN ...`);
+  log.info(`${controller_name}[${recivePresentationData.name}] -----> IN ...`)
   let presentationSigned = req.swagger.params.presentation.value
   log.debug(`${controller_name}[${recivePresentationData.name}] -----> Sending params: ${presentationSigned}`)
   entityService.getPresentationData(presentationSigned)
   .then(subjectData => {
-    log.info(`${controller_name}[${recivePresentationData.name}] -----> Successfully obtained presentation data`);
+    log.info(`${controller_name}[${recivePresentationData.name}] -----> Successfully obtained presentation data`)
     io.emit('getPresentationData', {status: 200,
                                     message: subjectData})
 
@@ -439,7 +436,7 @@ function recivePresentationData(req, res) {
   })
   .catch(error => {
     Errmsg.message = (error == false) ? 'Clave pública no válida' : 'Error obteniendo los datos de la presentación'
-    log.error(`${controller_name}[${recivePresentationData.name}] -----> ${Errmsg.message}`);
+    log.error(`${controller_name}[${recivePresentationData.name}] -----> ${Errmsg.message}`)
     io.emit('error', {status: 400,
                       message: Errmsg.message})
     res.status(400).send(Errmsg)

@@ -15,7 +15,8 @@ const moduleName = '[User Model]'
 const ObjectId = require('mongodb').ObjectID
 
 const mongoDatabase = myConfig.mongo.dbName
-const mongoCollection = myConfig.mongo.collection
+const userCollection = myConfig.mongo.collectionUser
+const credentialCollection = myConfig.mongo.collectionCredentials
 
 /////////////////////////////////////////////////////////
 ///////               MODULE EXPORTS              ///////
@@ -27,7 +28,9 @@ module.exports = {
   updateUser,
   getUser,
   getCredentialIdentityCatalog,
-  checkAuth
+  checkAuth,
+  saveTempCredential,
+  getCredentialFromDB
 }
 
 /////////////////////////////////////////////////////////
@@ -40,13 +43,12 @@ async function isAuth(data) {
     let connected = await mongoHelper.connect(myConfig.mongo)
     log.info(`${moduleName}[${isAuth.name}] -----> Checking if user is authenticated`);
     let db = connected.db(mongoDatabase)
-    let found = await db.collection(mongoCollection).findOne({"$or":[{"username": data.user}, {"email": data.user}], "password": data.password})
+    let found = await db.collection(userCollection).findOne({"$or":[{"username": data.user}, {"email": data.user}], "password": data.password})
     connected.close();
     return found
   }
   catch(error) {
     log.error(`${moduleName}[${isAuth.name}] Error -> ${error}`);
-    connected.close()
     throw error
   }
 }
@@ -63,7 +65,7 @@ async function login(params){
     let pwd = params.password
     let connected = await mongoHelper.connect(myConfig.mongo)
     let db = connected.db(mongoDatabase)
-    let found = await db.collection(mongoCollection).findOne({"$or":[{"username": username}, {"email": username}], "password": pwd})
+    let found = await db.collection(userCollection).findOne({"$or":[{"username": username}, {"email": username}], "password": pwd})
     if(found == null) {
       return found
     }
@@ -83,7 +85,6 @@ async function login(params){
   }
   catch(error) {
     log.error(`${moduleName}[${login.name}] Error -> ${error}`);
-    connected.close()
     throw error
   }
 }
@@ -104,7 +105,7 @@ async function createUser(params) {
       titleLegalBlockchain: myConfig.title
     }
     let db = connected.db(mongoDatabase)
-    let created = await db.collection(mongoCollection).insertOne(userData)
+    await db.collection(userCollection).insertOne(userData)
     log.info(`${moduleName}[${createUser.name}] -----> User created successfuly`)
     let msg = {
       message: 'Created new user correctly'
@@ -115,7 +116,6 @@ async function createUser(params) {
   }
   catch(error) {
     log.error(`${moduleName}[${createUser.name}] -----> Error: ${error}`)
-    connected.close()
     throw error
   }
 }
@@ -139,7 +139,7 @@ async function updateUser(params) {
       update.password = params.password
     }
     let db = connected.db(mongoDatabase)
-    let updated = await db.collection(mongoCollection).updateOne({"_id": new ObjectId(id)},{"$set": update })
+    let updated = await db.collection(userCollection).updateOne({"_id": new ObjectId(id)},{"$set": update })
     log.info(`${moduleName}[${updateUser.name}] -----> Updated Records: ${updated.result.nModified}`)
     let gettedUser = await getUser(id)
     let result = {
@@ -152,7 +152,6 @@ async function updateUser(params) {
   }
   catch(error) {
     log.error(`${moduleName}[${updateUser.name}] -----> Error: ${error}`)
-    connected.close()
     throw error
   }
 }
@@ -163,10 +162,12 @@ async function getUser(id) {
     let find = (id.startsWith('did') == true) ? {"did":id} : {"_id": new ObjectId(id)}
     let connected = await mongoHelper.connect(myConfig.mongo)
     let db = connected.db(mongoDatabase)
-    let user = await db.collection(mongoCollection).findOne(find)
+    let user = await db.collection(userCollection).findOne(find)
     if (user == null){
-      log.info(`${moduleName}[${getUser.name}] -----> User not found in the DataBase`)
-      return user
+      let error = 'User not found in the DataBase'
+      log.info(`${moduleName}[${getUser.name}] -----> ${error}`)
+      connected.close()
+      throw error
     } else {
       log.info(`${moduleName}[${getUser.name}] -----> Data obtained`)
       let loged = await login(user)
@@ -177,7 +178,6 @@ async function getUser(id) {
   }
   catch(error) {
     log.error(`${moduleName}[${getUser.name}] -----> Error: ${error}`)
-    connected.close()
     throw error
   }
 }
@@ -224,6 +224,46 @@ async function checkAuth(token) {
   }
   catch(error) {
     log.error(`${moduleName}[${checkAuth.name}] -----> Error: ${error}`)
+    throw error
+  }
+}
+
+async function saveTempCredential(credential, subjectDID) {
+  try {
+    log.info(`${moduleName}[${saveTempCredential.name}] -----> IN...`)
+    let connected = await mongoHelper.connect(myConfig.mongo)
+    let credentialData = {
+      authToken: jwt.sign({data: subjectDID}, myConfig.authKeyToken, { expiresIn: 60 * 60 }),
+      credential: credential
+    }
+    let db = connected.db(mongoDatabase)
+    await db.collection(credentialCollection).insertOne(credentialData)
+    log.info(`${moduleName}[${saveTempCredential.name}] -----> Credential saved successfuly`)
+    connected.close()
+    return credentialData.authToken
+  }
+  catch(error) {
+    log.error(`${moduleName}[${saveTempCredential.name}] -----> Error: ${error}`)
+    throw error
+  }
+}
+
+async function getCredentialFromDB(authToken) {
+  try {
+    log.info(`${moduleName}[${getCredentialFromDB.name}] -----> IN...`)
+    let find = {"authToken": authToken}
+    let connected = await mongoHelper.connect(myConfig.mongo)
+    let db = connected.db(mongoDatabase)
+    let credentialFound = await db.collection(credentialCollection).findOne(find)
+    if(credentialFound == null){
+      let error = 'Credential not found'
+      throw error
+    }
+    connected.close()
+    return credentialFound.credential
+  }
+  catch(error) {
+    log.error(`${moduleName}[${getCredentialFromDB.name}] -----> Error: ${error}`)
     throw error
   }
 }
