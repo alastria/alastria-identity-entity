@@ -26,7 +26,7 @@ module.exports = {
   getUser,
   getCredentialIdentityCatalog,
   checkUserAuth,
-  getCredentialFromDB
+  getObjectFromDB
 }
 
 /////////////////////////////////////////////////////////
@@ -151,18 +151,19 @@ function getCredentialIdentityCatalog(req, res) {
   })
 }
 
-function getCredentialFromDB(req, res) {
-  log.info(`${controller_name}[${getCredentialFromDB.name}] -----> IN ...`)
+function getObjectFromDB(req, res) {
+  log.info(`${controller_name}[${getObjectFromDB.name}] -----> IN ...`)
   let authToken = req.swagger.params.authToken.value
-  log.debug(`${controller_name}[${getCredentialFromDB.name}] -----> Sending params: ${authToken}`)
-  userModel.getCredentialFromDB(authToken)
-  .then(credentials => {
-    log.info(`${controller_name}[${getCredentialFromDB.name}] -----> Getted credentials from DB`)
-    res.status(200).send(credentials)
+  log.debug(`${controller_name}[${getObjectFromDB.name}] -----> Sending params: ${authToken}`)
+  userModel.getObjectsFromDB(authToken)
+  .then(object => {
+    log.info(`${controller_name}[${getObjectFromDB.name}] -----> Getted object from DB`)
+    userModel.deleteObjectFromDB(authToken)
+    res.status(200).send(object)
   })
   .catch(error => {
     Errmsg.message = error
-    log.error(`${controller_name}[${getCredentialFromDB.name}] -----> ${Errmsg.message}`)
+    log.error(`${controller_name}[${getObjectFromDB.name}] -----> ${Errmsg.message}`)
     io.emit('error', {status: 400,
                       message: Errmsg.message})
     res.status(400).send(Errmsg)

@@ -16,7 +16,7 @@ const ObjectId = require('mongodb').ObjectID
 
 const mongoDatabase = myConfig.mongo.dbName
 const userCollection = myConfig.mongo.collectionUser
-const credentialCollection = myConfig.mongo.collectionCredentials
+const collectionData = myConfig.mongo.collectionData
 
 /////////////////////////////////////////////////////////
 ///////               MODULE EXPORTS              ///////
@@ -29,8 +29,9 @@ module.exports = {
   getUser,
   getCredentialIdentityCatalog,
   checkAuth,
-  saveTempCredential,
-  getCredentialFromDB
+  saveTempObject,
+  getObjectsFromDB,
+  deleteObjectFromDB
 }
 
 /////////////////////////////////////////////////////////
@@ -165,7 +166,7 @@ async function getUser(id) {
     let user = await db.collection(userCollection).findOne(find)
     if (user == null){
       let error = 'User not found in the DataBase'
-      log.info(`${moduleName}[${getUser.name}] -----> ${error}`)
+      log.error(`${moduleName}[${getUser.name}] -----> ${error}`)
       connected.close()
       throw error
     } else {
@@ -228,42 +229,68 @@ async function checkAuth(token) {
   }
 }
 
-async function saveTempCredential(credential, subjectDID) {
+async function saveTempObject(object, subjectDID) {
   try {
-    log.info(`${moduleName}[${saveTempCredential.name}] -----> IN...`)
+    log.info(`${moduleName}[${saveTempObject.name}] -----> IN...`)
     let connected = await mongoHelper.connect(myConfig.mongo)
-    let credentialData = {
+    let objectData = {
       authToken: jwt.sign({data: subjectDID}, myConfig.authKeyToken, { expiresIn: 60 * 60 }),
-      credential: credential
+      object: object
     }
     let db = connected.db(mongoDatabase)
-    await db.collection(credentialCollection).insertOne(credentialData)
-    log.info(`${moduleName}[${saveTempCredential.name}] -----> Credential saved successfuly`)
+    await db.collection(collectionData).insertOne(objectData)
+    log.info(`${moduleName}[${saveTempObject.name}] -----> Object saved successfuly`)
     connected.close()
-    return credentialData.authToken
+    return objectData.authToken
   }
   catch(error) {
-    log.error(`${moduleName}[${saveTempCredential.name}] -----> Error: ${error}`)
+    log.error(`${moduleName}[${saveTempObject.name}] -----> Error: ${error}`)
     throw error
   }
 }
 
-async function getCredentialFromDB(authToken) {
+async function getObjectsFromDB(authToken) {
   try {
-    log.info(`${moduleName}[${getCredentialFromDB.name}] -----> IN...`)
+    log.info(`${moduleName}[${getObjectsFromDB.name}] -----> IN...`)
     let find = {"authToken": authToken}
     let connected = await mongoHelper.connect(myConfig.mongo)
     let db = connected.db(mongoDatabase)
-    let credentialFound = await db.collection(credentialCollection).findOne(find)
-    if(credentialFound == null){
-      let error = 'Credential not found'
+    let objectFound = await db.collection(collectionData).findOne(find)
+    if(objectFound == null){
+      let error = 'Object not found'
+      log.error(`${moduleName}[${getObjectsFromDB.name}] -----> ${error}`)
+      connected.close()
       throw error
     }
     connected.close()
-    return credentialFound.credential
+    log.info(`${moduleName}[${getObjectsFromDB.name}] -----> Object saved successfuly`)
+    return objectFound.object
   }
   catch(error) {
-    log.error(`${moduleName}[${getCredentialFromDB.name}] -----> Error: ${error}`)
+    log.error(`${moduleName}[${getObjectsFromDB.name}] -----> Error: ${error}`)
+    throw error
+  }
+}
+
+async function deleteObjectFromDB(authToken) {
+  try {
+    log.info(`${moduleName}[${deleteObjectFromDB.name}] -----> IN...`)
+    let deleteOne = {"authToken": authToken}
+    let connected = await mongoHelper.connect(myConfig.mongo)
+    let db = connected.db(mongoDatabase)
+    let objectDeleted = await db.collection(collectionData).deleteOne(deleteOne)
+    if(objectDeleted == null) {
+      let error = 'Object not found'
+      log.error(`${moduleName}[${deleteObjectFromDB.name}] -----> ${error}`)
+      connected.close()
+      throw error
+    }
+    connected.close()
+    log.info(`${moduleName}[${deleteObjectFromDB.name}] -----> Object deleted successfuly`)
+    return
+  }
+  catch(error) {
+    log.error(`${moduleName}[${deleteObjectFromDB.name}] -----> Error: ${error}`)
     throw error
   }
 }

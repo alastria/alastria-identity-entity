@@ -41,11 +41,11 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /credential/db:
+  /objects/db:
     x-swagger-router-controller: user.controller
     get:
       description: Get available credentials catalog from an issuer
-      operationId: getCredentialFromDB
+      operationId: getObjectFromDB
       parameters:
         - name: authToken
           in: query
@@ -990,11 +990,7 @@ definitions:
   credentialsURLResponse:
     type: string
   createCredentialResponse:
-    properties:
-      signedCredentials:
-        type: array
-        items:
-          type: string
+    type: string
   credentialStatusResponse:
     properties:
       status:

@@ -99,6 +99,10 @@ loadJsonFile(pathFile)
                 log.info(`[App] -----> Server started in http://localhost:${port}`)
                 next()
               })
+              .catch(error => {
+                log.error(`[App] -----> ${error}`)
+                res.status(401).send(error)
+              })
             // })
           }
         // }

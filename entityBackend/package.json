@@ -8,7 +8,7 @@
   "license": "",
   "main": "app.js",
   "dependencies": {
-    "alastria-identity-lib": "github:alastria/alastria-identity-lib#develop",
+    "alastria-identity-lib": "github:alastria/alastria-identity-lib",
     "axios": "0.19.2",
     "cors": "2.8.3",
     "eth-crypto": "1.5.2",
@@ -16,7 +16,6 @@
     "jsonwebtoken": "8.5.1",
     "log4js": "6.1.0",
     "mongodb": "3.5.1",
-    "node-fetch": "2.6.0",
     "socket.io": "2.3.0",
     "swagger-express-mw": "0.1.0"
   },

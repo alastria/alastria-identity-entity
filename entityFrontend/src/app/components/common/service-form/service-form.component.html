@@ -34,9 +34,34 @@
         </div>
       </div>
     </div>
+    <div class="row">
+      <div class="col-1 hidden-sm"></div>
+      <div class="col-sm-12 col-md-12 col-lg-8">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="text" class="form-control" id="email" formControlName="email" class="form-control">
+        </div>
+        <div *ngIf="!serviceForm?.controls.email.valid && serviceForm?.controls.email.touched" class="alert alert-danger">
+          Please enter your email
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-1 hidden-sm"></div>
+      <div class="col-sm-12 col-md-12 col-lg-8">
+        <div class="form-group">
+          <label for="titleLegalBlockchain">Title</label>
+          <input type="text" class="form-control" id="titleLegalBlockchain" formControlName="titleLegalBlockchain" class="form-control">
+        </div>
+        <div *ngIf="!serviceForm?.controls.titleLegalBlockchain.valid && serviceForm?.controls.titleLegalBlockchain.touched" class="alert alert-danger">
+          Please enter your titleLegalBlockchain
+        </div>
+      </div>
+    </div>
     <div class="col-12">
       <div class="form-group text-center">
-        <button class="btn btn-outline-primary" type="submit" [disabled]="!serviceForm?.controls.fullname.valid  || !serviceForm?.controls.address.valid"> 
+        <button class="btn btn-outline-primary" type="submit" [disabled]="!serviceForm?.controls.fullname.valid || !serviceForm?.controls.address.valid || 
+                                                                          !serviceForm?.controls.email.valid || !serviceForm?.controls.titleLegalBlockchain.valid"> 
           CONTRACT 
         </button>
       </div>

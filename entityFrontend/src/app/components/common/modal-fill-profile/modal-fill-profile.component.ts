@@ -34,7 +34,7 @@ export class ModalFillProfileComponent implements OnInit {
 
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
-      options: this.fb.array(this.addCheckboxes(), this.maxLengthArray(1, 2))
+      options: this.fb.array(this.addCheckboxes(), this.maxLengthArray(1))
     });
 
     if (this.options) {
@@ -67,7 +67,7 @@ export class ModalFillProfileComponent implements OnInit {
     return controls;
   }
 
-  maxLengthArray(min: number, max: number) {
+  maxLengthArray(min: number) {
     return function validate(formGroup: FormGroup) {
       let checked = 0;
       Object.keys(formGroup.controls).forEach(key => {
@@ -76,7 +76,7 @@ export class ModalFillProfileComponent implements OnInit {
           checked++;
         }
       });
-      if (checked < min || checked > max) {
+      if (checked < min) {
         return {
           limit: true,
         };

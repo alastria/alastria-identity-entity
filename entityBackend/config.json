@@ -8,9 +8,8 @@
   "mongo": {
     "url": "mongodb://mongo:27017",
     "dbName": "alastriaUsers",
-    "collection": "users",
     "collectionUser": "users",
-    "collectionCredentials": "usersCredentials",
+    "collectionData": "usersObjects",
     "interceptorElapse": 100
   },
   "didFormat": {
@@ -32,6 +31,5 @@
   "entityPrivateKey": "a6ad807cab657b88bee4e13a9c784c01e3f26a9c4f10aa5a16684afc973599de", 
   "entityPublicKey": "0xe1e3fee6d907bd93e313fd8d9a1e6787d042634df7136c67126d9e639d18a6b944b0eba7f61b2239a1f98e6cf1c026952bc9a7875ca62857fb3091bdab6f0643",
   "authKeyToken": "qwertyuiopasdfghjklzxcvbnm123456",
-  "keyManagerUrl": "",
-  "authToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlbnRpdHlJc3N1ZXIiLCJpYXQiOjE1ODczNjc3MjcsImV4cCI6MTYxODkwMzcyNywiYXVkIjoiRXhhbXBsZSBhdXRob3JpemF0aW9uIFRva2VuIiwic3ViIjoiaWRlbnRpdHlTdWJqZWN0In0.zujXluegmpfzWLqoFECL_X6h8gaRIHkQrg5kh9fvSyg"
+  "keyManagerUrl": ""
 }

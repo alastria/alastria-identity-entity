@@ -5,7 +5,6 @@ import { ActivatedRoute } from '@angular/router';
 // SERVICES
 import { HomeService } from 'src/app/services/home/home.service';
 import { SocketService } from 'src/app/services/socket/socket.service';
-import { AlastriaLibService } from 'src/app/services/alastria-lib/alastria-lib.service';
 
 // COMPONENTS
 import { ServiceFormComponent } from '../../common/service-form/service-form.component';
@@ -72,7 +71,9 @@ export class ServiceDetailComponent implements OnInit {
         if (data && data.length) {
           formNewValues = {
             fullname: (data[0].fullname) ? data[0].fullname : (data[1].fullname) ? data[1].fullname : '',
-            address: (!data[1]) ? '' : (data[1].address) ? data[1].address : ''
+            address: (!data[1]) ? '' : (data[1].address) ? data[1].address : '',
+            email: (data[2].email) ? data[2].email : (data[1].email) ? data[1].email : '',
+            titleLegalBlockchain: (data[3].titleLegalBlockchain) ? data[3].titleLegalBlockchain : (data[1].titleLegalBlockchain) ? data[1].titleLegalBlockchain : '',
           };
         }
         this.serviceFormComponent.setValuesForm(formNewValues);

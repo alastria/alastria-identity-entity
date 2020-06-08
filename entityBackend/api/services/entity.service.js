@@ -6,9 +6,7 @@
 
 const { transactionFactory, config } = require('alastria-identity-lib')
 const EthCrypto = require('eth-crypto')
-const fetch = require('node-fetch')
 const configHelper = require('../helpers/config.helper')
-const mongoModel = require('../models/user.model')
 const myConfig = configHelper.getConfig()
 const web3Helper = require('../helpers/web3.helper')
 const web3 = web3Helper.getWeb3()
@@ -116,7 +114,7 @@ async function createAlastriaToken(functionCall) {
       exp: expDate,
       ani: myConfig.netID,
       nbf: currentDate,
-      jti: Math.random().toString(36).substring(2)
+      jti: `Alastria/token/${Math.random().toString()}`
     }
     let alastriaToken = tokenHelper.createAlastriaToken(alastriaTokenData)
     let AlastriaTokenSigned = tokenHelper.signJWT(alastriaToken, myConfig.entityPrivateKey)
@@ -344,7 +342,7 @@ async function createCredential(identityDID, credentials) {
       let credentialSubject = {}
       const currentDate = Math.floor(Date.now());
       const expDate = currentDate + 86400000;
-      let jti = Math.random().toString(36).substring(2)
+      let jti = `Alastria/credential/${Math.random().toString()}`
       credentialSubject.levelOfAssurance = credential.levelOfAssurance
       credentialSubject[credential.field_name] = (credential.field_name == 'fullname') ? `${user.userData.name} ${user.userData.surname}` : user.userData[credential.field_name]
 
@@ -371,12 +369,12 @@ async function createCredential(identityDID, credentials) {
       verifiableCredential: credentialsJWT
     }
 
-    let responseToken = await mongoModel.saveTempCredential(credentialObject, identityDID)
-    let credentialTinyURL = {
-      url: `${myConfig.callbackUrl}credential/db?authToken=${responseToken}`
+    let responseToken = await userModel.saveTempObject(credentialObject, identityDID)
+    let objectTinyURL = {
+      url: `${myConfig.callbackUrl}objects/db?authToken=${responseToken}`
     }
 
-    return credentialTinyURL
+    return objectTinyURL
   }
   catch(error){
     log.error(`${serviceName}[${createCredential.name}] -----> ${error}`)
@@ -440,12 +438,20 @@ async function createPresentationRequest(requestData) {
     log.info(`${serviceName}[${createPresentationRequest.name}] -----> IN ...`)
     const currentDate = Math.floor(Date.now());
     const expDate = currentDate + 86400000;
-    let jti = Math.random().toString(36).substring(2)
+    let jti = `Alastria/request/${Math.random().toString()}`
     let objectRequest = tokenHelper.createPresentationRequest(myConfig.entityDID, myConfig.entityDID, myConfig.context,
                                                                    myConfig.context[0], `0x${myConfig.procHash}`, requestData,
                                                                    `${myConfig.callbackUrl}alastria/presentation`,expDate, currentDate, jti)
     let presentationRequest = tokenHelper.signJWT(objectRequest, myConfig.entityPrivateKey)
-    return presentationRequest
+    let objectPresentationRequest = {
+      jwt: presentationRequest
+    }
+
+    let responseToken = await userModel.saveTempObject(objectPresentationRequest, myConfig.entityDID)
+    let objectTinyURL = {
+      url: `${myConfig.callbackUrl}objects/db?authToken=${responseToken}`
+    }
+    return objectTinyURL.url
   }
   catch(error) {
     log.error(`${serviceName}[${createPresentationRequest.name}] -----> ${error}`)
