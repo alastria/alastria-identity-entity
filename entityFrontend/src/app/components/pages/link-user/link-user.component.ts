@@ -192,10 +192,10 @@ export class LinkUserComponent implements OnInit {
     try {
       let presentationRequestInfo = [
         {
-            '@context': 'JWT',
-            levelOfAssurance: 3,
-            required: true,
-            field_name: 'fullname'
+          '@context': 'JWT',
+          levelOfAssurance: 3,
+          required: true,
+          field_name: 'fullname'
         },
         {
           '@context': 'JWT',
@@ -203,6 +203,12 @@ export class LinkUserComponent implements OnInit {
           required: true,
           field_name: 'email'
         },
+        {
+          '@context': 'JWT',
+          levelOfAssurance: 3,
+          required: true,
+          field_name: 'address'
+        }
       ];
       const presentationRequest = await this.entityService.createPresentationRequest(presentationRequestInfo);
       this.qrData = presentationRequest;
@@ -248,7 +254,8 @@ export class LinkUserComponent implements OnInit {
         if (data && data.length) {
           formNewValues = {
             fullname: (data[0].fullname) ? data[0].fullname : (data[1].fullname) ? data[1].fullname : '',
-            email: (data[1].email) ? data[1].email : (data[0].email) ? data[0].email : ''
+            email: (data[1].email) ? data[1].email : (data[0].email) ? data[0].email : '',
+            address: (!data[2]) ? '' : (data[2].address) ? data[1].address : ''
           };
         }
         this.userFormComponent.setValuesForm(formNewValues);

@@ -8,7 +8,8 @@
   "mongo": {
     "url": "mongodb://mongo:27017",
     "dbName": "alastriaUsers",
-    "collection": "users",
+    "collectionUser": "users",
+    "collectionData": "usersObjects",
     "interceptorElapse": 100
   },
   "didFormat": {
