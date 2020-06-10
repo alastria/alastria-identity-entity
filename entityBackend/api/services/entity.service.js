@@ -351,6 +351,15 @@ async function createCredential(identityDID, credentials) {
       let credentialSigned = tokenHelper.signJWT(credentialObject, myConfig.entityPrivateKey)
       let credentialPsmHash = tokenHelper.psmHash(web3, credentialSigned, myConfig.entityDID)
       let credentialTX = transactionFactory.credentialRegistry.addIssuerCredential(web3, credentialPsmHash)
+      let updateCredentialsGived = {
+        credentialsGived: {
+          value: credential.field_name,
+          psmHash: credentialPsmHash,
+          credential: credentialSigned
+        },
+        id: identityDID
+      }
+      await userModel.updateGivedRevoked(updateCredentialsGived)
       credentialsTXSigned.push(credentialTX)
       credentialsJWT.push(credentialSigned)
     })

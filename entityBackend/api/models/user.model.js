@@ -31,7 +31,8 @@ module.exports = {
   checkAuth,
   saveTempObject,
   getObjectsFromDB,
-  deleteObjectFromDB
+  deleteObjectFromDB,
+  updateGivedRevoked
 }
 
 /////////////////////////////////////////////////////////
@@ -102,8 +103,8 @@ async function createUser(params) {
       address: params.address,
       password: params.password,
       did: params.did,
-      vinculated: (params.vinculated == null) ? false : params.vinculated,
-      titleLegalBlockchain: myConfig.title
+      credentialsGived: [],
+      revoked : []
     }
     let db = connected.db(mongoDatabase)
     await db.collection(userCollection).insertOne(userData)
@@ -134,7 +135,7 @@ async function updateUser(params) {
       email: ((params.email == null) || (params.email == undefined)) ? user.userData.email : params.email,
       address: ((params.address == null) || (params.address == undefined)) ? user.userData.address : params.address,
       did: ((params.did == null) || (params.did == undefined)) ? user.userData.did : params.did,
-      vinculated: ((params.vinculated == null) || (params.vinculated == undefined)) ? user.userData.vinculated : params.vinculated,
+      vinculated: ((params.vinculated == null) || (params.vinculated == undefined)) ? user.userData.vinculated : params.vinculated
     }
     if(params.password) {
       update.password = params.password
@@ -157,8 +158,36 @@ async function updateUser(params) {
   }
 }
 
+async function updateGivedRevoked(params) {
+  try {
+    log.info(`${moduleName}[${updateGivedRevoked.name}] -----> IN...`)
+    let updated
+    let connected = await mongoHelper.connect(myConfig.mongo)
+    let db = connected.db(mongoDatabase)
+    let id = (params._id) ? params._id : params.id
+    let fieldToUpdate = (params['credentialsGived'] !== undefined) ? "credentialsGived" : "revoked"
+    if(fieldToUpdate === "credentialsGived") {
+      updated = await db.collection(userCollection).updateOne(
+                                    {"did": id},
+                                    {"$push": { "credentialsGived": {"value": params[fieldToUpdate].value, "psmHash": params[fieldToUpdate].psmHash }}})
+      log.info(`${moduleName}[${updateGivedRevoked.name}] -----> Updated Gived Credential`)
+    } else {
+      updated = await db.collection(userCollection).updateOne(
+                                    {"did": id},
+                                    {"$push": { "revoked": {"value": params[fieldToUpdate].value, "psmHash": params[fieldToUpdate].psmHash }}})
+        log.info(`${moduleName}[${updateGivedRevoked.name}] -----> Updated Revoke Credential`)
+    }
+    return
+  }
+  catch(error) {
+    log.error(`${moduleName}[${updateGivedRevoked.name}] -----> Error: ${error}`)
+    throw error
+  }
+}
+
 async function getUser(id) {
   try {
+    console.log('ID ----->', id)
     log.info(`${moduleName}[${getUser.name}] -----> IN...`)
     let find = (id.startsWith('did') == true) ? {"did":id} : {"_id": new ObjectId(id)}
     let connected = await mongoHelper.connect(myConfig.mongo)
@@ -170,7 +199,6 @@ async function getUser(id) {
       connected.close()
       throw error
     } else {
-      log.info(`${moduleName}[${getUser.name}] -----> Data obtained`)
       let loged = await login(user)
       log.info(`${moduleName}[${getUser.name}] -----> User data getted`)
       connected.close()
