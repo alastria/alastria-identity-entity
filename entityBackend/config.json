@@ -31,5 +31,6 @@
   "entityPrivateKey": "a6ad807cab657b88bee4e13a9c784c01e3f26a9c4f10aa5a16684afc973599de", 
   "entityPublicKey": "0xe1e3fee6d907bd93e313fd8d9a1e6787d042634df7136c67126d9e639d18a6b944b0eba7f61b2239a1f98e6cf1c026952bc9a7875ca62857fb3091bdab6f0643",
   "authKeyToken": "qwertyuiopasdfghjklzxcvbnm123456",
-  "keyManagerUrl": ""
+  "keyManagerUrl": "",
+  "revokeCode": 2
 }

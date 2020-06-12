@@ -297,8 +297,7 @@ function updateIssuerCredentialStatus(req, res) {
   entityService.updateIssuerCredentialStatus(updateData)
   .then(updatedStatus => {
     log.info(`${controller_name}[${updateIssuerCredentialStatus.name}] -----> Status Updated`)
-    let statusUpdated = updatedStatus
-    res.status(200).send(statusUpdated)
+    res.status(200).send(updatedStatus)
   })
   .catch(error => {
     log.error(`${controller_name}[${updateIssuerCredentialStatus.name}] -----> ${error}`)

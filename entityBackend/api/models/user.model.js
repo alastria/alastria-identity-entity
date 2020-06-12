@@ -175,7 +175,7 @@ async function updateGivedRevoked(params) {
       updated = await db.collection(userCollection).updateOne(
                                     {"did": id},
                                     {"$push": { "revoked": {"value": params[fieldToUpdate].value, "psmHash": params[fieldToUpdate].psmHash }}})
-        log.info(`${moduleName}[${updateGivedRevoked.name}] -----> Updated Revoke Credential`)
+      log.info(`${moduleName}[${updateGivedRevoked.name}] -----> Updated Revoke Credential`)
     }
     return
   }
@@ -187,7 +187,6 @@ async function updateGivedRevoked(params) {
 
 async function getUser(id) {
   try {
-    console.log('ID ----->', id)
     log.info(`${moduleName}[${getUser.name}] -----> IN...`)
     let find = (id.startsWith('did') == true) ? {"did":id} : {"_id": new ObjectId(id)}
     let connected = await mongoHelper.connect(myConfig.mongo)
