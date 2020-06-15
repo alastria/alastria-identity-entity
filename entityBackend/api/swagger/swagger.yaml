@@ -41,6 +41,34 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /objects/db:
+    x-swagger-router-controller: user.controller
+    get:
+      description: Get available credentials catalog from an issuer
+      operationId: getObjectFromDB
+      parameters:
+        - name: authToken
+          in: query
+          type: string
+          description: Auth Token to validate in tha call to backend
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/createCredentialResponse"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /login:
     x-swagger-router-controller: user.controller
     get:
@@ -508,7 +536,7 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: "#/definitions/createCredentialResponse"
+            $ref: "#/definitions/credentialsURLResponse"
         "400":
           description: Bad Request
           schema:
@@ -959,12 +987,10 @@ definitions:
         type: number
   alastriaSessionResponse:
     type: string
+  credentialsURLResponse:
+    type: string
   createCredentialResponse:
-    properties:
-      signedCredentials:
-        type: array
-        items:
-          type: string
+    type: string
   credentialStatusResponse:
     properties:
       status:

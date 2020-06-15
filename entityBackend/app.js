@@ -78,13 +78,12 @@ loadJsonFile(pathFile)
       
       // Auth
       app.all('*', (req, res, next) => {
-        let tokenJWT = req.headers['authorization']
+        let tokenJWT = (req.headers['authorization']) ? req.headers['authorization'] : req.query.authToken
         keyManagerUrl = myConfig.keyManagerUrl
         if(!tokenJWT) {
           let error = 'It is necessary to provide an authentication token'
           log.error(`[App] -----> ${error}`)
-          // res.status(401).send(`Error: ${error}`)
-          next()
+          res.status(401).send(`Error: ${error}`)
         } else {
           // if(keyManagerUrl == '') {
           //   let error = 'It is necessary to provide a key manager URL'
@@ -98,6 +97,10 @@ loadJsonFile(pathFile)
               .then(() => {
                 log.info(`[App] -----> Server started in http://localhost:${port}`)
                 next()
+              })
+              .catch(error => {
+                log.error(`[App] -----> ${error}`)
+                res.status(401).send(error)
               })
             // })
           }

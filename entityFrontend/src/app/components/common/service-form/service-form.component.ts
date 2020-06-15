@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ɵConsole } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 // SERVICES
@@ -44,6 +44,8 @@ export class ServiceFormComponent implements OnInit {
   setValuesForm(formNewValues: any) {
     this.serviceForm.get('fullname').setValue(formNewValues.fullname);
     this.serviceForm.get('address').setValue(formNewValues.address);
+    this.serviceForm.get('email').setValue(formNewValues.email);
+    this.serviceForm.get('titleLegalBlockchain').setValue(formNewValues.titleLegalBlockchain);
   }
 
   showModalQr() {
@@ -55,10 +57,10 @@ export class ServiceFormComponent implements OnInit {
     try {
       let requestData = [
         {
-            '@context': 'JWT',
-            levelOfAssurance: 3,
-            required: true,
-            field_name: 'fullname'
+          '@context': 'JWT',
+          levelOfAssurance: 3,
+          required: true,
+          field_name: 'fullname'
         },
         {
           '@context': 'JWT',
@@ -66,6 +68,18 @@ export class ServiceFormComponent implements OnInit {
           required: false,
           field_name: 'address'
         },
+        {
+          '@context': 'JWT',
+          levelOfAssurance: 3,
+          required: false,
+          field_name: 'email'
+        },
+        {
+          '@context': 'JWT',
+          levelOfAssurance: 3,
+          required: false,
+          field_name: 'titleLegalBlockchain'
+        }
       ];
 
       const presentationRequest = await this.entityService.createPresentationRequest(requestData);
@@ -82,7 +96,9 @@ export class ServiceFormComponent implements OnInit {
   private generateForm(): void {
     this.serviceForm = this.fb.group({
       fullname: ['', Validators.required],
-      address: ['', Validators.required]
+      address: ['', Validators.required],
+      email: ['', Validators.required],
+      titleLegalBlockchain: ['', Validators.required]
     });
   }
 
