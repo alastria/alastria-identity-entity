@@ -417,12 +417,13 @@ async function updateIssuerCredentialStatus(updateData) {
       let updateTX = transactionFactory.credentialRegistry.updateCredentialStatus(web3, item.credentialHash, item.status)
       let updateTXSigned = await issuerGetKnownTransaction(updateTX)
       await sendSigned(updateTXSigned)
+      let credential = await userModel.getCredentialBypsmHash(item.credentialHash)
       let updateCredentialsRevoke = {
         revoked: {
-          value: item.field_name,
+          status: true,
           psmHash: item.credentialHash
         },
-        id: item.identityDID
+        id: credential.did
       }
       await userModel.updateGivedRevoked(updateCredentialsRevoke)
       updatedStatus = await getIssuerCredentialStatus(myConfig.entityDID, item.credentialHash)

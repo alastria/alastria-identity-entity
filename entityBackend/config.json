@@ -10,6 +10,7 @@
     "dbName": "alastriaUsers",
     "collectionUser": "users",
     "collectionData": "usersObjects",
+    "collectionCredentials": "credentials",
     "interceptorElapse": 100
   },
   "didFormat": {

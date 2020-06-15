@@ -17,6 +17,7 @@ const ObjectId = require('mongodb').ObjectID
 const mongoDatabase = myConfig.mongo.dbName
 const userCollection = myConfig.mongo.collectionUser
 const collectionData = myConfig.mongo.collectionData
+const credentialsCollection = myConfig.mongo.collectionCredentials
 
 /////////////////////////////////////////////////////////
 ///////               MODULE EXPORTS              ///////
@@ -26,13 +27,14 @@ module.exports = {
   login,
   createUser,
   updateUser,
+  updateGivedRevoked,
+  getCredentialBypsmHash,
   getUser,
   getCredentialIdentityCatalog,
   checkAuth,
   saveTempObject,
   getObjectsFromDB,
-  deleteObjectFromDB,
-  updateGivedRevoked
+  deleteObjectFromDB
 }
 
 /////////////////////////////////////////////////////////
@@ -158,6 +160,26 @@ async function updateUser(params) {
   }
 }
 
+async function getCredentialBypsmHash (psmHash) {
+  try {
+    log.info(`${moduleName}[${getCredentialBypsmHash.name}] -----> IN...`)
+    let connected = await mongoHelper.connect(myConfig.mongo)
+    let db = connected.db(mongoDatabase)
+    let user = await db.collection(credentialsCollection).findOne({"psmHash": psmHash})
+    if(user == null) {
+      let error = 'User not found'
+      log.error(`${moduleName}[${getCredentialBypsmHash.name}] -----> ${error}`)
+      throw error
+    }
+    log.info(`${moduleName}[${getCredentialBypsmHash.name}] -----> User getted`)
+    return user
+  }
+  catch(error) {
+    log.error(`${moduleName}[${getCredentialBypsmHash.name}] -----> Error: ${error}`)
+    throw error
+  }
+}
+
 async function updateGivedRevoked(params) {
   try {
     log.info(`${moduleName}[${updateGivedRevoked.name}] -----> IN...`)
@@ -166,15 +188,17 @@ async function updateGivedRevoked(params) {
     let db = connected.db(mongoDatabase)
     let id = (params._id) ? params._id : params.id
     let fieldToUpdate = (params['credentialsGived'] !== undefined) ? "credentialsGived" : "revoked"
+    let insert = {
+      did: id,
+      field_name: params[fieldToUpdate].value,
+      psmHash: params[fieldToUpdate].psmHash,
+      revoked: false
+    }
     if(fieldToUpdate === "credentialsGived") {
-      updated = await db.collection(userCollection).updateOne(
-                                    {"did": id},
-                                    {"$push": { "credentialsGived": {"value": params[fieldToUpdate].value, "psmHash": params[fieldToUpdate].psmHash }}})
+      updated = await db.collection(credentialsCollection).insertOne(insert)
       log.info(`${moduleName}[${updateGivedRevoked.name}] -----> Updated Gived Credential`)
     } else {
-      updated = await db.collection(userCollection).updateOne(
-                                    {"did": id},
-                                    {"$push": { "revoked": {"value": params[fieldToUpdate].value, "psmHash": params[fieldToUpdate].psmHash }}})
+      updated = await db.collection(credentialsCollection).updateOne({"did": id, "psmHash": params.revoked.psmHash},{"$set": {"revoked": params.revoked.status}})
       log.info(`${moduleName}[${updateGivedRevoked.name}] -----> Updated Revoke Credential`)
     }
     return

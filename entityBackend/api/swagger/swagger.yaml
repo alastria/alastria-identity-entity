@@ -962,10 +962,6 @@ definitions:
           type: integer
         credentialHash:
           type: string
-        field_name:
-          type: string
-        identityDID:
-          type: string
   presentationRequestData:
     type: array
     items:
