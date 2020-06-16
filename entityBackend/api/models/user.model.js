@@ -28,6 +28,7 @@ module.exports = {
   createUser,
   updateUser,
   updateGivedRevoked,
+  getCredentials,
   getCredentialBypsmHash,
   getUser,
   getCredentialIdentityCatalog,
@@ -160,7 +161,27 @@ async function updateUser(params) {
   }
 }
 
-async function getCredentialBypsmHash (psmHash) {
+async function getCredentials(did) {
+  try {
+    log.info(`${moduleName}[${getCredentials.name}] -----> IN...`)
+    let connected = await mongoHelper.connect(myConfig.mongo)
+    let db = connected.db(mongoDatabase)
+    let credentials = await db.collection(credentialsCollection).find(({"did": did})).toArray()
+    if(credentials == null) {
+      let error = 'Credentials not found'
+      log.error(`${moduleName}[${getCredentials.name}] -----> ${error}`)
+      throw error
+    }
+    log.info(`${moduleName}[${getCredentials.name}] -----> Credentials getted`)
+    return credentials
+  }
+  catch(error) {
+    log.error(`${moduleName}[${getCredentials.name}] -----> Error: ${error}`)
+    throw error
+  }
+}
+
+async function getCredentialBypsmHash(psmHash) {
   try {
     log.info(`${moduleName}[${getCredentialBypsmHash.name}] -----> IN...`)
     let connected = await mongoHelper.connect(myConfig.mongo)

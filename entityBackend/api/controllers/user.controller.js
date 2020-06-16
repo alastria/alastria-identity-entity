@@ -26,6 +26,7 @@ module.exports = {
   getUser,
   getCredentialIdentityCatalog,
   checkUserAuth,
+  getCredentials,
   getObjectFromDB
 }
 
@@ -148,6 +149,24 @@ function getCredentialIdentityCatalog(req, res) {
     log.error(`${controller_name}[${getCredentialIdentityCatalog.name}] -----> ${error}`)
     Errmsg.message = error
     res.status(404).send(Errmsg)
+  })
+}
+
+function getCredentials(req, res) {
+  log.info(`${controller_name}[${getCredentials.name}] -----> IN ...`)
+  let identityDID = req.swagger.params.identityDID.value
+  log.debug(`${controller_name}[${getCredentials.name}] -----> Sending params: ${identityDID}`)
+  userModel.getCredentials(identityDID)
+  .then(object => {
+    log.info(`${controller_name}[${getCredentials.name}] -----> Getted object from DB`)
+    res.status(200).send(object)
+  })
+  .catch(error => {
+    Errmsg.message = error
+    log.error(`${controller_name}[${getCredentials.name}] -----> ${Errmsg.message}`)
+    io.emit('error', {status: 400,
+                      message: Errmsg.message})
+    res.status(400).send(Errmsg)
   })
 }
 
