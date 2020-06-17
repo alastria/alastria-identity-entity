@@ -88,6 +88,20 @@ export class UserService {
       });
   }
 
+  getCredentialsDB(did: string): any {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json',
+        'Authorization': this.auth
+      })
+    };
+    return this.http.get(`${this.apiUrl}/${this.path}/user/credential?identityDID=${did}`, httpOptions).toPromise()
+      .then((res) => res)
+      .catch((error: any) => {
+        throw error;
+      });
+  }
+
   /**
    * Get data of user
    * @returns user

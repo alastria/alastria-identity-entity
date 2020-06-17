@@ -1,4 +1,4 @@
-import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl } from '@angular/forms';
 
 @Component({
@@ -52,6 +52,7 @@ export class ModalFillProfileComponent implements OnInit {
     const selectedOptionsValue = this.form.value.options
       .map((v, i) => v ? this.options[i].value : null)
       .filter(v => v !== null);
+    this.form.reset()
     this.handleFillYourProfile.emit(selectedOptionsValue);
   }
 

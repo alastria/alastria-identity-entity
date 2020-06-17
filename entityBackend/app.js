@@ -85,8 +85,7 @@ loadJsonFile(pathFile)
         if(!tokenJWT) {
           let error = 'It is necessary to provide an authentication token'
           log.error(`[App] -----> ${error}`)
-          // res.status(401).send(`Error: ${error}`)
-          next()
+          res.status(401).send(`Error: ${error}`)
         } else {
           // if(keyManagerUrl == '') {
           //   let error = 'It is necessary to provide a key manager URL'
