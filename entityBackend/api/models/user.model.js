@@ -106,6 +106,7 @@ async function createUser(params) {
       address: params.address,
       password: params.password,
       did: params.did,
+      titleLegalBlockchain: myConfig.title,
       credentialsGived: [],
       revoked : []
     }

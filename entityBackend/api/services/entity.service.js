@@ -6,6 +6,7 @@
 
 const { transactionFactory, config } = require('alastria-identity-lib')
 const EthCrypto = require('eth-crypto')
+const SecureRandom = require('secure-random')
 const configHelper = require('../helpers/config.helper')
 const myConfig = configHelper.getConfig()
 const web3Helper = require('../helpers/web3.helper')
@@ -114,7 +115,7 @@ async function createAlastriaToken(functionCall) {
       exp: expDate,
       ani: myConfig.netID,
       nbf: currentDate,
-      jti: `Alastria/token/${Math.random().toString()}`
+      jti: `Alastria/token/${SecureRandom(5)}`
     }
     let alastriaToken = tokenHelper.createAlastriaToken(alastriaTokenData)
     let AlastriaTokenSigned = tokenHelper.signJWT(alastriaToken, myConfig.entityPrivateKey)
@@ -338,17 +339,19 @@ async function createCredential(identityDID, credentials) {
     let credentialsJWT = []
     let credentialsTXSigned = []
     let sendCredentialTX = []
-    credentials.map(async credential => {
+    let updateObjectCredential = []
+    let sendSingTX = []
+    credentials.map(credential => {
       let credentialSubject = {}
       const currentDate = Math.floor(Date.now());
       const expDate = currentDate + 86400000;
-      let jti = `Alastria/credential/${Math.random().toString()}`
+      let jti = `Alastria/credential/${SecureRandom(5)}`
       credentialSubject.levelOfAssurance = credential.levelOfAssurance
       credentialSubject[credential.field_name] = (credential.field_name == 'fullname') ? `${user.userData.name} ${user.userData.surname}` : user.userData[credential.field_name]
 
-      let credentialObject = tokenHelper.createCredential(myConfig.entityDID, myConfig.entityDID, identityDID,
+      let objectCredential = tokenHelper.createCredential(myConfig.entityDID, myConfig.entityDID, identityDID,
                                                                 myConfig.context, credentialSubject, expDate, currentDate, jti)
-      let credentialSigned = tokenHelper.signJWT(credentialObject, myConfig.entityPrivateKey)
+      let credentialSigned = tokenHelper.signJWT(objectCredential, myConfig.entityPrivateKey)
       let credentialPsmHash = tokenHelper.psmHash(web3, credentialSigned, myConfig.entityDID)
       let credentialTX = transactionFactory.credentialRegistry.addIssuerCredential(web3, credentialPsmHash)
       let updateCredentialsGived = {
@@ -358,21 +361,21 @@ async function createCredential(identityDID, credentials) {
         },
         id: identityDID
       }
-      await userModel.updateGivedRevoked(updateCredentialsGived)
+      updateObjectCredential.push(userModel.updateGivedRevoked(updateCredentialsGived))
       credentialsTXSigned.push(credentialTX)
       credentialsJWT.push(credentialSigned)
     })
-    credentialsTXSigned.map(async (item) => {
-      let issuerTXSigned = await issuerGetKnownTransaction(item)
+    credentialsTXSigned.map(item => {
       log.info(`${serviceName}[${createCredential.name}] -----> Preparing to send transaction`)
-      sendCredentialTX.push(issuerTXSigned)
-      sendCredentialTX.map(async TXToSend => {
-        log.info(`${serviceName}[${createCredential.name}] -----> Sending transaction`)
-        await sendSigned(TXToSend)
-      })
+      sendCredentialTX.push(issuerGetKnownTransaction(item))
     })
+    // sendCredentialTX.map(TXToSend => {
+    //   console.log('TXTOSEND ----->', TXToSend)
+    //   log.info(`${serviceName}[${createCredential.name}] -----> Sending transaction`)
+    //   sendSingTX.push(sendSigned(TXToSend))
+    // })
+    Promise.all([updateObjectCredential, sendCredentialTX])
     log.info(`${serviceName}[${createCredential.name}] -----> Created Successfully`)
-    
     let credentialObject = {
       verifiableCredential: credentialsJWT
     }
@@ -450,7 +453,7 @@ async function getIssuerCredentialStatus(identityDID, credentialHash) {
     log.info(`${serviceName}[${getIssuerCredentialStatus.name}] -----> Credential status getted`)
     return status
   }
-  catch(errror) {
+  catch(error) {
     log.error(`${serviceName}[${getIssuerCredentialStatus.name}] -----> ${error}`)
     throw error
   }
@@ -461,7 +464,7 @@ async function createPresentationRequest(requestData) {
     log.info(`${serviceName}[${createPresentationRequest.name}] -----> IN ...`)
     const currentDate = Math.floor(Date.now());
     const expDate = currentDate + 86400000;
-    let jti = `Alastria/request/${Math.random().toString()}`
+    let jti = `Alastria/request/${SecureRandom(5)}`
     let objectRequest = tokenHelper.createPresentationRequest(myConfig.entityDID, myConfig.entityDID, myConfig.context,
                                                                    myConfig.context[0], `0x${myConfig.procHash}`, requestData,
                                                                    `${myConfig.callbackUrl}alastria/presentation`,expDate, currentDate, jti)

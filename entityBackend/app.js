@@ -15,7 +15,7 @@ const cors = require('cors')
 const io = require('socket.io')()
 const pathFile = 'config.json'
 const log = Log.getLogger()
-const bodyParser = require('body-parser')
+// const bodyParser = require('body-parser')
 
 const configHost = process.env.CONFIG_HOST
 const configPath = process.env.CONFIG_PATH
@@ -76,7 +76,7 @@ loadJsonFile(pathFile)
       
       // Enable CORS
       app.use(cors());
-      app.use(bodyParser.json({limit: '50mb', extended: true}))
+      // app.use(bodyParser.json({limit: '50mb', extended: true}))
       
       // Auth
       app.all('*', (req, res, next) => {
