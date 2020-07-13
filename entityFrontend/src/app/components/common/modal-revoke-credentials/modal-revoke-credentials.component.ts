@@ -30,7 +30,7 @@ export class ModalRevokeCredentialsComponent implements OnInit {
   async init() {
     await this.getCredentialsDB();
     this.form = this.fb.group({
-      options: this.fb.array(this.addCheckboxes())
+      options: this.fb.array(this.addCheckboxes(), this.maxLengthArray(1, 1))
     });
     if (this.credentials) {
       this.addCheckboxes();
@@ -76,4 +76,21 @@ export class ModalRevokeCredentialsComponent implements OnInit {
     return controls;
   }
 
+  maxLengthArray(min: number, max: number) {
+    return function validate(formGroup: FormGroup) {
+      let checked = 0;
+      Object.keys(formGroup.controls).forEach(key => {
+        const control = formGroup.controls[key];
+        if (control.value === true) {
+          checked++;
+        }
+      });
+      if (checked < min || checked > max) {
+        return {
+          limit: true,
+        };
+      }
+      return null;
+    }
+  }
 }
