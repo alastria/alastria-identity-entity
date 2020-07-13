@@ -338,9 +338,9 @@ async function createCredential(identityDID, credentials) {
     let user = await userModel.getUser(identityDID)
     let credentialsJWT = []
     let credentialsTXSigned = []
-    let sendCredentialTX = []
     let updateObjectCredential = []
-    let sendSingTX = []
+    // let sendCredentialTX = []
+    // let sendSingTX = []
     credentials.map(credential => {
       let credentialSubject = {}
       const currentDate = Math.floor(Date.now());
@@ -365,16 +365,16 @@ async function createCredential(identityDID, credentials) {
       credentialsTXSigned.push(credentialTX)
       credentialsJWT.push(credentialSigned)
     })
-    credentialsTXSigned.map(item => {
-      log.info(`${serviceName}[${createCredential.name}] -----> Preparing to send transaction`)
-      sendCredentialTX.push(issuerGetKnownTransaction(item))
-    })
+    // credentialsTXSigned.map(item => {
+    //   log.info(`${serviceName}[${createCredential.name}] -----> Preparing to send transaction`)
+    //   sendCredentialTX.push(issuerGetKnownTransaction(item))
+    // })
     // sendCredentialTX.map(TXToSend => {
     //   console.log('TXTOSEND ----->', TXToSend)
     //   log.info(`${serviceName}[${createCredential.name}] -----> Sending transaction`)
     //   sendSingTX.push(sendSigned(TXToSend))
     // })
-    Promise.all([updateObjectCredential, sendCredentialTX])
+    Promise.all([updateObjectCredential])
     log.info(`${serviceName}[${createCredential.name}] -----> Created Successfully`)
     let credentialObject = {
       verifiableCredential: credentialsJWT
@@ -414,27 +414,33 @@ async function getSubjectCredentialStatus(subjectDID, subjectPSMHash) {
 async function updateIssuerCredentialStatus(updateData) {
   try {
     log.info(`${serviceName}[${updateIssuerCredentialStatus.name}] -----> IN ...`)
-    let updatedArray = []
+    // let updatedArray = []
     let updatedStatus
-    let promises = updateData.map(async (item) => {
-      let updateTX = transactionFactory.credentialRegistry.updateCredentialStatus(web3, item.credentialHash, item.status)
-      let updateTXSigned = await issuerGetKnownTransaction(updateTX)
+    let updateTX = []
+    let credential
+    updateData.map(item => {
+      credential = item
+      updateTX.push(transactionFactory.credentialRegistry.updateCredentialStatus(web3, item.credentialHash, item.status))
+    })
+    let promises = updateTX.map(async tx => {
+      let updateTXSigned = await issuerGetKnownTransaction(tx)
       await sendSigned(updateTXSigned)
-      let credential = await userModel.getCredentialBypsmHash(item.credentialHash)
+      let credentialTX = await userModel.getCredentialBypsmHash(credential.credentialHash)
       let updateCredentialsRevoke = {
         revoked: {
           status: true,
-          psmHash: item.credentialHash
+          psmHash: credential.credentialHash
         },
-        id: credential.did
+        id: credentialTX.did
       }
       await userModel.updateGivedRevoked(updateCredentialsRevoke)
-      updatedStatus = await getIssuerCredentialStatus(myConfig.entityDID, item.credentialHash)
+      updatedStatus = await getIssuerCredentialStatus(myConfig.entityDID, credential.credentialHash)
       log.info(`${serviceName}[${updateIssuerCredentialStatus.name}] -----> Credential status updated`)
-      updatedArray.push(updatedStatus)
-      
+      // updatedArray.push(updatedStatus)
     })
+      
     await Promise.all(promises)
+    // return updatedArray
     return updatedStatus
   }
   catch(error) {
