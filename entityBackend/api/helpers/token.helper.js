@@ -70,8 +70,7 @@ function verifyJWT(tokenJWT, publicKey) {
 function createAlastriaToken(tokenData) {
   try {
     let alastriaToken = tokensFactory.tokens.createAlastriaToken(tokenData.iss, tokenData.gwu, tokenData.cbu,
-      tokenData.ani, tokenData.exp, tokenData.nbf, 
-      tokenData.jti)
+      tokenData.ani, tokenData.exp, `${tokenData.kid}#keys-1`, tokenData.jwk, tokenData.nbf, tokenData.jti)
     log.info(`${helper_name}[${createAlastriaToken.name}] -----> Created Alastria Token`)
     return alastriaToken
   }
@@ -80,10 +79,10 @@ function createAlastriaToken(tokenData) {
     throw error
   }
 }
-
- function createCredential(kid, iss, sub, contect, credentialSubject, exp, nbf, jti) {
+function createCredential(iss, context, credentialSubject, kid, sub, exp, nbf, jti, jwk, type) {
   try {
-    let credential =  tokensFactory.tokens.createCredential(`${kid}#keys-1`, iss, sub, contect, credentialSubject, exp, nbf, jti)
+    let credential =  tokensFactory.tokens.createCredential(iss, context, credentialSubject, `${kid}#keys-1`, sub , exp, nbf, jti, jwk, type)
+
     log.info(`${helper_name}[${createCredential.name}] -----> Created Credential`)
     return credential
   }
@@ -93,9 +92,9 @@ function createAlastriaToken(tokenData) {
   }
 }
 
-function createPresentationRequest(kid, iss, context, procUrl, procHash, data, cbu, exp, nbf, jti) {
+function createPresentationRequest(iss, context, procUrl, procHash, data, cbu, type, kid, jwk, exp, nbf, jti) {
   try {
-    let credential = tokensFactory.tokens.createPresentationRequest(`${kid}#keys-1`, iss, context, procUrl, procHash, data, cbu, exp, nbf, jti)
+    let credential = tokensFactory.tokens.createPresentationRequest(iss, context, procUrl, procHash, data, cbu, type, `${kid}#keys-1`, jwk, exp, nbf, jti)
     log.info(`${helper_name}[${createPresentationRequest.name}] -----> Created Presentation Reques`)
     return credential
   }

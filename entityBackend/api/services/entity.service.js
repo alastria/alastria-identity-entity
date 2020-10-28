@@ -108,15 +108,19 @@ async function createAlastriaToken(functionCall) {
     log.info(`${serviceName}[${createAlastriaToken.name}] -----> IN ...`)
     const currentDate = Math.floor(Date.now());
     const expDate = currentDate + 86400000;
+
     let alastriaTokenData = {
       iss: myConfig.entityDID,
       gwu: myConfig.nodeUrl.alastria,
       cbu: (functionCall == 'CreateAlastriaID') ? `${myConfig.callbackUrl}alastria/did` : `${myConfig.callbackUrl}alastria/alastriaSession`,
-      exp: expDate,
       ani: myConfig.netID,
+      exp: expDate,
+      kid: myConfig.entityDID,
+      jwk: myConfig.entityPublicKey,
       nbf: currentDate,
       jti: `Alastria/token/${SecureRandom(5)}`
     }
+
     let alastriaToken = tokenHelper.createAlastriaToken(alastriaTokenData)
     let AlastriaTokenSigned = tokenHelper.signJWT(alastriaToken, myConfig.entityPrivateKey)
     return AlastriaTokenSigned
@@ -349,8 +353,8 @@ async function createCredential(identityDID, credentials) {
       credentialSubject.levelOfAssurance = credential.levelOfAssurance
       credentialSubject[credential.field_name] = (credential.field_name == 'fullname') ? `${user.userData.name} ${user.userData.surname}` : user.userData[credential.field_name]
 
-      let objectCredential = tokenHelper.createCredential(myConfig.entityDID, myConfig.entityDID, identityDID,
-                                                                myConfig.context, credentialSubject, expDate, currentDate, jti)
+      let objectCredential = tokenHelper.createCredential(myConfig.entityDID, myConfig.context, credentialSubject, myConfig.entityDID, identityDID,
+                                                          expDate, currentDate, jti, myConfig.entityPublicKey, myConfig.typeCredential)
       let credentialSigned = tokenHelper.signJWT(objectCredential, myConfig.entityPrivateKey)
       let credentialPsmHash = tokenHelper.psmHash(web3, credentialSigned, myConfig.entityDID)
       let credentialTX = transactionFactory.credentialRegistry.addIssuerCredential(web3, credentialPsmHash)
@@ -471,9 +475,10 @@ async function createPresentationRequest(requestData) {
     const currentDate = Math.floor(Date.now());
     const expDate = currentDate + 86400000;
     let jti = `Alastria/request/${SecureRandom(5)}`
-    let objectRequest = tokenHelper.createPresentationRequest(myConfig.entityDID, myConfig.entityDID, myConfig.context,
-                                                                   myConfig.context[0], `0x${myConfig.procHash}`, requestData,
-                                                                   `${myConfig.callbackUrl}alastria/presentation`,expDate, currentDate, jti)
+
+    let objectRequest = tokenHelper.createPresentationRequest(myConfig.entityDID, myConfig.context, myConfig.procUrl, `0x${myConfig.procHash}`, requestData,
+                                                              `${myConfig.callbackUrl}alastria/presentation`, myConfig.typePresentation, myConfig.entityDID, 
+                                                              myConfig.entityPublicKey, expDate, currentDate, jti)
     let presentationRequest = tokenHelper.signJWT(objectRequest, myConfig.entityPrivateKey)
     let objectPresentationRequest = {
       jwt: presentationRequest
