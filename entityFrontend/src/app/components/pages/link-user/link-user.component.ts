@@ -7,7 +7,6 @@ import { DeviceDetectorService} from 'ngx-device-detector';
 // SERVICES
 import { UserService } from 'src/app/services/user/user.service';
 import { SocketService } from 'src/app/services/socket/socket.service';
-import { AlastriaLibService } from 'src/app/services/alastria-lib/alastria-lib.service';
 
 // MODELS
 import { User } from 'src/app/models/user/user.model';
@@ -117,7 +116,6 @@ export class LinkUserComponent implements OnInit {
   constructor( private router: Router,
                private userService: UserService,
                private socketService: SocketService,
-               private alastriaLibService: AlastriaLibService,
                private deviceDetector: DeviceDetectorService,
                private http: HttpClient,
                private entityService: EntityService) {

@@ -1,6 +1,6 @@
 # Alastria Identity Entity
 
-This is an example of _Entity_ in Alastria. You can try the demo online accessing to [Entity Frontend](http://52.16.248.226/).
+This is an example of _Entity_ in Alastria. You can try the demo online accessing to [Entity Frontend](http://34.244.47.233/login).
 
 This repository contains two main dockers, **entityBackend** and **entityFrontend**.
 
