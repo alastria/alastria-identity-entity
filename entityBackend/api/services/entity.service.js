@@ -6,6 +6,7 @@
 
 const { transactionFactory, config } = require('alastria-identity-lib')
 const EthCrypto = require('eth-crypto')
+const SecureRandom = require('secure-random')
 const configHelper = require('../helpers/config.helper')
 const myConfig = configHelper.getConfig()
 const web3Helper = require('../helpers/web3.helper')
@@ -107,15 +108,19 @@ async function createAlastriaToken(functionCall) {
     log.info(`${serviceName}[${createAlastriaToken.name}] -----> IN ...`)
     const currentDate = Math.floor(Date.now());
     const expDate = currentDate + 86400000;
+
     let alastriaTokenData = {
       iss: myConfig.entityDID,
       gwu: myConfig.nodeUrl.alastria,
       cbu: (functionCall == 'CreateAlastriaID') ? `${myConfig.callbackUrl}alastria/did` : `${myConfig.callbackUrl}alastria/alastriaSession`,
-      exp: expDate,
       ani: myConfig.netID,
+      exp: expDate,
+      kid: myConfig.entityDID,
+      jwk: myConfig.entityPublicKey,
       nbf: currentDate,
-      jti: `Alastria/token/${Math.random().toString()}`
+      jti: `Alastria/token/${SecureRandom(5)}`
     }
+
     let alastriaToken = tokenHelper.createAlastriaToken(alastriaTokenData)
     let AlastriaTokenSigned = tokenHelper.signJWT(alastriaToken, myConfig.entityPrivateKey)
     return AlastriaTokenSigned
@@ -337,34 +342,44 @@ async function createCredential(identityDID, credentials) {
     let user = await userModel.getUser(identityDID)
     let credentialsJWT = []
     let credentialsTXSigned = []
-    let sendCredentialTX = []
-    credentials.map(async credential => {
+    let updateObjectCredential = []
+    // let sendCredentialTX = []
+    // let sendSingTX = []
+    credentials.map(credential => {
       let credentialSubject = {}
       const currentDate = Math.floor(Date.now());
       const expDate = currentDate + 86400000;
-      let jti = `Alastria/credential/${Math.random().toString()}`
+      let jti = `Alastria/credential/${SecureRandom(5)}`
       credentialSubject.levelOfAssurance = credential.levelOfAssurance
       credentialSubject[credential.field_name] = (credential.field_name == 'fullname') ? `${user.userData.name} ${user.userData.surname}` : user.userData[credential.field_name]
 
-      let credentialObject = tokenHelper.createCredential(myConfig.entityDID, myConfig.entityDID, identityDID,
-                                                                myConfig.context, credentialSubject, expDate, currentDate, jti)
-      let credentialSigned = tokenHelper.signJWT(credentialObject, myConfig.entityPrivateKey)
+      let objectCredential = tokenHelper.createCredential(myConfig.entityDID, myConfig.context, credentialSubject, myConfig.entityDID, identityDID,
+                                                          expDate, currentDate, jti, myConfig.entityPublicKey, myConfig.typeCredential)
+      let credentialSigned = tokenHelper.signJWT(objectCredential, myConfig.entityPrivateKey)
       let credentialPsmHash = tokenHelper.psmHash(web3, credentialSigned, myConfig.entityDID)
       let credentialTX = transactionFactory.credentialRegistry.addIssuerCredential(web3, credentialPsmHash)
+      let updateCredentialsGived = {
+        credentialsGived: {
+          value: credential.field_name,
+          psmHash: credentialPsmHash
+        },
+        id: identityDID
+      }
+      updateObjectCredential.push(userModel.updateGivedRevoked(updateCredentialsGived))
       credentialsTXSigned.push(credentialTX)
       credentialsJWT.push(credentialSigned)
     })
-    credentialsTXSigned.map(async (item) => {
-      let issuerTXSigned = await issuerGetKnownTransaction(item)
-      log.info(`${serviceName}[${createCredential.name}] -----> Preparing to send transaction`)
-      sendCredentialTX.push(issuerTXSigned)
-      sendCredentialTX.map(async TXToSend => {
-        log.info(`${serviceName}[${createCredential.name}] -----> Sending transaction`)
-        await sendSigned(TXToSend)
-      })
-    })
+    // credentialsTXSigned.map(item => {
+    //   log.info(`${serviceName}[${createCredential.name}] -----> Preparing to send transaction`)
+    //   sendCredentialTX.push(issuerGetKnownTransaction(item))
+    // })
+    // sendCredentialTX.map(TXToSend => {
+    //   console.log('TXTOSEND ----->', TXToSend)
+    //   log.info(`${serviceName}[${createCredential.name}] -----> Sending transaction`)
+    //   sendSingTX.push(sendSigned(TXToSend))
+    // })
+    Promise.all([updateObjectCredential])
     log.info(`${serviceName}[${createCredential.name}] -----> Created Successfully`)
-    
     let credentialObject = {
       verifiableCredential: credentialsJWT
     }
@@ -403,12 +418,33 @@ async function getSubjectCredentialStatus(subjectDID, subjectPSMHash) {
 async function updateIssuerCredentialStatus(updateData) {
   try {
     log.info(`${serviceName}[${updateIssuerCredentialStatus.name}] -----> IN ...`)
-    let updateTX = transactionFactory.credentialRegistry.updateCredentialStatus(web3, updateData.credentialHash, updateData.status)
-    let updateTXSigned = await issuerGetKnownTransaction(updateTX)
-    await sendSigned(updateTXSigned)
-    let issuerCredentialUpdated = await getIssuerCredentialStatus(myConfig.entityDID, updateData.credentialHash)
-    let updatedStatus = issuerCredentialUpdated
-    log.info(`${serviceName}[${updateIssuerCredentialStatus.name}] -----> Credential status updated`)
+    // let updatedArray = []
+    let updatedStatus
+    let updateTX = []
+    let credential
+    updateData.map(item => {
+      credential = item
+      updateTX.push(transactionFactory.credentialRegistry.updateCredentialStatus(web3, item.credentialHash, item.status))
+    })
+    let promises = updateTX.map(async tx => {
+      let updateTXSigned = await issuerGetKnownTransaction(tx)
+      await sendSigned(updateTXSigned)
+      let credentialTX = await userModel.getCredentialBypsmHash(credential.credentialHash)
+      let updateCredentialsRevoke = {
+        revoked: {
+          status: true,
+          psmHash: credential.credentialHash
+        },
+        id: credentialTX.did
+      }
+      await userModel.updateGivedRevoked(updateCredentialsRevoke)
+      updatedStatus = await getIssuerCredentialStatus(myConfig.entityDID, credential.credentialHash)
+      log.info(`${serviceName}[${updateIssuerCredentialStatus.name}] -----> Credential status updated`)
+      // updatedArray.push(updatedStatus)
+    })
+      
+    await Promise.all(promises)
+    // return updatedArray
     return updatedStatus
   }
   catch(error) {
@@ -427,7 +463,7 @@ async function getIssuerCredentialStatus(identityDID, credentialHash) {
     log.info(`${serviceName}[${getIssuerCredentialStatus.name}] -----> Credential status getted`)
     return status
   }
-  catch(errror) {
+  catch(error) {
     log.error(`${serviceName}[${getIssuerCredentialStatus.name}] -----> ${error}`)
     throw error
   }
@@ -438,10 +474,11 @@ async function createPresentationRequest(requestData) {
     log.info(`${serviceName}[${createPresentationRequest.name}] -----> IN ...`)
     const currentDate = Math.floor(Date.now());
     const expDate = currentDate + 86400000;
-    let jti = `Alastria/request/${Math.random().toString()}`
-    let objectRequest = tokenHelper.createPresentationRequest(myConfig.entityDID, myConfig.entityDID, myConfig.context,
-                                                                   myConfig.context[0], `0x${myConfig.procHash}`, requestData,
-                                                                   `${myConfig.callbackUrl}alastria/presentation`,expDate, currentDate, jti)
+    let jti = `Alastria/request/${SecureRandom(5)}`
+
+    let objectRequest = tokenHelper.createPresentationRequest(myConfig.entityDID, myConfig.context, myConfig.procUrl, `0x${myConfig.procHash}`, requestData,
+                                                              `${myConfig.callbackUrl}alastria/presentation`, myConfig.typePresentation, myConfig.entityDID, 
+                                                              myConfig.entityPublicKey, expDate, currentDate, jti)
     let presentationRequest = tokenHelper.signJWT(objectRequest, myConfig.entityPrivateKey)
     let objectPresentationRequest = {
       jwt: presentationRequest

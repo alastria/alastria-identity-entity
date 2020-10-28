@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { environment } from './../../../../environments/environment';
 import { DeviceDetectorService } from 'ngx-device-detector';
@@ -7,11 +6,11 @@ import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 // COMPONENTS
 import { CreateAlastriaIdComponent } from '../../common/create-alastria-id/create-alastria-id.component';
 import { UserFormComponent } from 'src/app/components/common/user-form/user-form.component';
+import { ModalRevokeCredentialsComponent } from 'src/app/components/common/modal-revoke-credentials/modal-revoke-credentials.component';
 
 // SERVICES
 import { UserService } from 'src/app/services/user/user.service';
 import { SocketService } from 'src/app/services/socket/socket.service';
-import { AlastriaLibService } from 'src/app/services/alastria-lib/alastria-lib.service';
 import { EntityService } from 'src/app/services/entity/entity.service'
 
 // MODELS
@@ -20,7 +19,6 @@ import { ResultModal } from './../../../models/result-modal/result-modal';
 import { Event } from 'src/app/models/enums/enums.model';
 
 declare var $: any;
-const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
 
 @Component({
   selector: 'app-profile',
@@ -40,6 +38,7 @@ const alastriaLibJsonUrl = '../../../assets/alastria-lib.json';
 export class ProfileComponent implements OnInit {
   private subscription: Subscription = new Subscription();
   @ViewChild(CreateAlastriaIdComponent) createAlastriaIdComponent: CreateAlastriaIdComponent;
+  @ViewChild(ModalRevokeCredentialsComponent) revokeCredentialComponent: ModalRevokeCredentialsComponent;
   @ViewChild(UserFormComponent) userFormComponent: UserFormComponent;
   user: User;
   isDesktop: boolean;
@@ -149,6 +148,9 @@ export class ProfileComponent implements OnInit {
         break;
       case 'Fill your AlastriaID profile':
         this.fillYourProfile();
+        break;
+      case 'Revoke profile data':
+        this.revokeCredentials();
         break;
       case 'Alastria ID':
         $('#modalCreateAlastriaId').modal('show');
@@ -262,6 +264,15 @@ export class ProfileComponent implements OnInit {
     $('#simpleModal').modal('show');
   }
 
+  async handleRevokeCredentials(profileFields: Array<string>) {
+    let revoked = await this.entityService.revokeCredentials(profileFields)
+    console.log(revoked)
+    let user = this.userService.getUserLoggedIn()
+    await this.userService.getCredentialsDB(user.did)
+    await $('#modalRevokeCredentials').modal('hide');
+    this.revokeCredentialComponent.init();
+  }
+
   private async sendAlastriaTokenToApp() {
     const alastriaToken = await this.createAlastriaToken();
     const message = {
@@ -296,23 +307,37 @@ export class ProfileComponent implements OnInit {
     }
   }
 
-  private addOptionInMenu() {
+  private async addOptionInMenu() {
     const titleOptionFill = 'Fill your AlastriaID profile';
-
     if (this.user.vinculated && !this.optionsMenu.includes(titleOptionFill)) {
       this.optionsMenu.splice(this.optionsMenu.length - 1, 1);
       this.optionsMenu.push(titleOptionFill);
     }
-
+    
     const titleOptionCreate = 'Create Alastria ID';
     if (!this.isDesktop && this.optionsMenu.includes('Alastria ID')) {
       this.optionsMenu.splice(this.optionsMenu.length - 1, 1);
       this.optionsMenu.push(titleOptionCreate);
     }
+
+    this.user = this.userService.getUserLoggedIn();
+    let credentials = await this.userService.getCredentialsDB(this.user.did);
+    const titleOptionRevoke = 'Revoke profile data';
+    if (credentials.length > 0) {
+      this.optionsMenu.splice(this.optionsMenu.length - 1, 1);-
+      this.optionsMenu.push(titleOptionFill);
+      this.optionsMenu.push(titleOptionRevoke);
+    }
+
+  }
+
+  private async revokeCredentials() {
+    $('#modalRevokeCredentials').modal('show');
   }
 
   private fillYourProfile(): void {
     $('#modalFillProfile').modal('show');
+    this.revokeCredentialComponent.init();
   }
 
   /**

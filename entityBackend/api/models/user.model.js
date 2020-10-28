@@ -17,6 +17,7 @@ const ObjectId = require('mongodb').ObjectID
 const mongoDatabase = myConfig.mongo.dbName
 const userCollection = myConfig.mongo.collectionUser
 const collectionData = myConfig.mongo.collectionData
+const credentialsCollection = myConfig.mongo.collectionCredentials
 
 /////////////////////////////////////////////////////////
 ///////               MODULE EXPORTS              ///////
@@ -26,6 +27,9 @@ module.exports = {
   login,
   createUser,
   updateUser,
+  updateGivedRevoked,
+  getCredentials,
+  getCredentialBypsmHash,
   getUser,
   getCredentialIdentityCatalog,
   checkAuth,
@@ -102,8 +106,9 @@ async function createUser(params) {
       address: params.address,
       password: params.password,
       did: params.did,
-      vinculated: (params.vinculated == null) ? false : params.vinculated,
-      titleLegalBlockchain: myConfig.title
+      titleLegalBlockchain: myConfig.title,
+      credentialsGived: [],
+      revoked : []
     }
     let db = connected.db(mongoDatabase)
     await db.collection(userCollection).insertOne(userData)
@@ -134,7 +139,7 @@ async function updateUser(params) {
       email: ((params.email == null) || (params.email == undefined)) ? user.userData.email : params.email,
       address: ((params.address == null) || (params.address == undefined)) ? user.userData.address : params.address,
       did: ((params.did == null) || (params.did == undefined)) ? user.userData.did : params.did,
-      vinculated: ((params.vinculated == null) || (params.vinculated == undefined)) ? user.userData.vinculated : params.vinculated,
+      vinculated: ((params.vinculated == null) || (params.vinculated == undefined)) ? user.userData.vinculated : params.vinculated
     }
     if(params.password) {
       update.password = params.password
@@ -157,6 +162,75 @@ async function updateUser(params) {
   }
 }
 
+async function getCredentials(did) {
+  try {
+    log.info(`${moduleName}[${getCredentials.name}] -----> IN...`)
+    let connected = await mongoHelper.connect(myConfig.mongo)
+    let db = connected.db(mongoDatabase)
+    let credentials = await db.collection(credentialsCollection).find(({"did": did})).toArray()
+    if(credentials == null) {
+      let error = 'Credentials not found'
+      log.error(`${moduleName}[${getCredentials.name}] -----> ${error}`)
+      throw error
+    }
+    log.info(`${moduleName}[${getCredentials.name}] -----> Credentials getted`)
+    return credentials
+  }
+  catch(error) {
+    log.error(`${moduleName}[${getCredentials.name}] -----> Error: ${error}`)
+    throw error
+  }
+}
+
+async function getCredentialBypsmHash(psmHash) {
+  try {
+    log.info(`${moduleName}[${getCredentialBypsmHash.name}] -----> IN...`)
+    let connected = await mongoHelper.connect(myConfig.mongo)
+    let db = connected.db(mongoDatabase)
+    let user = await db.collection(credentialsCollection).findOne({"psmHash": psmHash})
+    if(user == null) {
+      let error = 'User not found'
+      log.error(`${moduleName}[${getCredentialBypsmHash.name}] -----> ${error}`)
+      throw error
+    }
+    log.info(`${moduleName}[${getCredentialBypsmHash.name}] -----> User getted`)
+    return user
+  }
+  catch(error) {
+    log.error(`${moduleName}[${getCredentialBypsmHash.name}] -----> Error: ${error}`)
+    throw error
+  }
+}
+
+async function updateGivedRevoked(params) {
+  try {
+    log.info(`${moduleName}[${updateGivedRevoked.name}] -----> IN...`)
+    let updated
+    let connected = await mongoHelper.connect(myConfig.mongo)
+    let db = connected.db(mongoDatabase)
+    let id = (params._id) ? params._id : params.id
+    let fieldToUpdate = (params['credentialsGived'] !== undefined) ? "credentialsGived" : "revoked"
+    let insert = {
+      did: id,
+      field_name: params[fieldToUpdate].value,
+      psmHash: params[fieldToUpdate].psmHash,
+      revoked: false
+    }
+    if(fieldToUpdate === "credentialsGived") {
+      updated = await db.collection(credentialsCollection).insertOne(insert)
+      log.info(`${moduleName}[${updateGivedRevoked.name}] -----> Updated Gived Credential`)
+    } else {
+      updated = await db.collection(credentialsCollection).updateOne({"did": id, "psmHash": params.revoked.psmHash},{"$set": {"revoked": params.revoked.status}})
+      log.info(`${moduleName}[${updateGivedRevoked.name}] -----> Updated Revoke Credential`)
+    }
+    return
+  }
+  catch(error) {
+    log.error(`${moduleName}[${updateGivedRevoked.name}] -----> Error: ${error}`)
+    throw error
+  }
+}
+
 async function getUser(id) {
   try {
     log.info(`${moduleName}[${getUser.name}] -----> IN...`)
@@ -170,7 +244,6 @@ async function getUser(id) {
       connected.close()
       throw error
     } else {
-      log.info(`${moduleName}[${getUser.name}] -----> Data obtained`)
       let loged = await login(user)
       log.info(`${moduleName}[${getUser.name}] -----> User data getted`)
       connected.close()

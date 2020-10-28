@@ -221,6 +221,34 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /user/credential:
+    x-swagger-router-controller: user.controller
+    get:
+      description: Get available credentials catalog from an issuer
+      operationId: getCredentials
+      parameters:
+        - name: identityDID
+          in: query
+          type: string
+          description: Identity to find the credential catalog
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/credentialCatalogList"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Address not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /user/credential/{identityDID}:
     x-swagger-router-controller: user.controller
     get:
@@ -954,12 +982,14 @@ definitions:
       credentialFormat:
         type: object
   credentialStatusData:
-    type: object
-    properties:
-      status:
-        type: integer
-      credentialHash:
-        type: string
+    type: array
+    items:
+      type: object
+      properties:
+        status:
+          type: integer
+        credentialHash:
+          type: string
   presentationRequestData:
     type: array
     items:

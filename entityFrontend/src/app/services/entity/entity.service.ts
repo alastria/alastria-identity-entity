@@ -134,4 +134,22 @@ export class EntityService {
         throw error;
       });
   }
+
+  revokeCredentials(credentials: any): any {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json',
+        'Authorization': this.auth
+      })
+    };
+    return this.http.post(`${this.apiUrl}/${this.path}/alastria/credential/status/issuer`, credentials, httpOptions).toPromise()
+      .then((res) => {
+        console.log('res --> ', res);
+        return res;
+      })
+      .catch((error: any) => {
+        throw error;
+      });
+    
+  }
 }
