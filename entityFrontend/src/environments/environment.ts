@@ -5,10 +5,11 @@
 export const environment = {
   production: false,
   apiUrl: 'http://localhost:10010/v1',
-  websocketUrl: 'ws://localhost:8080',
+  // websocketUrl: 'ws://localhost:8080', // deployed runing npm run start
+  websocketUrl: 'ws://localhost:10011', // deployed with docker
   entityName: '[Entity]',
   callbackUrl: 'http://localhost:10010/v1',
-  authToken: "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlbnRpdHlJc3N1ZXIiLCJpYXQiOjE1ODczNjc3MjcsImV4cCI6MTYxODkwMzcyNywiYXVkIjoiRXhhbXBsZSBhdXRob3JpemF0aW9uIFRva2VuIiwic3ViIjoiaWRlbnRpdHlTdWJqZWN0In0.zujXluegmpfzWLqoFECL_X6h8gaRIHkQrg5kh9fvSyg"
+  authToken: "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBbGFzdHJpYSIsImlhdCI6MTYzMjMyNjIxMSwiZXhwIjoxNjYzODYyMjAxLCJhdWQiOiJ3d3cuZXhhbXBsZS5jb20iLCJzdWIiOiJqcm9ja2V0QGV4YW1wbGUuY29tIn0.K6NWppQSBXfn4mub9za62qACfHRyRMYdz5o-KFBj_fM"
 };
 
 /*
