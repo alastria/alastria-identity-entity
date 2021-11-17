@@ -9,7 +9,7 @@
   "main": "app.js",
   "dependencies": {
     "alastria-identity-lib": "github:alastria/alastria-identity-lib",
-    "axios": "0.19.2",
+    "axios": "0.21.2",
     "cors": "2.8.3",
     "eth-crypto": "1.5.2",
     "express": "4.17.1",
@@ -17,7 +17,7 @@
     "log4js": "6.1.0",
     "mongodb": "3.5.1",
     "secure-random": "1.1.2",
-    "socket.io": "2.3.0",
+    "socket.io": "2.4.0",
     "swagger-express-mw": "0.1.0"
   },
   "devDependencies": {
