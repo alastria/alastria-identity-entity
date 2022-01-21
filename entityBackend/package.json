@@ -14,7 +14,7 @@
     "eth-crypto": "1.5.2",
     "express": "4.17.1",
     "jsonwebtoken": "8.5.1",
-    "log4js": "6.1.0",
+    "log4js": "6.4.0",
     "mongodb": "3.5.1",
     "secure-random": "1.1.2",
     "socket.io": "2.3.0",
