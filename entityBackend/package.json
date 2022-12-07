@@ -12,17 +12,17 @@
     "axios": "0.19.2",
     "cors": "2.8.3",
     "eth-crypto": "1.5.2",
-    "express": "4.17.1",
+    "express": "4.18.2",
     "jsonwebtoken": "8.5.1",
     "log4js": "6.1.0",
     "mongodb": "3.5.1",
     "secure-random": "1.1.2",
     "socket.io": "2.3.0",
-    "swagger-express-mw": "0.1.0"
+    "swagger-express-mw": "0.7.0"
   },
   "devDependencies": {
     "should": "7.1.0",
-    "supertest": "1.0.0",
+    "supertest": "6.3.2",
     "load-json-file": "5.2.0"
   },
   "scripts": {
